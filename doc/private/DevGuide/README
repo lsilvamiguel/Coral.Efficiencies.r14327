@@ -1,0 +1,24 @@
+$Id: README,v 1.2 1999/09/14 10:00:03 aimar Exp $
+
+To Generate the HTML version do:
+
+- create sub directory
+
+         html
+
+- Save As HTML in the File menu
+
+	 choose the directory  html
+  	 file name             DevGuide.html
+
+- run some changes to adapt the html files.
+
+         gen_html.sh
+  
+- check if you like the 
+
+         html/welcome.html web
+
+- publish the web running
+
+         publish_html.sh

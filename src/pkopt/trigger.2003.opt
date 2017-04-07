@@ -1,0 +1,49 @@
+// scalers used for beam flux measurement
+FluxScalers SCFI02X1 SCFI02X2 SCFI02X3 SCFI02Y1 SCFI02Y2 SCFI02Y3
+
+// the information which serve for muon track identification.
+// Gives detectors which work in coinsidence.
+
+Trigger  det  HI04X1_d  HI05X1_d
+Trigger  det  HI04X1_u  HI05X1_u
+
+Trigger  det  HL04X1_m  HL05X1_m
+
+Trigger  det  HM04X1_d  HM05X1_d  HM04Y1_d  HM05Y1_d
+Trigger  det  HM04X1_u  HM05X1_u  HM04Y1_u  HM05Y1_u
+
+Trigger  det  HO03Y1_m  HO04Y1_m
+Trigger  det  HO03Y1_m  HO04Y2_m
+
+// Correspondance between hodoscope name (second letter) and trigger mask.
+// Mask can not be "0".
+
+//             name  mask
+Trigger mask	I	1
+Trigger mask	M	2
+Trigger mask	L	4
+Trigger mask	O	8
+Trigger mask	M	256
+Trigger mask	C	16
+Trigger mask	O	512
+Trigger mask	O	1024
+
+Trigger MW1_ID	7fffff	// Hexa, all trigs = 23 possible triggers, dixit Juergen
+ 
+
+// if hodoscopes are used in tracking and last point of track is
+// downstream of fired hodoscope such track is rejected from 
+// mu' candidates.
+
+Trigger  tracking   1   // 0-hodos not in tracking, 1-hodos in tracking
+
+// if time of cluster is inside of ClrTime window such cluster
+// is considered as beloned to trigger track.
+Trigger  ClrTime    9   // in ns. If 0 - no check
+
+// If 'on' check on trigger matrix is performed.
+Trigger  Matix      1   // 0 - Off, 1 - ON
+
+Trigger  Print      0   // 0 - Off, 1 - ON
+
+Trigger  Hist       1   // 0 - Off, 1 - ON

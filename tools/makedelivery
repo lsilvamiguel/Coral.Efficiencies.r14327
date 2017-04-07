@@ -1,0 +1,122 @@
+#!/bin/sh
+#
+# Script to delivery a Coral release.
+# 1999/xx/xx V0.0 Benigno Gobbo - first release
+# 1999/xx/xx V1.0 Benigno Gobbo - added file exclusions
+# 2000/05/16 V2.0 Benigno Gobbo - added automatic version retrieve 
+# 2000/05/25 V2.1 Benigno Gobbo - links in lib/$PLATF 
+# 2000/06/26 V2.2 Benigno Gobbo - 
+
+# --- variables
+#echo -n "What Coral Version? "
+#read version
+#!/bin/sh
+
+if [ -z ${CORAL} ]
+then
+  echo "CORAL environment not defined. Please set it an re-run me..."
+  exit 1
+fi
+
+if [ -r ${CORAL}/src/base/CoralRelease.h ]
+then
+  MAJOR=`awk '/CORAL_MAJOR_RELEASE/ {printf "%d", substr($3,2) }' ${CORAL}/src/base/CoralRelease.h`
+  MINOR=`awk '/CORAL_MINOR_RELEASE/ {printf "%d", substr($3,2) }' ${CORAL}/src/base/CoralRelease.h`
+  BUILD=`awk '/CORAL_BUILD/ {printf "%d", substr($3,2) }' ${CORAL}/src/base/CoralRelease.h`
+else
+  echo "No CoralRelease.h file. Exit."
+  exit 1;
+fi
+
+version=${MAJOR}.${MINOR}.${BUILD}
+
+echo -n "Is ${version} correct [y/n]? "
+read YENO
+if [ "$YENO" != "y" ]
+then
+  echo "OK, no action taken..."
+  exit 0
+fi
+
+#
+here=`pwd`
+#today=`date '+%Y%m%d' | awk '{printf "%s",$1 }'`
+deldir=/afs/cern.ch/compass/delivery/coral
+#dest=$deldir/$version-$today
+dest=$deldir/$version
+dirlist="lib include makefiles"
+
+# --- compilation step
+echo ">>> Making libs in $CORAL/src"
+cd $CORAL/src
+gmake install
+
+# --- installation
+if [ ! -d $dest ] 
+then
+  mkdir $dest
+fi
+echo -n "Replace links for dev [y/n]? "
+read YeNo
+if [ "$YeNo" = "y" ]
+then
+  cd $deldir
+  rm dev
+  ln -s $version dev
+fi
+
+#echo ">>> Set the list of files to be excluded"
+#DIRTAGS="Linux Solaris HP-UX OSF1 HP-UX AIX CVS"
+#EXCLUDEFILE=${CORAL}/tools/tar-exclude-list
+#rm -fr $EXCLUDEFILE
+#for DIRTAG in $DIRTAGS
+#do
+#  LIST=`find ${CORAL}/src -name "$DIRTAG"`
+#  for DIR in $LIST
+#  do
+#    find $DIR -name "*" | sed s:${CORAL}/src/::g >> ${CORAL}/tools/tar-exclude-list
+#  done
+#done
+
+#for dir in $dirlist
+#do
+
+#  echo ">>> Installing files in $dest/$dir"
+#  if [ "$dir" = "src" ]
+#  then
+#    cd $CORAL/$dir ; tar cf - -X $EXCLUDEFILE . | ( cd $dest/$dir ; tar xf - )
+#  else
+#    cd $CORAL/$dir ; tar cf - --exclude CVS . | ( cd $dest/$dir ; tar xf - )
+#  fi
+#done
+
+echo ">>> Installing files in $dest/lib"
+cd $dest ; mkdir lib 
+cp -r $CORAL/lib $dest
+
+echo ">>> Installing files in $dest/makefiles"
+mkdir makefiles
+cp $CORAL/makefiles/*.mk $dest/makefiles
+
+echo ">>> Installing files in $dest/include"
+mkdir include
+cp $CORAL/include/*.h $dest/include
+
+cp $CORAL/setup.csh $dest/
+cp $CORAL/setup.sh $dest/
+
+# --- make links in include 
+#echo ">>> Making links in $dest/include"
+#CORAL=$dest
+#cd $dest/src
+#gmake include
+
+# --- make links in lib
+#echo ">>> Making links in $dest/lib"
+#CORAL=$dest
+#cd $dest/src
+#gmake install
+
+#rm -fr $EXCLUDEFILE
+echo ">>> That's all, changing directory to $here"
+cd $here

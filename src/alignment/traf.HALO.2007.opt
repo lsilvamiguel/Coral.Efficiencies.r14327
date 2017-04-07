@@ -1,0 +1,228 @@
+// $Id: traf.HALO.2007.opt,v 1.2 2008/03/25 17:16:36 ybedfer Exp $
+
+// coral options file for "HALO alignment", i.e. align beam telescope w/ HALO tracks.
+
+// - By default, the file is valid for:
+//   - 2007,
+//   - longitudinal setup.
+// - Alternative entries are provided for the other cases, commented out by
+//  default and to be commented back in if need be.
+//   - For the transverse case, these concern the specification of the target
+//    field map and that of the extent of the reconstruction zone.
+//   - For the data taking year:
+//       - Almost everything is dealt w/ by a reference to a ``bare'' version of
+//        the main options file for TraFDic reco, taken from the "./user"
+//        directory, simplified and copied to this (alignment) directory:
+//               "./trafdic.<year>.bare.opt". 
+//       - Except for the list of detectors to be excluded from tracking.
+// - The case of the detector table ("detectors.dat"), and corresponding dico,
+//  is special: since what one has in view is to tune the table's parameter, an
+//  explicit reference to the file containing the initial parameters is to be
+//  given, instead of the traditional reference to a directory.
+
+// This file is therefore to be modified by:
+//   I)  Specifying input data one wants to process instead of the default
+//  II)  Setting accordingly:
+//     i) Target field map (either solenoid or dipole)
+//    ii) Zone extension: upstream of target (longitudinal case) or not.
+//   iii) "./trafdic.<year>.bare.opt" options file.
+// III)  Specifying detector table.
+//  IV)  Setting options specific to alignment:
+//     i) Name of detectors to be excluded from tracking. Those to be excluded
+//       for the purpose of alignment have to be added to the, year-dependent,
+//       list of detectors to be excluded in any case. Typically these are
+//       detectors liable to upset the field off, momentum-less, reco, like
+//       those downstream of muon walls.
+//    ii) Criteria for selecting tracks to be written to output TTree (chi2
+//       cut, ...)
+
+// Tip: Set your "emacs" in "c++-mode" to view this ".opt" file. And have this
+//     done automatically by setting the appropriate hook in your "~/.emacs.el"
+//     init file, cf. "~ybedfer/.emacs.el".
+
+//     ********** Reference to options file for TraFDic reco **********
+//include 	${CORAL}/trafdic.2002.bare.opt
+//include 	${CORAL}/trafdic.2003.bare.opt
+//include 	${CORAL}/src/alignment/trafdic.2004.bare.opt
+//include 	${CORAL}/src/alignment/trafdic.2006.bare.opt
+include 	${CORAL}/src/alignment/trafdic.2007.bare.opt
+
+//					   ***** HISTOGRAMMING
+histograms package ROOT
+
+histograms	home	~/w0/csub/traf.HALO6.64286.root
+//histograms	home	~/w0/csub/traf.HALO6.64299.root
+
+
+//					   ***** INPUT DATA...
+Data job
+
+//						...either raw file
+Data file	/castor/cern.ch/compass/data/2007/raw/W30/cdr27002-64286.raw
+//Data file	/castor/cern.ch/compass/data/2007/raw/W30/cdr27002-64299.raw
+
+//						...or retrieved from oracle DB
+//Data type raw
+//Database select oracle
+
+//Data year 2006
+//Data run select 49966
+//Data container cdr22001-49966
+
+//					   ***** EVENT SELECTION
+events to read 40000 	// # of evts to read or file name of evt#'s (evt# = spill#<<16|evt#_in_spill)
+//events to skip 113//10486973
+selection trigger mask 10f		// Trigger selection (hexadecimal): excluding pure calo and pure high-Q^2 trigger, which jitter times are large
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+// In case of transverse data: uncomment following entry:
+//CsField SOL_field	 $COMPASS_FILES/maps/mag_fields/SOL/OD_dipole.fieldmap
+
+//					   ***** MAGNETs INFO
+CsMagInfo SM2 0 	// ==0: Do NOT use NMR, !=0: Rescaling factor (applied to NMR corrected map)
+//CsMagInfo Update solenoid		// To be enabled during target rotation
+
+
+//					   ***** LOGGER
+error logger log level error 	// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level none
+error logger verbosity normal 	// low, normal, high. 
+
+//                 STRAW options: X-ray and signal propagation correction
+// NOTA BENE: A unique entry for all "STRAW settings".
+STRAW settings spacers=YES signal_propagation=YES
+
+//	********** OVERWRITE WHAT'S IN "../pkopt/trafdic.????.opt"... **********
+// (Note: the reference to the "../pkopt/trafdic.????.opt" in embedded in the
+// "./trafdic.????.bare.opt" referenced supra.)
+
+//	 	 ...SETTINGS SPECIFIC to ALIGNMENT
+
+//  Correction for propagation time (as well as X-ray correction or else in
+// drifts): the corrections have to be ported to coral's CsClusters (and then on
+// to the output TTree) => Set bit 0x4 of the bit pattern
+//  Note: In the newest (as of 2008/03) realease of "./pkopt/trafdic.2007.opt",
+//       this setting is already implemented. 
+TraF	ReMode	[29]	7	// Propagation+X-ray+latency correction in Drifts (&1: Pattern Recognotion, &2: Fit, &4: Modify CsClusters)	(TEv::FitSegments,BackTrackZ1,ForeTrack2RICHWall,TracksFit2,TracksRefit)
+
+// 					   ***** DETECTOR TABLE...
+// (Not necessarily the one retrieved from the official directory by automatic
+// search, which may not be the most appropriate starting point.)
+//detector	table	/afs/cern.ch/compass/detector/geometry/2007/
+detector	table	$COMPASS_FILES/geometry/2007/detectors.64268.1T.plus.dat
+//detector	table	$COMPASS_FILES/geometry/2007/detectors.64295.1T.minus.dat
+// Corresponding dico file
+TraF	Dicofit	$COMPASS_FILES/geometry/2007/dico/dico.64268.plus
+//TraF	Dicofit	$COMPASS_FILES/geometry/2007/dico/dico.64295.minus
+
+//	 	 ...Otherwise
+//TraF	Graph	[6]	1		// For INTERACTIVE coral w/o graphics
+//TraF	iCut	[0]	7		// Trigger selection in TraFDic
+//TraF	Print	[0]	3		// Event-by-event numbering
+TraF	Print	[3]	3		// Event-by-event numbering
+//TraF	Print	[8]	3		// EoE
+
+// 					   ***** SMOOTHED HELICES (Cf. SPECIFIC for HALO)
+
+//	********** OPTIONS SPECIFIC to ALIGNMENT **********
+main do alignment	// Book/fill alignment TTree
+main magnets	on	// (on|off) default is off
+// Upper limit on the chi2/NDF of selected tracks:
+//  One has to make a trade-off between too loose a selection cut that would let
+// through ghost tracks that might upset the minimisation and too tight a one
+// that might bias the alignment by restricting it to the sub-region of phase
+// space where the initial alignment is already good enough. For the particular
+// case of the HALO (i.e. scifi/Si telescope) alignment, the following remarks
+// hold:
+//  - Beam tracks (even when one includes their continuation into the
+//   spectrometer, as is here the case) tend to have a much better chi2 than
+//   the rest.
+//  - At the time when one performs the HALO alignment, the spectrometer's (as
+//   opposed to the scifi/Si telescope's) detectors are expected to be already
+//   aligned.
+// Therefore, even when one makes for the fact that the scifi/Si detectors are
+// yet to be aligned, an upper limit on tracks chi2 of 15*NDF seems reasonable.
+// NOTA BENE: In case the starting file is badly scifi/Si aligned, one would
+//           have to realax the 2 cuts infra.
+TraF	dCut	[ 2]	10	// Chi2 cut for scifi/Si segment	(TEv::PrePattern2)
+main chi2 cut	15	// Cut on chi2/NDF for the entire halo track.
+main require	cop	// Keep only track with momentum. (Note that this is supplemented in "./align.HALO.opt" by a requirement on the reconstruction zones spanned by the tracks.)  
+
+
+// DETECTORS OPTIONS: SPECIAL SETTING for catching OFF-TIME tracks
+FI01X1__ HitTime [0-1]	5	15
+FI01Y1__ HitTime [0-1]	5	15
+FI02X1__ HitTime [0-1]	5	15
+FI02Y1__ HitTime [0-1]	5	15
+FI03X1__ HitTime [0-1]	5	15
+FI03Y1__ HitTime [0-1]	5	15
+FI03U1__ HitTime [0-1]	5	15
+FI04X1__ HitTime [0-1]	5	15
+FI04Y1__ HitTime [0-1]	5	15
+FI04U1__ HitTime [0-1]	5	15
+FI05X1__ HitTime [0-1]	5	15
+FI05Y1__ HitTime [0-1]	5	15
+FI55X1__ HitTime [0-1]	5	15
+FI55Y1__ HitTime [0-1]	5	15
+FI06X1__ HitTime [0-1]	5	15
+FI06Y1__ HitTime [0-1]	5	15
+FI06V1__ HitTime [0-1]	5	15
+FI07X1__ HitTime [0-1]	5	15
+FI07Y1__ HitTime [0-1]	5	15
+FI08X1__ HitTime [0-1]	5	15
+FI08Y1__ HitTime [0-1]	5	15
+
+// mM Clusterisation cuts (Hit time cuts are made dyssymmetric (whereas cluster time cuts are symmetric) on purpose => optimum reco efficiency)
+MM	 HitTime     [0-1]	-40	71	// Template (corresponds to Res. ~= 9.3 ns, i.e. average measured on MM03)
+MM	 ClusterTime [0-1]	-35	55
+// Special case of 2/3V: the window is made tighter, in order to give a
+// disadvantage to off-time tracks.
+//MM02V  ClusterTime [0-1]	-32	32	// Template for special case of 2/3V
+MM01V1__ HitTime     [0-1]	-57	92	// Res. = 12.5 ns
+MM01V1__ ClusterTime [0-1]	-50	70
+MM01U1__ HitTime     [0-1]	-61	97	// Res. = 13.2 ns
+MM01U1__ ClusterTime [0-1]	-54	74
+MM01X1__ HitTime     [0-1]	-65    101	// Res. = 13.9 ns
+MM01X1__ ClusterTime [0-1]	-57	77
+MM01Y1__ HitTime     [0-1]	-59	95	// Res. = 12.9 ns
+MM01Y1__ ClusterTime [0-1]	-52	72
+MM02V1__ HitTime     [0-1]	-39	70	// Res. =  9.2 ns
+MM02V1__ ClusterTime [0-1]	-22	42
+MM02U1__ HitTime     [0-1]	-64    101	// Res. = 13.8 ns
+MM02U1__ ClusterTime [0-1]	-57	77
+MM02X1__ HitTime     [0-1]	-41	72	// Res. =  9.4 ns
+MM02X1__ ClusterTime [0-1]	-35	55
+MM02Y1__ HitTime     [0-1]	-65    102	// Res. = 14.0 ns
+MM02Y1__ ClusterTime [0-1]	-58	78
+MM02Y1__ HitTime     [0-1]	-44     76	// Res. = 10.0 ns
+MM02Y1__ ClusterTime [0-1]	-38	58
+MM03V1__ ClusterTime [0-1]	-22	42
+
+TraF	dCut	[77-78]	8 15	// SI time cuts for "cind" case: #sigmas, absolute time (ns).	(TEv::ImportClusters)
+TraF	dCut	[80]	10	// SI offset (Mainly used to catch off-time tracks in alignment procedure. Could also make for T0 mis-calibration.)	(TEv::ImportClusters)
+
+//  List of detectors excluded from tracking (and hence, from alignment): the
+// list consists of 3 sets:
+//   i) Detectors excluded from standard tracking, which depend upon each data
+//     taking year.
+//      E.g. particular SI plane that would happen to be out of order
+//  ii) Detectors excluded from the alignment procedure, because they would be
+//     difficult to align, given their crude ganularity and or their low
+//     sampling rate, etc...
+//     (Note that whether these are indeed valid reasons for excluding them is
+//     debatable...)
+// iii) Detectors useless for halo reconstruction => All detectors but fibers,
+//     silicons and downstream GEMs are off
+TraF	DetNameOff	V	BM	M	D	ST	P	H	GM01	GM02	GM03	GM04	GM05	GM06
+TraF	dCut	[67]	0	// No ForeTrack to RICHWall (since it's turned off)	(TEv::TracksFit2)
+TraF	ReMode	[17]	0	// NO GEM correlations
+TraF	ReMode	[32]	0	// No ForeTrack to MAs (since MAs are turned off)	(TEv::TracksFit2)
+
+//=== Enable bridging over target
+TraF	ReMode	[26]	1
+
+//=== Smoothed helices for extrapolations
+TraF	SmoothPos [0]	-300.	
+TraF	SmoothPos [1]	-600.	
+
+//end

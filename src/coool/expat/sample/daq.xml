@@ -1,0 +1,50 @@
+<map version="0.1">
+<!-- comment -->
+
+<catch id="128">
+        <port id="0">
+                plane   16
+                order   0
+        </port>
+
+        <port id="4">
+                plane   16
+                order   1
+        </port>
+
+        <port id="8">
+                plane   16
+                order   2
+        </port>
+
+        <port id="12">
+                plane   17
+                order   0
+        </port>
+        
+</catch>
+
+<DetID name="aaa" chip="ChipF1">
+        <catch id="1" t="q">
+        </catch>
+
+        <formula name="f">
+           void f(
+        </formula>
+</DetID>
+
+<DetID name="ECAL1">
+        <catch SrcID="">
+        </catch>
+</DetID>
+
+
+<DetID name="SciFib">
+        <!-- plane     channels         -->
+        <plane id="16" special="0" channels="96" trig="sf2h" center="-8400" width="350"></plane>
+</DetID>
+
+</map>
+
+
+<!-- We can add detector position here also! -->

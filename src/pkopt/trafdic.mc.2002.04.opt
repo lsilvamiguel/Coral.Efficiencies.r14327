@@ -1,0 +1,399 @@
+// $Id: trafdic.mc.2002.04.opt 13199 2012-01-13 16:56:38Z suhl $
+
+// TraFDic options for MC CG,v7.1.2002.04
+
+// N.B.: Inefficiencies AND pessimistic drift resolutions
+
+// From ./trafdic.mc.2002.03.opt,v1.23
+// Modified to have ".04" geometry and material maps. Same dico (for
+// differences between ".03" and ".04" probably concerns detectors
+// ouside the dictionary, like, e.g., ST04)
+// $Log: trafdic.mc.2002.04.opt,v $
+// Revision 1.10  2007/03/13 07:05:06  ybedfer
+//  - Straws "DeadTime": 30 ns only for the 6 mm straws.
+//  - GEMs association: "GM" -> "GEM", in line w/ new "CsGeom.cc".
+//  - Pattern of PR iterations where enhanced scifis.
+//
+// Revision 1.8  2006/11/15 04:04:09  ybedfer
+//  - New "TraF" entries:
+//    - Booking smoothed pulls histos ("Hist[3]").
+//    - Pattern of zones where enlarged drift routes ("iCut[27]").
+//  - New set of "TraF" entries for "ForeTrack2RICHWall", reproducing
+//   previous built-in values: "dCut[70]" = min. momentum , "iCut [25]" =
+//   max. #hits/plane (w/ in fact a small increase w.r.t. previous).
+//  - Extra "iPRpar's", for max. # of common hits in proj. search,
+//   reproducing the values formerly supplied for both proj. and space
+//   search, except for zone 0x1. (N.B.: there is also a diff in the low
+//   momentum forward special case, but built-in's have been (and still are)
+//   used instead of the option entries.)
+//  - Updates (long due) bringing 2002 in line w/ the rest:
+//    - Time spread in the response of MWPCs (thanks to Vadim).
+//    - Beam momentum ("dCut[4]").
+//    - Distance for coalescence: 2 entries, ("dCut[26-27]") for LAS and
+//     SAS resp., instead of one ("[27]").
+//    - Propagation+X-ray+latency correction (in fact only latency (on
+//     off-time tracks) is concerned in the present MC case) enabled.
+//    - Entries for ForeTracking to MAs and Hs ("ReMode[32-33]").
+//    - Entries for enabling cleaning and decoalescing drift hits.
+//  - Cancel GEM correlation (in keeping w/ 2002 RD)
+//  - Event time histo.
+//
+// Revision 1.7  2005/09/04 21:20:25  ybedfer
+//  Newly introduced "iCut[24]" on #hits for relaxing PR requirements in
+// group #3 set = 20 (i.e. no change w.r.t. the previous, built-in, cut).
+//
+// Revision 1.6  2005/07/26 14:05:25  ybedfer
+//  Add "i/dPRpar" entries for PR w/ 2-zone proj search in Z (In line w/
+// what's been done for "mc.2003.01" and "2003").
+//
+// Revision 1.5  2005/07/18 16:10:08  ybedfer
+//  - Add foretracking.
+//  - Enlarged PR routes for scifiSi zone, upon 2nd iteration.
+// (Validated, as a whole, on
+// "/grid/fzk.de/../valexakh/../dstar.160.full_p-up.2002.04.outpipe.fz.1:10")
+//
+// Revision 1.4  2005/06/16 01:24:40  ybedfer
+//  Align w/ "trafdic.mc.2003.01.opt". Validated on gridKa's
+// "~valexakh/../dstar.160.full_p-up.2002.04.outpipe.fz.1:10".
+//
+// Revision 1.3  2004/11/17 02:24:28  ybedfer
+//  - Max chi2 for pickup lowered (dCut[60]).
+//  - Add options for max momentum of fringe-field reco (dCut[66]).
+//  - Paraxial search disabled (code is not yet ready).
+//
+
+
+
+//					   ***** DETECTOR TABLE
+
+//detector table  	/afs/cern.ch/compass/delivery/simevt/testntfz71/detectors.2002.04.reff.dat	// Original Vadim's file
+detector table  	$COMPASS_FILES/geometry/mc/detectors.2002.04.real.dat	// Modifications w.r.t. Vadim's: detector inefficiencies.
+
+//					   ***** MATERIAL MAPS
+// (".m2002.04.map" matching "mgeo" in detector table)
+
+CsMaterialMap Zone_1		$COMPASS_FILES/maps/material/2002.04/material.target.m2002.04.map
+CsMaterialMap Zone_2		$COMPASS_FILES/maps/material/2002.04/material.saclay.m2002.04.map
+CsMaterialMap Zone_3		$COMPASS_FILES/maps/material/2002.04/material.straw.m2002.04.map
+CsMaterialMap Zone_4		$COMPASS_FILES/maps/material/2002.04/material.muf2.m2002.04.map
+CsMaterialMap Zone_5		$COMPASS_FILES/maps/material/2002.04/material.muf3.m2002.04.map
+CsMaterialMap Zone_6		$COMPASS_FILES/maps/material/2002.04/material.hcal1.m2002.04.map
+CsMaterialMap Zone_7		$COMPASS_FILES/maps/material/2002.04/material.muf1.m2002.04.map
+CsMaterialMap Zone_8		$COMPASS_FILES/maps/material/2002.04/material.rich.m2002.04.map
+CsMaterialMap ELossTarget	$COMPASS_FILES/maps/material/2002.04/material.target_de.m2002.04.map
+
+
+//					   ***** DETECTORS OPTIONS
+
+FI HitTime [0-1] -25 35			// SciFi - SIMPLE PRECISION F1 Units
+FI01X1__ HitTime [0-1] -18 23
+FI01Y1__ HitTime [0-1] -18 23
+FI02X1__ HitTime [0-1] -18 23
+FI02Y1__ HitTime [0-1] -18 23
+FI05X1__ HitTime [0-1] -25 40
+FI08X1__ HitTime [0-1] -25 40
+FI08Y1__ HitTime [0-1] -25 40
+PC HitTime [0-1] -250 600		// MWPC -  Hit: F1 units
+PC ClusterTime [0-1] -25 55			// Cluster: ns
+//      space res. (tslice) time slice length (ns)
+PA driftTimeMCDecoding
+PA driftParsMC [0-4] 0.4 1.0 0. 2.0 4.9
+PB driftTimeMCDecoding
+PB driftParsMC [0-4] 0.4 1.0 0. 2.0 4.9
+PS driftTimeMCDecoding
+PS driftParsMC [0-4] 0.4 1.0 0. 2.0 4.9
+
+DC DeadTime  60				// DC dead time ~= ASD8 dead time
+ST DeadTime  60				// Straws dead time ~= max. drift time
+ST03X1ub DeadTime  30
+ST03Y1ub DeadTime  30
+ST03U1ub DeadTime  30
+ST03V1ub DeadTime  30
+ST03Y2ub DeadTime  30
+ST03X2ub DeadTime  30
+ST04V1ub DeadTime  30
+ST04Y1ub DeadTime  30
+ST04X1ub DeadTime  30
+ST03X1db DeadTime  30
+ST03Y1db DeadTime  30
+ST03U1db DeadTime  30
+ST03V1db DeadTime  30
+ST03Y2db DeadTime  30
+ST03X2db DeadTime  30
+ST04V1db DeadTime  30
+ST04Y1db DeadTime  30
+ST04X1db DeadTime  30
+MB DeadTime 300
+DW DeadTime 300
+
+include ${CORAL}/src/pkopt/gem.2002.opt	// GM Clusterisation cuts 
+GM	amplitudeMCDecoding
+// spSig_ detector space resolution (mm) 
+// eGain_ effective gain - should be tuned to reproduce cluster amlitudes   
+// eGSig_ gain sigma (a.u.) for amplitude correlation, for example.
+// sWidth_ signal width (mm) (should be tuned to have correct number of strips/cluster
+// tRes_ time resolution (ns)
+GM	ampParsMC [0-4]	0.07	2500.	100.	0.30	12.
+GM	ampCorrelationMC
+GEM	make associations
+GM	Master		XV
+
+MM HitTime [0-1] -360 440		// mM Clusterisation cuts (Hit time cuts are made dyssymmetric (whereas cluster time cuts are symmetric) on purpose => optimum reco efficiency)
+MM ClusterTime [0-1] -40 40			// Cluster: ns
+MM02V1__ ClusterTime [0-1] -30 30
+MM03V1__ ClusterTime [0-1] -30 30
+
+SI ClusterTime [0] -1			// SI: No time cut (Specific for MC)
+SI ClusteringSelect ratio       // unless amplitude parameters are tuned, simple
+                                // ratio clustering is the only possibility
+
+//					//  ***** MULTI-HIT DECODING (cf. V.A)
+// Multi-hit means
+// a) all drift cells (or tubes) crossed by a track are fired,
+// not only closest to track cell(tube). There is also check on maximal drift 
+// distance, which reproduces geometrical inefficiency for StrawTubes and
+// DriftTubes detectors. 
+// b) more then one digit per wire is allowed , this is regulated
+// by two-hits-resolution parameter in detectors.dat (and later by DeadTime
+// option in clusterization).
+// Nota Bene: (As of 03/02) has method determining whether CsCluster is genuine
+// or mirror run amok.
+DC multiHitMCDecoding
+ST multiHitMCDecoding
+DW multiHitMCDecoding
+MB multiHitMCDecoding
+
+//------------------------------
+//   LR (Left/Right ambiguities)
+//------------------------------
+
+include 	${CORAL}/src/pkopt/lr.2002.opt
+
+
+//------------------------------
+// TRACK RECONSTRUCTION:  TraFDiC
+//  - i.e. variety of TraFFiC code stored in "./src/track/lattice",
+//  - C++ methods referenced infra (being quoted in the comment string appended
+//   to each option entry) are available there (in subdir "sources") and
+//   described in some detail.
+//------------------------------
+
+		/// Event display modes
+
+TraF	Graph [0]	1	// Main graphics switch ( 0 == "Event display is OFF") 
+TraF	Graph [1]	2	// 0 - B/W; 1 - color, hollow; 2 - color, filled
+TraF	Graph [2]	2	// Min Nhits on track to draw
+TraF	Graph [3]	0	// 1 - draw Bz/By, 2 - draw sqrt(By^2+Bz^2), 3 - draw |B|
+TraF	Graph [4]	0	// 1 - hadron setup
+TraF	Graph [5]	0	// 1 - do not draw switched off detectors
+TraF	Graph [6]	0	// if > 0, "step-by-step" event drawing (N.B.: This flag also affects the final chi2 distibution. Even when graphics is disabled!)
+TraF	Graph [7]	-3	// if > 0 "movie" mode with pause in specified number of seconds 
+
+TraF 	DefView	[0-3]	-0.	4800.	-170.	170.	// Default field of view:  gr. 1,2,3,4         
+
+
+TraF	PSdir	./		// Directory for PS files
+
+		/// Histogram switches
+TraF	Hist	[ 0]	1	// if == 0, all Traffic histograms are OFF
+TraF	Hist	[ 1]	5	// MCMonitor (&4:Scat'd mu)
+TraF	Hist	[ 2]	0	// In ImportClusters() (set ReMode[0]=2 before) 
+//TraF	Hist	[ 3]	1	// Smoothed Pulls		(TTrack::Refine)
+TraF	Hist	[ 4]	0	// In TEv::BridgeSegments2()
+
+TraF	Hist	[ 6]	0	// In PrePattern et al.		(TEv::PrePattern2,Quadruples,TAlgo::FindSpace)
+TraF	Hist	[ 7]	0	// In Fore/BackTracking
+TraF	Hist	[ 8]	2047	// Event Time			(TEv::SetEventTime)
+TraF	Hist	[16]	0	// Residuals: |Groups of det's  histo'ed
+TraF	Hist	[17]	14	// Residuals: |Groups of inactive det's histo'ed
+TraF	Hist	[18]	14	// Residuals: &Groups of tracks histo'ed
+//TraF	Hist	[19]	0
+
+		/// Debug printouts
+TraF	Print	[ 0]	1	// Main printout switch (if == 0 - no printing)
+TraF	Print	[ 1]	0	// MC info
+
+TraF	Print	[ 3]	0	// Detectors' info (1 || 2)
+TraF	Print	[ 4]	0	// in TEv::BridgeSegments()
+TraF	Print	[ 5]	0	// in TEv::PrePattern, Algo::FindProj and Algo::FindSpace
+TraF	Print	[ 6]	0	// in THlx::Extrapolate() (Propagation through the material map) 
+TraF	Print	[ 7]	0	// Dico info
+TraF	Print	[ 8]	0	// EoE
+TraF	Print	[ 9]	0	// TEv::OutputMC 
+
+
+		/// Various cuts and parameters
+
+	//double
+TraF	dCut	[ 1]	0.0	// Max field (KGauss) for straight line extrapolation	(THelix::Extrapolate)
+TraF	dCut	[ 2]	13.0	// Chi2 cut for beam Scifi/Si: Have to make for possible Si misalignment (PrePattern) 
+TraF	dCut	[ 3]	100.	// Max. length for Runge-Kutta extrapolation (cm)	(TAlgo::Rrkutex) 
+TraF	dCut	[ 4]	160	// Beam momentum (GeV).					(TEv::TracksFit2,BridgeSegments2,BackTrackZ2)
+TraF	dCut	[ 5]	0	// cop spread (c/GeV). If finite: no BMS reco.		(TEv::TracksFit2)
+
+TraF	dCut	[ 7]	60.	// Preliminary Chi2/Nhits for merged track candidate	(TEv::BridgeSegments)
+
+TraF	dCut	[ 9]	30.	// Final Chi2/Nhits cut for merged track candidate	(TEv::BridgeSegments)
+TraF	dCut	[10]	0.85	// Min fraction of correct hits to associate MC track	(TTrack::FindKine)
+TraF	dCut	[11]	10	// Upper Chi2 cut for Scifi track cleaning		(TEv::BridgeSegments)
+TraF	dCut	[12]	150	// Min Chi2 increment for Scifi track cleaning		(TEv::BridgeSegments)
+TraF	dCut	[13]	3	// Upper Chi2 cut for Scifi track cleaning		(TEv::TracksFit)
+TraF	dCut	[14]	200	// Min Chi2 increment for Scifi track cleaning		(TEv::TracksFit)
+TraF	dCut	[15]	20	// Cut on time up-downstream diff for bridging		(TEv::BridgeSegments)
+TraF	dCut	[16]	5	// Upper Chi2 cut for track cleaning		(TEv::TacksFit2,BackTrack)
+TraF	dCut	[17]	10	// Track Chi2/NDoF quality cut. No cut, == 0.		(TEv::TracksFit)
+TraF	dCut	[18-19]	0. 1000.	// Mom. range of clusters to import (MC only) 	(TEv::ImportClusters)
+TraF	dCut	[20]	1.e+10	// Chi2 time cut. "0" means "No time used"
+TraF	dCut	[21-25]	6.25 5.4 4.5 0 5.0	// Cut on SciFi hit time difference (vs. zone,ns)
+TraF	dCut	[26]	4.	// If > distance/resolution: coalesce mirrors in LAS	(TEv::ImportClusters)
+TraF	dCut	[27]	4.      // If > distance/resolution: coalesce mirrors in SAS	(TEv::ImportClusters)
+			// GEM quad correl  dU=U-U(Y,Z), dV=V-V(Y,Z,U)
+TraF	dCut	[28-37]	.560 .400 .400 .250 .130 .080 .130 .130 .130 .080	// dU
+TraF	dCut	[39-48]	.120 .120 .108 .096 .084 .051 .084 .084 .084 .072	// dV
+TraF	dCut	[50-54]	.5 .5 .6 .6 .6	// Minimum efficiency per track (vs. zone)
+TraF	dCut	[55-59]	.5 .5 .4 .4 .5	// Chi2 cut in space track finding (vs. zone)
+TraF	dCut	[60]	3	// Pick-up: Chi2/NDF max.			(TEv::PrePattern2)
+TraF	dCut	[62-65]	4. 2. 5. 10.	// Coeff. of Space PR Q function: chi2, time, target pointing, efficiency.	(TAlgo::FindSpace)
+TraF	dCut	[66]	10	// Maximum momentum for fringe-field tracks.	(TEv::BridgeSegments2,TracksFit2)
+TraF	dCut	[67-68]	950 1025	// Foretrack to RichWall: reconstruction zone(cm).	(TEv::ForeTrack2RICHWall)
+TraF	dCut	[69-70]	5 2.5		// Foretrack to RichWall: chi2 cut, min. momentum(GeV).	(TEv::ForeTrack2RICHWall)
+
+TraF	dCut	[75]	0	// =0 <-> Si timing disregarded (because lack of reliable time calibration, !=0 would specify lower bound on time uncertainty of Si hits)	(TEv::ImportClusters)
+
+TraF	dCut	[84]	.0050	// SI route enlargement w.r.t. resolution (accounts for run to tun misalignment)	(TAlgo2:FindSpace)
+
+	//int
+TraF	iCut	[ 0]	0	// Trigger selection
+TraF	iCut	[1-2] 	6 8 	// Reconstructibility criterion LAS: #ANTE #POST
+TraF	iCut	[3-4] 	5 6 	// Reconstructibility criterion SAS: #ANTE #POST
+TraF	iCut	[ 5]	2	// Extra # hits required in zone #1 tracks bridging RICH 
+TraF	iCut	[ 6]	12	// Min #hits MAs and PA01:2s to qualify track segment downstream of LAS absorber (TEvFitSegments) 
+
+TraF	iCut	[12]	0	// Reco'ility criterion mu': #POST muWall	(TEv::MCMonitor)
+
+TraF	iCut	[16]	39	// Pattern of zones where scifis enhanced.	(TEv::PrePattern,TAlgo::FindSpace)
+TraF	iCut	[17]	3	// Pattern of zones where drifts subdued.	(TAlgo::FindSpace)
+TraF	iCut	[18]	16	// Pattern of zones where linear fit.		(TAlgo::FindSpace)
+TraF	iCut	[19]	7	// Pattern of zones where quadratic fit.	(TAlgo::FindProj,Space)
+TraF	iCut	[20]	2	// Min #scifi-hits in beam telescope.		(TEv::PrePattern2)
+
+TraF	iCut	[24]	20	// Max. zone 0x4 #hits for relaxing iPRpar[30].	(TAlgo::FindProj)
+TraF	iCut	[25]	30	// Max #hits/plane in RICHWall zone (PS+ST04).	(TEv::ForeTrack2RICHWall)
+
+TraF	iCut	[27]	1	// Pattern of zones where enlarged drift routes (TEv::PrePattern2)
+TraF	iCut	[28]	6	// Pattern of PR iterations where enhanced scifis in zones 0x3	(TEv::PrePattern2,TAlgo::FindProj,Space)
+
+
+// CUTS and PARAMETERS for PATTERN RECOGNITION (TEv::PrePattern;TAlgo::FindProj,FindSpace)
+				// HIT SEARCH WINDOW IN SIGMAS OF RESOLUTION
+                        	     // MAX TRACK SLOPE (tan(alpha))
+						// EXTRA TO ACCOMODATE CURVATURE in X and Y
+
+
+TraF	dPRpar [  0 -  3 ]	2.5  0.080	0.115	0.015
+TraF	dPRpar [ 10 - 13 ]	2.   0.500 	0.100	0.060
+TraF	dPRpar [ 20 - 23 ]	3.   0.4	0.	0.
+TraF	dPRpar [ 30 - 33 ]	3.   0.5	0.	0.
+TraF	dPRpar [ 40 - 43 ]	3.   0.05	0.010	0.010
+	// PR for low momentum forward tracks
+TraF	dPRpar [ 90 - 93 ]	2.   0.100	0.110	0.020
+        // PR w/ 2-zone proj search in Z
+TraF	dPRpar [100 - 103]	0.  0.100	0.0	0.030
+
+
+				// MIN. # OF HITS for PROJ. TRACKS
+				    // MAX. # OF COMMON HITS for 2 SPACE TRACKS
+				        // MIN. # OF HITS FOR SPACE TRACK
+						// SUBSEQUENT ITERATIONS
+								// MAX. # OF COMMON HITS for 2 PROJ. TRACKS (iter. 1 and 2 sqq, for short and long segments)
+TraF	iPRpar [  0 -  9 ]	3   3   9	3  2  8		2 2 3 2
+TraF	iPRpar [ 10 - 17 ]	3   2  11	3  2  9		2 2
+TraF	iPRpar [ 20 - 27 ]	3   2  10	2  1  8		2 1
+TraF	iPRpar [ 30 - 37 ]	3   2   9	3  2  7		2 2
+TraF	iPRpar [ 40 - 47 ]	3   3  11       3  2 10		3 2
+	// PR for low momentum forward tracks
+TraF	iPRpar [ 90 - 97 ]	1   0   0	7  4  8		0 2
+        // PR w/ 2-zone proj search in Z
+TraF	iPRpar [100 - 106]	7   2   0	0  0  0		2
+//TraF	iPRpar [119]
+
+
+		// DEBUGING MODES' SWITCHES
+
+TraF	ReMode	[ 0]	0	// if == 1 - all tracking is OFF; if == 2 Traffic is OFF completely
+
+		// TRAFFIC MODULARITY
+
+TraF	ReMode	[ 1]	2	// == 0 - maximal (default)
+				// == 1 - medium
+				// == 2 - minimal
+				// == 3 - minimal... untill EoE where MC is read at last
+				// == 4 - minimal... but MC is read at PrePattern
+
+
+		// ----     track finding debug modes
+TraF	ReMode	[ 2]	0	// >0: Prepattern is OFF
+TraF	ReMode	[ 3]	0	// >0: (track) Bridging is OFF 				(TEv::BridgeSegments2)
+TraF	ReMode	[ 4]	0	// >0: Ideal PR, >1: SuperIdeal (no composite Clusters)	(TEv::PrePattern2)
+TraF	ReMode	[ 5]	0	// >0: Space track finding OFF (proj. tracks only)	(TEv::PrePattern2)
+TraF	ReMode	[ 6]	0	// >0: Ideal track bridging, >1: SuperIdeal (init q/P w/ MC)	(TEv::BridgeSegments2)
+
+TraF	ReMode	[ 8]	0	// if == 1 - set all rad. lengths to very big value	(TSetup::Init)
+TraF	ReMode	[ 9]	0	// if == 1 - extrapolate tracks to vertex (MC only)	(TEv::TracksFit2)
+TraF	ReMode	[10]	0	// 0 - new helix extrapolation, 1 - old one
+
+
+		// OPTIONS SPECIFIC to TraFDic
+
+TraF    ReMode	[11]	2	// if != 0 - Alternative PrePattern
+TraF    ReMode	[12]	2	// if != 0 - Alternative Bridging
+TraF    ReMode	[13]	2	// if != 0 - Alternative Fitting
+TraF    ReMode	[14]	6	// != 0 <-> Quasi-Newton fit enabled ...
+				// ... &2: using dico, &4: using fast fit
+
+TraF	Dicofit		$COMPASS_FILES/geometry/mc/dico/dico.2002.03
+
+TraF	ReMode	[15]	31	// != 0: Clean Track List, in zones &ReMode[15].
+TraF	ReMode	[16]	1	// if > 0 TraFFiC's Muon Bridging is OFF	(CsTrafficBridging)
+
+TraF	ReMode	[17]	0	// No GEM correlations
+TraF	ReMode	[18]	7	// Backtrack. &0x1: Zone 1 (&0x2: even w/out P). &0x4: Zone 2
+
+TraF	ReMode	[20]	2	// 1: Use material map; 2: Material map + dE/dX
+TraF	ReMode	[21]	0	// != 0 - switch OFF "plane insertion"  (TEv::TracksFit2)
+TraF	ReMode	[22]	1	// Hits maps				(TEv::TracksFit2)
+
+TraF	ReMode	[24]	1	// > 0 - no FullKF for tracks without momentum
+				// => no smoothing (required by ideal beam reco)
+	// MC Beam reco: bit pattern allows to simulate BMS response
+        // &0x1 = Momentum assignment: if set, get cop from generation info
+        // &0x6 = Rejection: if set reject all but:
+        //  - 0x4 = Super ideal BMS = track associated to beam (MC track #0)
+        //  - 0x2 = Ideal BMS = associated tracks
+TraF	ReMode	[25]	5	// Super ideal BMS, w/, smeared, generation cop
+TraF	ReMode	[26]	0	// != 0 - Bridging over target
+TraF	ReMode	[28]	1	// LR filter (Requires LR association be set)
+TraF	ReMode	[29]	3	// Propagation+X-ray+latency correction in Drifts (&1: PrePat, &2: Fit, &4: Modify CsClusters)		(TEv::TracksFit2,TracksRefit)
+
+TraF	ReMode	[31]	0	// Paraxial track finding, &0x2 <-> w/ Extrapolation	(TEv::ParaxialPR)
+TraF	ReMode	[32]	1	// ForeTrack to MAs. =2: only if no mu candidate else, =1: in any case	(TEv::TracksFit2)
+TraF	ReMode	[33]	7	// ForeTrack to Hs.  &2: only if trigger !elucidated yet, &4: only for tracks consistent w/ trigger.	(TEv::TracksFit2,ForeTrack2Hs)
+
+TraF	ReMode	[38]	1	// Clean drift hits			(TEv::TracksFit2)
+TraF	ReMode	[39]	1	// Decoalesce drift hits		(TEv::TracksFit2)
+
+	// Misc (should be moved to geometry database)
+
+TraF	Target [0-2]	-35. 0 	0	// Target center position
+TraF	MuonWall [0] 	3400.		// Last muon wall position		
+
+	// TBNAMES of DETECTORS to be EXCLUDED FROM PATTERN RECOGNITION
+	// (Max 20., can be abbreviated, caveat: underscores are not recognised)
+TraF	DetNameOff	VO	VI
+
+	// IDs of DETECTORS to be EXCLUDED FROM PATTERN RECOGNITION (Max. 100)
+
+//TraF	DetOff [0-23]	5	6	17	18	27	33	7	8	19	20	28	34	9	10	21	22	29	35	11	12	23	24	30	36
+
+
+//end

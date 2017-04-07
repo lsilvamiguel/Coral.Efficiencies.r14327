@@ -1,0 +1,137 @@
+//
+// coral option file
+//
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+
+// pattern method:
+pattern method 1
+
+// tracking method:
+tracking method 1
+
+// This is an MC run
+Monte Carlo job
+//Monte Carlo file /afs/cern.ch/compass/delivery/simevt/testntfz/zebradat.5.fz 
+Monte Carlo file /afs/cern.ch/exp/compass/scratch/d05/COMGeant/lepto.full_p-up.outpipe.fz
+//
+events to read    1000
+//events to skip  50
+//
+// detector table
+// detector table /afs/cern.ch/compass/delivery/simevt/testntfz/detectors.5.dat
+detector table   /afs/cern.ch/exp/compass/scratch/d02/valexakh/momres/detectors.dat
+
+// DECODING. options: <nothing>, MCExact
+make decoding MCExact
+//make decoding
+//
+Data year   1999
+Data period calibration
+//
+CDB     bms       /afs/cern.ch/user/k/khaustov/private/coral/src/calib/tofdetcalib/cdb/test/BMS.conf
+CDB     scf       /afs/cern.ch/user/k/khaustov/private/coral/src/calib/tofdetcalib/cdb/test/ScFb.conf
+
+// CLUSTERING. options: <nothing>, MCExact, MCSmeared, MCQuantized
+make clustering MCExact
+//make clustering MCSmeared
+//make clustering
+
+//Histogramming
+histograms package ROOT
+histograms home    coral.root
+
+//Compass event display
+//event display
+
+// OO settings
+ooInit nFiles 12 
+ooInit nPages 10
+ooInit nMaxPages 10
+
+
+// define geometrical zones
+define zone 0 3500 before M1
+define zone 3500 17000 between M1 and M2
+define zone 17000 32000 between M2 and Muon Wall
+define zone 32000 99999 after Muon Wall
+
+// Magnetic field maps
+CsField SOL_field  /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SOL/OXFORD.map.01.data
+CsField SM1m_field /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.01.data
+CsField SM2_field  /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM2/FSM.map.2000.data
+
+// options for the logger
+error logger log level 3
+error logger verbosity 1
+//
+//++++++++++++++++++++++++++++++ Beam reconstruction procedure parametrs +++++++++++++++++++++++++++++++
+// Beam Reconstruction flag
+beam reconstruction
+
+//                        CsBeamRecons::
+BeamRecons    BMSrec    0     // if=1, BMS reconsruction ON, 
+                              // If=0, BMS reconstruction OFF (for MC, hadrons) 
+BeamRecons  BmChrg      1     // Beam particle charge (with sign!)
+BeamRecons  BmMoment  100.    // Beam momentum (used as output beam momentum  if BMSrec=0)  
+BeamRecons  MxTmdiff    2.    // Max. allowed time difference between BMS and FbHod tracks (ns)
+BeamRecons  Printlev    1     // Print level (0 - no print; 1 - only coral.options parameters; 
+                                              2 - +  reconstructed events
+//
+//                         CsBmFiHod::
+ScFbHod1X     Unit         1    // Unit number for ScFb1  (far from the target)
+ScFbHod1X     Name      VSA1    // Unit number for ScFb1  (far from the target)
+ScFbHod1Y     Unit         1    // Unit number for ScFb1  (far from the target)
+ScFbHod1Y     Name      VSA2    // Unit number for ScFb1  (far from the target)
+//
+ScFbHod2X     Unit         2    // Unit number for ScFb2  (near to the target)
+ScFbHod2X     Name      VSA1    // Unit number for ScFb2  (near to the target)
+ScFbHod2Y     Unit         2    // Unit number for ScFb2  (near to the target)
+ScFbHod2Y     Name      VSA2    // Unit number for ScFb2  (near to the target)
+//                  FbHod recons parameters
+BmFiHod     MinTmWin   -10.    // Low edge of Time Window for raw data selection
+BmFiHod     MaxTmWin    10.    // High edge of Time Window for raw data selection
+BmFiHod     MxTmDiff     1.5   // Max. Hit Time Fluctuation from mean value for a track
+BmFiHod     MxTmChiq     23.    // Max. Time Chiq
+BmFiHod     TrckDiff     13.    // Dead time (Min. Time between two hits in the same hod. element)
+BmFiHod     MxNmbHit     60     // Max. number of hits/plane
+BmFiHod     Mn2htWin    -5.2    // Low edge of Time Window for double hits
+BmFiHod     Mx2htWin     2.34   // High edge of Time Window for doule hits
+BmFiHod     MnTrgWin    -0.6     // Low edge of Trigger Window  
+BmFiHod     MxTrgWin     0.6     // High edge of Trigger Window 
+BmFiHod     Printlev      1      // Print level (0 - no print; 1 - rec. parameters, 
+                                                2 - + input and reconstructed event
+//
+BmFiHod       ReadCDB      NO   // if YES - read calibration CDB, if NO - calibration  files
+ScFbHod1X     T0calib      ScHod1X.clb     // T0 calibration file name
+ScFbHod1Y     T0calib      ScHod1Y.clb     // 
+ScFbHod2X     T0calib      ScHod2X.clb     // 
+ScFbHod2Y     T0calib      ScHod2Y.clb     // 
+BmFiHod       SlopeCalib   scfbslp.dat    // Slope calibration file name
+//
+//                         CsBMSrecons::
+BMSHod0       Name    VSA1      // BMS Hodoscope1 name 
+BMSHod1       Name    VSA2      // BMS Hodoscope2 name 
+BMSHod2       Name    VSA1      // BMS Hodoscope3 name 
+BMSHod3       Name    VSA2      // BMS Hodoscope4 name 
+//                     BMSrecons parameters
+BMSreco     TmWindow   1000.    // Time Window for raw data
+BMSreco     MxTmDiff   1000.    // Max. Hit Time Fluctuation from mean value for a track
+BMSreco     MxTmChi4   1000.    // Max. Time Chiq for 4 hit tracks
+BMSreco     MxSpChiq   1000.    // Max. Space Chiq
+BMSreco     MxTmChi3   1000.    // Max. Time Chiq for 3 hit tracks
+BMSreco     MxNmbHit     60     // Max. number of hits/plane
+BMSreco     Printlev      0     // Print level (0 - no print; 1 - input parametrs, 2 - + calibrations,
+//                                              + row and reconstructed events
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+
+
+
+
+
+
+
+

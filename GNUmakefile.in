@@ -1,0 +1,223 @@
+top_srcdir = @top_srcdir@
+
+include $(top_srcdir)/makefiles/Include.mk
+
+
+# REQUIREMENTS FOR RECURSIVE MAKEFILES IN SUBDIRECTORIES:
+# All makefiles in subdirectories that are called recursively from this top
+# makefile must contain these targets (either defined directly or - preferred
+# - by including General.mk):
+# * default
+# * all
+# * depend
+# * clean
+# * distclean
+
+# make sure that only well-defined set of targets is propagated to subdirs
+RECURSIVE_GOALS = $(filter default all depend clean distclean, $(MAKECMDGOALS))
+
+# directories to be built for "default" target:  everything that is needed for
+# the CORAL libraries
+DIRS = \
+src/base \
+src/beam \
+src/calorim \
+src/condb/filedb \
+src/evdb \
+src/event \
+src/evmc \
+src/geom \
+src/geom/gem \
+src/geom/mumega \
+src/geoutil/g3read \
+src/hist \
+src/rich \
+src/rich/evdis \
+src/track \
+src/track/spacepoint \
+src/track/trafdic \
+src/util \
+src/vertex \
+src/vertex/Kalman \
+src/vertex/Roland
+
+ifeq "$(USE_MySQL)" "yes"
+     DIRS += src/condb/mysqldb/MyInterface
+     DIRS += src/ppi
+endif  
+
+ifeq "$(USE_ORACLE)" "yes"
+    DIRS += src/oracle
+endif
+
+ifeq "$(USE_NewEDIS)" "yes"
+    DIRS += src/evdis
+endif
+
+
+external_libs = DaqDataDecoding Reco
+
+
+# directories to be built for "all" target:  additional testing, etc.
+# dependancies
+ALL_DEPS = 
+# and the directories themselves
+ALL_DIRS = \
+src/alignment \
+src/user \
+src/tests/calorimeters_led_laser \
+src/tests/calorim_gui \
+src/tests/realdata \
+src/tests/rich1 \
+src/track/trafdic/makeDico
+
+ifeq "$(USE_ORACLE)" "yes"
+    ALL_DIRS += src/tests/oracle
+endif
+
+
+.PHONY: default
+default: test_env test_gcc $(external_libs) $(DIRS) options_files
+
+
+.PHONY: all
+all: default $(ALL_DIRS)
+	@$(MAKE) user
+	@$(MAKE) alignment
+
+
+# may be called directly: 'make user'
+.PHONY: user
+user: src/user test_env test_gcc
+
+
+# may be called directly: 'make alignment'
+.PHONY: alignment test_env test_gcc
+alignment: src/alignment src/tests/realdata src/track/trafdic/makeDico
+
+
+.PHONY: $(DIRS)
+$(DIRS): $(external_libs)
+	@$(MAKE) -C $@ $(RECURSIVE_GOALS)
+
+
+.PHONY: $(ALL_DIRS)
+$(ALL_DIRS): $(ALL_DEPS) $(DIRS)
+	@$(MAKE) -C $@ $(RECURSIVE_GOALS)
+
+
+.PHONY: $(ALL_DEPS)
+$(ALL_DEPS): $(DIRS)
+	@$(MAKE) -C $@ $(RECURSIVE_GOALS)
+
+
+.PHONY: depend
+depend: test_env test_gcc
+	@for dir in $(DIRS) src/DaqDataDecoding src/calorim/Reco; do $(MAKE) -C $$dir depend; done
+
+
+.PHONY: lib
+lib: $(external_libs) test_env test_gcc
+	@for dir in $(DIRS); do $(MAKE) @CompassSetup@ -C $$dir lib; done
+
+
+.PHONY: options_files
+options_files:
+	@$(MAKE) -C src/user options_files
+
+
+.PHONY: check
+check:
+	@$(MAKE) -C src/calorim check
+
+
+auto_config_files = @auto_config_files@
+
+
+# RATIONALE FOR CLEAN AND DISTCLEAN TARGETS:
+# * subdirectory makefiles are responsible to clean themselves, no calls
+#   to 'find' in this top-level makefile
+# * 'distclean' includes 'clean', however this also must be done in the
+#   subdirectory makefiles to avoid recursing twice through all directories
+
+.PHONY: clean
+# According to GNU Makefile Standards, 'clean' is supposed to "delete all files
+# that normally created by building the program."
+# http://www.gnu.org/prep/standards/standards.html#Standard-Targets
+clean: $(DIRS) $(ALL_DIRS)
+	@rm -rf $(top_srcdir)/lib/$(OS)
+	@$(MAKE) -C src/DaqDataDecoding clean
+	@$(MAKE) -C src/calorim/Reco    clean
+
+
+.PHONY: distclean
+# According to GNU Makefile Standards, 'distclean' is supposed to "delete all
+# files that are created by configuring or building the program."
+# http://www.gnu.org/prep/standards/standards.html#Standard-Targets
+distclean: $(DIRS) $(ALL_DIRS)
+	@rm -rf $(top_srcdir)/lib
+	@$(MAKE) -C src/DaqDataDecoding distclean
+	@$(MAKE) -C src/calorim/Reco    distclean
+	@rm -rf coral_config.h config.status config.cache config.log marklib.dvi COMPASS.FDB COMPASS.BOOT
+	@rm -f $(auto_config_files)
+	@rm -rf include
+
+
+.PHONY: depclean
+depclean:
+	@find ${CORAL} -name depend.mk -exec rm {} \;
+	@find ${CORAL} -name ".dep*" -exec rm {} \;
+
+
+# automatic re-running of configure if the configure.in file has changed
+${srcdir}/configure: configure.in
+	cd ${srcdir} && autoconf
+
+GNUMakefile: GNUMakefile.in config.status
+	./config.status
+
+config.status: configure
+	./config.status --recheck
+
+
+$(top_srcdir)/lib/$(OS):
+	@mkdir -p $(top_srcdir)/lib/$(OS)
+
+
+.PHONY: DaqDataDecoding
+DaqDataDecoding: $(top_srcdir)/lib/$(OS)
+	@$(MAKE) -C src/DaqDataDecoding $(RECURSIVE_GOALS)
+	@(cd lib/$(OS); ln -sf ../../src/DaqDataDecoding/src/libDaqDataDecoding.a .; cd ..)
+	@(cd lib/$(OS); ln -sf ../../src/DaqDataDecoding/src/libDaqDataDecoding.so .; cd ..)
+
+
+.PHONY: Reco
+Reco: $(top_srcdir)/lib/$(OS)
+	@$(MAKE) -C src/calorim/Reco $(RECURSIVE_GOALS)
+	@(cd lib/$(OS); ln -sf ../../src/calorim/Reco/src/libReco.a .; cd ..)
+	@(cd lib/$(OS); ln -sf ../../src/calorim/Reco/src/libReco.so .; cd ..)
+
+
+.PHONY: test_env
+test_env:
+	@if test "$(CORAL)" = ""; then \
+	  echo "You forgot to include setup.sh!"; \
+	  exit 1; \
+	fi
+
+
+GCC_VERSION_ = $(shell $(CC) --version | xargs | awk '{print $$3}' )
+.PHONY: test_gcc
+test_gcc:
+	@if test "$(GCC_VERSION)" != "$(GCC_VERSION_)"; then \
+	  echo "You can not fool me!!"; \
+	  echo "You are using $(GCC_VERSION_) and you configured for $(GCC_VERSION)!"; \
+	  exit 1; \
+	fi
+
+show:	
+	@echo "CFLAGS:        $(CFLAGS)"
+	@echo "C_FLAGS:       $(C_FLAGS)"
+	@echo "FFLAGS:        $(FFLAGS)"
+	@echo "LDFLAGS:       $(LDFLAGS)"
+	@echo "LIBS:          $(LIBS)"

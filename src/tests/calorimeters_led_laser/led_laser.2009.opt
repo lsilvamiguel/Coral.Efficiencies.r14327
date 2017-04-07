@@ -1,0 +1,23 @@
+//
+include ${CORAL}/src/tests/calorimeters_led_laser/coral_2009_general.opt
+// make calorimeters reconstruction
+include ${CORAL}/src/tests/calorimeters_led_laser/calorim_led_2009.opt 	 
+// 					   ***** DETECTOR TABLE...
+detector table $COMPASS_FILES/geometry/2009/detectors.77466.hadron.dat
+//					   ***** MAPPING
+decoding map $COMPASS_FILES/maps/2009.xml
+events to read 30000000			// # of events to read
+//					   ***** INPUT DATA...
+
+Data files /castor/cern.ch/compass/data/2009/raw/calib_data/cdrpccoeb22-77879-t3ffff000.001.raw
+Data files /castor/cern.ch/compass/data/2009/raw/calib_data/cdrpccoeb23-77879-t3ffff000.001.raw
+Data files /castor/cern.ch/compass/data/2009/raw/calib_data/cdrpccoeb24-77879-t3ffff000.001.raw
+
+Data files /castor/cern.ch/compass/data/2009/raw/calib_data/cdrpccoeb25-77879-t3ffff000.001.raw
+Data files /castor/cern.ch/compass/data/2009/raw/calib_data/cdrpccoeb26-77879-t3ffff000.001.raw
+
+//Data files /castor/cern.ch/compass/data/2009/raw/calib_data/cdrpccoeb22-77879-t00000800.001.raw
+//Data files /castor/cern.ch/compass/data/2009/raw/calib_data/cdrpccoeb22-77879-t00000800.002.raw
+
+//Data files /castor/cern.ch/compass/data/2009/raw/calib_data/cdrpccoeb22-77879-t00000180.001.raw
+//Data files /castor/cern.ch/compass/data/2009/raw/calib_data/cdrpccoeb22-77879-t00000180.002.raw

@@ -1,0 +1,26 @@
+#ifndef CORAL_config_include
+#define CORAL_config_include
+
+#define USE_ORACLE              1
+
+#define USE_MySQL               1
+
+#define USE_RFIO                1
+
+#define USE_TGEANT		0
+
+#define USE_NewEDIS             0
+
+#define USE_CERN_LIBRARY        1
+
+#define USE_HIGZ                1
+
+#define USE_HBOOK               1
+
+#define USE_ZEBRA               1
+
+#define USE_COMPASS_Date        1
+
+#define USE_Qt                  0
+
+#endif // CORAL_config_include

@@ -1,0 +1,176 @@
+
+CC              = @CC@
+CXX             = @CXX@
+LIBRARY=CondDB
+
+OBJS = CondDbHandler.o
+LHCTOP = /afs/cern.ch/sw/lhcxx/specific/redhat61/gcc-2.95.2
+
+C_INCLUDES =-I@DIR_Objectivity@/include
+C_INCLUDES +=-I@DIR_HepODBMS@/include
+C_INCLUDES +=-I@DIR_ConditionsDB@/include
+C_INCLUDES +=-I@DIR_HepUtilities@/include 
+
+LIBS =-L@DIR_Objectivity@/lib @LIB_Objectivity@
+LIBS +=-L@DIR_HepODBMS@/lib @LIB_HepODBMS@
+LIBS +=-L@DIR_ConditionsDB@/implementationObjy/lib @LIB_ConditionsDB@
+LIBS +=-L@DIR_HepUtilities@/lib @LIB_HepUtilities@
+LIBS += -rdynamic -lpthread -ldl
+
+CXXFLAGS = -ansi -DLinux -Dlong32=int -Dlong64="long long" -fnonnull-objects $(C_INCLUDES)
+CXXFLAGS += @CDBFLAGS@ 
+
+#
+#DB parameters
+#private
+LOCKSERVER = @LOCKSERVER@
+FDBHOST    = @FDBHOST@
+FDBPATH    = @FDBPATH@
+FDBFILE    = -fdfilepath $(FDBPATH)/CDB2001.FDB
+BOOTFILE   = CDB2001.BOOT
+FDNUMBER   = 5010
+DBSERVER   = @DBSERVER@
+DBNAME     = CDB
+DBFILEPATH = @DBFILEPATH@
+SCHEMA     = schema.dmp.20010921
+CDBGENERAL = conditionsDBGeneral
+STANDALONE = @STANDALONE@
+FOLDERSET  = folderset.dat
+FOLDER     = folder.dat
+#TEST
+AZDB      = /afs/cern.ch/compass/scratch/d01/DB
+INPUTFILE = SiFi_1011~~start-2000-09-06-05:08:26~~finish-2000-09-06-05:09:45
+TESTFOLDER=/compass/FI01X1__/t0  
+BTIME     = 2000-09-06-05:08:26
+ETIME     = 2000-09-06-05:09:45
+#
+
+#TOOLS
+CDBTOOLS   = /afs/cern.ch/user/m/manara/public/cdb_tools
+MKFOLDER   = mkFolder
+MKFOLDERSET= mkFolderSet
+TOOLS      = $(MKFOLDER) $(MKFOLDERSET)
+#APP
+STORER     = storeCDB
+READER     = readCDB
+APPS	   = $(STORER) $(READER)
+#
+
+#Handler
+LIBHAND    = -L./$(PWD)/condb/handler -L./ -lCondDB
+#
+
+
+.cc.o:
+	$(CXX) $(CXXFLAGS) -c $*.cc -o $*.o  
+
+all: lib tools app
+
+lib : libCondDB.so
+
+libCondDB.so : $(OBJS)
+	$(CXX) -shared -o $@ $(OBJS)
+
+#required tools
+tools: mkFolderSet mkFolder
+
+#examples
+app: storeCDB readCDB
+
+#make Federation Database and Conditions Database
+cdb: @CDBPROCEDURE@
+
+#Store/Read test
+test: store_2000 read_test
+
+mkFolderSet : mkFolderSet.cc
+	$(CXX) $(CXXFLAGS) $(C_INCLUDES) -o mkFolderSet mkFolderSet.cc $(LIBS)
+
+mkFolder : mkFolder.cc
+	$(CXX) $(CXXFLAGS) $(C_INCLUDES) -o mkFolder mkFolder.cc $(LIBS)
+
+storeCDB : storeCDB.cc
+	$(CXX) $(CXXFLAGS) $(C_INCLUDES) -o storeCDB storeCDB.cc $(LIBS)
+
+readCDB : readCDB.cc
+	$(CXX) $(CXXFLAGS) $(C_INCLUDES) -o readCDB readCDB.cc $(LIBS) $(LIBHAND)
+
+readCDB2 : readCDB2.cc
+	$(CXX) $(CXXFLAGS) $(C_INCLUDES) -o readCDB2 readCDB2.cc $(LIBS) $(LIBHAND)
+
+store_test:
+	$(STORER) $(BOOTFILE) $(TESTFOLDER) $(AZDB)/$(INPUTFILE) $(BTIME) $(ETIME)
+
+read_test:
+	$(READER) $(BOOTFILE) $(BTIME) $(ETIME)
+
+store_2000:
+	store.2000.example.csh
+
+test_2_fdb: test_2_fdb.cc
+	$(CXX) $(CXXFLAGS) $(C_INCLUDES) -o test_2_fdb test_2_fdb.cc $(LIBS) $(LIBHAND)
+
+
+depend:
+	@$(CXX) $(CXXFLAGS) $(C_INCLUDES) -I. -MM CondDbHandler.cc > .depend
+
+clean:
+	rm -fr *.o $(MKFOLDER) $(TOOLS) $(APPS)
+
+install:
+	ln -fs `pwd`/libCondDB.so ../../../lib/Linux/libCondDB.so
+
+
+#
+#Objectivity
+#
+
+fdb: $(BOOTFILE)
+
+$(BOOTFILE):
+	echo `if [ "$(STANDALONE)" = "-standalone" ] ; then\
+		if [ ! -e cdb ] ; then\
+			echo create cdb directory ...\
+			mkdir ./cdb;\
+		fi\
+	fi`
+	oonewfd $(LOCKSERVER) $(FDBHOST) $(FDBFILE) \
+	-fdnumber $(FDNUMBER) $(STANDALONE) $(BOOTFILE)
+	ooschemaupgrade -infile $(SCHEMA) $(STANDALONE) $(BOOTFILE)
+
+db: fdb
+	oonewdb -db $(DBNAME) $(DBSERVER)\
+	 $(DBFILEPATH) $(STANDALONE) $(BOOTFILE)
+	oonewdb -db GM $(DBSERVER)\
+	-filepath /shift/compass001d/data02/objsrvvy/cdb $(STANDALONE) $(BOOTFILE)
+	oonewdb -db MM $(DBSERVER)\
+	-filepath /shift/compass001d/data02/objsrvvy/cdb $(STANDALONE) $(BOOTFILE)
+
+folderset: 
+	$(MKFOLDERSET) $(BOOTFILE) $(FOLDERSET)
+	echo `if [ "$(STANDALONE)" = "" ] ; then\
+	oochangedb -db conditionsDBGeneral $(DBSERVER)\
+	 $(DBFILEPATH)/conditionsDBGeneral.CDB2001.DB $(BOOTFILE);\
+	fi`
+
+folder: 
+	$(MKFOLDER) $(BOOTFILE) $(FOLDER)
+
+delete_fdb:
+	oodeletefd -force $(STANDALONE) $(BOOTFILE)
+
+delete_cdb:
+	oodeletedb -all -force $(STANDALONE) $(BOOTFILE)
+
+-include .depend
+
+
+
+
+
+
+
+
+
+
+

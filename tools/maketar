@@ -1,0 +1,124 @@
+#!/bin/sh
+#
+# Script to make a tar file according to the Coral release number and
+# eventally store it to the Compass Delivery area.
+# 1999/xx/xx V0.0 Benigno Gobbo - first release
+# 1999/xx/xx V1.0 Benigno Gobbo - added file exclusions
+# 2000/05/16 V2.0 Benigno Gobbo - added automatic version retrieve 
+# 2000/06/07 V2.1 Benigno Gobbo - follows new "configure" structure
+#                               - now starts from coral directory
+#
+here=`pwd`
+
+#echo -n " What Coral Version? " 
+#read VERSION
+
+if [ -z ${CORAL} ] 
+then
+  echo "CORAL environment not defined. Please set it an re-run me..."
+  exit 1
+fi
+
+if [ -r ${CORAL}/src/base/CoralRelease.h ]
+then
+  MAJOR=`awk '/CORAL_MAJOR_RELEASE/ {printf "%d", substr($3,2) }' ${CORAL}/src/base/CoralRelease.h`
+  MINOR=`awk '/CORAL_MINOR_RELEASE/ {printf "%d", substr($3,2) }' ${CORAL}/src/base/CoralRelease.h`
+  BUILD=`awk '/CORAL_BUILD/ {printf "%d", substr($3,2) }' ${CORAL}/src/base/CoralRelease.h`
+else
+  echo "No CoralRelease.h file. Exit."
+  exit 1
+fi
+
+VERSION=${MAJOR}.${MINOR}.${BUILD}
+
+echo -n "Is ${VERSION} correct [y/n]? "
+read YENO
+if [ "$YENO" != "y" ]
+then
+  echo "OK, no action taken..."
+  exit 0
+fi
+
+cd $CORAL/tools
+CORALVER="coral-${VERSION}"
+echo ">>> Making a symbolic link $CORALVER to $CORAL"
+if [ -e $CORALVER ]
+then
+  echo ">>> $CORALVER already exists. Exit with no action taken."
+  exit 1
+fi
+ln -s $CORAL $CORALVER
+
+cd $CORAL
+cd ..
+UPCORAL=`pwd`
+cd $CORAL/tools
+
+#echo ">>> Making a clear in $CORAL/src"
+#cd src
+#gmake clean
+#cd ../
+
+echo ">>> Set the list of files to be excluded"
+OSNAMES="Linux Solaris HP-UX OSF1 HP-UX AIX CVS"
+EXCLUDEFILE=${CORAL}/tools/tar-exclude-list
+rm -fr $EXCLUDEFILE
+for OSNAME in $OSNAMES
+do
+  LIST=`find ${CORALVER} -follow -name "$OSNAME"`
+  for DIR in $LIST
+  do
+#    DIR=`echo ${DIR} | sed s:${UPCORAL}:\.:g | awk '{print $1}'`
+    DIR="./`echo ${DIR} | awk '{print $1}'`"
+    find $DIR -follow -name "*" >> ${CORALVER}/tools/tar-exclude-list
+  done
+done
+#find ./$CORALVER -follow -name GNUmakefile >> ${CORALVER}/tools/tar-exclude-list
+
+#FILE=`date '+%Y%m%d' | awk '{printf "coral-'${VERSION}'-%s.tar",$1 }'`
+FILE="${CORAL}/tools/coral-${VERSION}.tar"
+echo ">>> Creating $FILE tar file"
+
+tar cvf $FILE ./${CORALVER}/ChangeLog 
+tar rvf $FILE ./${CORALVER}/GNUmakefile.in
+tar rvf $FILE ./${CORALVER}/INSTALL
+tar rvf $FILE ./${CORALVER}/README
+tar rvf $FILE ./${CORALVER}/TODO
+tar rvf $FILE ./${CORALVER}/configure
+tar rvf $FILE ./${CORALVER}/configure.in
+tar rvf $FILE ./${CORALVER}/coral_config.h.in
+tar rvf $FILE ./${CORALVER}/install-sh
+tar rvf $FILE ./${CORALVER}/setup.sh.in
+tar rvf $FILE ./${CORALVER}/setup.csh.in
+tar rvf $FILE ./${CORALVER}/mkinstalldirs
+tar rvf $FILE ./${CORALVER}/makefiles
+tar rvf $FILE ./${CORALVER}/include
+tar rvf $FILE -X $EXCLUDEFILE ./${CORALVER}/src
+
+echo ">>> Compressing $FILE"
+gzip $FILE
+
+echo -n "Should I move $FILE into delivery [y/n]? "
+read YeNo
+if [ "$YeNo" = "y" ]
+then
+  echo ">>> moving $FILE.gz to /afs/cern.ch/compass/delivery/coral/tar"
+  mv $FILE.gz /afs/cern.ch/compass/delivery/coral/tar
+
+  echo -n "Should I make a link in the WWW page [y/n]? "
+  read YeNo1
+  if [ "$YeNo1" = "y" ]
+  then 
+    echo ">>> removing $FILE.gz"
+    rm /afs/cern.ch/compass/delivery/coral/www/coral.tar.gz
+
+    echo ">>> making simbolic link for www page"
+    ln -s /afs/cern.ch/compass/delivery/coral/tar/$FILE.gz /afs/cern.ch/compass/delivery/coral/www/coral.tar.gz
+  fi
+fi
+
+rm $EXCLUDEFILE
+rm $CORALVER
+
+echo ">>> That's all, changing directory to $here"
+cd $here

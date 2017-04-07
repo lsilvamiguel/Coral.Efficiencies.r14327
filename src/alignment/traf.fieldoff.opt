@@ -1,0 +1,230 @@
+// $Id: traf.fieldoff.opt,v 1.3 2007/04/02 20:45:13 ybedfer Exp $
+
+// coral options file for field off single zone reco for alignment purposes.
+
+// - By default, the file is valid for:
+//   - 2006,
+//   - longitudinal setup.
+// - Alternative entries are provided, commented out by default and to be
+//  commented back in, for other cases. For the transverse case, these concern
+//  the specification of the target field map and that of the extent of the
+//  reconstruction zone.
+
+// This file is therefore to be modified by:
+//   I)  Specifying input data one wants to process instead of the default
+//  II)  Setting accordingly:
+//     i) Target field map (either solenoid or dipole)
+//    ii) Zone extension: upstream of target (longitudinal case) or not.
+//   iii) Full path to "detectors.dat" (and not only the dir where it must be
+//       looked for as is possible in the field ON case).
+//    iv) Directory of decoding maps.
+//     v) Options file to be included for TrafDic reco ("./pkopt/trafdic.<year>.opt").
+// III)  Specifying detector table.
+//  IV)  Setting options specific to alignment:
+//     i) Name of detectors to be excluded from tracking. Those to be excluded
+//       for the purpose of alignment have to be added to the, year-dependent,
+//       list of detectors to be excluded in any case. Typically these are
+//       detectors liable to upset the field off, momentum-less, reco, like
+//       those downstream of muon walls.
+//    ii) Criteria for selecting tracks to be written to output TTree (chi2
+//       cut, ...)
+//   V)  Using a detector table produced w/ a COMGeant version < 7.3 => Comment
+//      back in the "TraF Target" entry.
+
+// Tip: Set your "emacs" in "c++-mode" to view this ".opt" file. And have this
+//     done automatically by setting the appropriate hook in your "~/.emacs.el"
+//     init file, cf. "~ybedfer/.emacs.el".
+
+//                                         ***** NO phast OUTPUT: a special TTree output is used instead
+
+//					   ***** HISTOGRAMMING
+histograms package	ROOT
+histograms home 	traf.fieldoff.root
+
+
+//					   ***** THIS IS A DATA RUN
+Data job
+//					   ***** INPUT DATA...
+
+
+//						...either raw file
+Data file /castor/cern.ch/compass/data/2006/raw/W40/cdr22001-52714.raw
+
+//						...or retrieved from oracle DB
+//Data type raw
+//Database select oracle
+
+//Data year 2006
+//Data run select 52714
+//Data container cdr22001-52714
+
+
+// 					   ***** DETECTOR TABLE...
+detector table  	$COMPASS_FILES/geometry/2006/FIELDOFF/detectors.52960.dat
+
+//					   ***** CALIBRATION
+
+use calibration
+CDB use MySQLDB
+
+CDB server	wwwcompass	// This is an alias, pointing, as of 10/11, to "compass02" located in computer center (reachable outside Cern)
+// "CDB entrytime Y-M-D-H:M:S" can be entered to reject all calibrations issued
+// before specified date. E.g., in order to reject all trigger matrix files:
+// N.B.: CDB is constantly evolving => Leaving "CDB entrytime" disabled may
+// give rise to unprecdictable behaviour.
+
+// "entrytime" entry can be made to affect only a (set of) specific TBName(s):
+// "TBname(or TB) CDBentrytime(sic!)"
+//ST CDBentrytime 2003-10-01-00:00:00	// Files registered before specif'd date
+//DW CDBentrytime 2003-10-01-00:00:00	// Files registered before specif'd date
+
+// CDB can be replaced by a File DB, for any given (set of) TBName(s):
+
+//DW FileDB	/afs/cern.ch/user/l/leberig/public/marcin/
+
+
+
+
+
+//					   ***** MAPPING
+// Looks like one has to be specific there, spelling out which particular sub-dir of "mpas" is compatible w/ input data
+//decoding map $COMPASS_FILES/maps/2002.xml
+//decoding map $COMPASS_FILES/maps/2003.xml
+//decoding map $COMPASS_FILES/maps/2004.xml
+decoding map $COMPASS_FILES/maps/2006.xml
+
+
+//					   ***** EVENT SELECTION
+events to read 26000 	// # of evts to read or file name of evt#'s (evt# = spill#<<16|evt#_in_spill)
+//events to skip 843 //139 //705 //229 //843
+//events BOS_skip 1.22			// skip first ~400(? cf. Jürgen) ms in spill (disabled in 2004)
+selection trigger mask fef		// Trigger selection (hexadecimal): excluding pure calo trigger, which jitter time is large
+//selection trigger strict
+
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+//reset random seed every new event
+
+//	Upon option, turn off drift-time measurement in drift-like detectors
+//ST IS_MWPC
+//MB IS_MWPC
+//DW IS_MWPC
+//DC IS_MWPC
+//DR IS_MWPC
+
+
+pattern method 1 	// not used yet
+tracking method 1 	// not used yet
+
+// 					   ***** DECODING
+make decoding 	// <nothing>, MCExact
+
+//  	 	 	 	 	   ***** CLUSTERING
+make clustering 	// <nothing>, MCExact, MCSmeared, MCQuantized
+
+//					   ***** RECONSTRUCTION SCHEMA
+reconstruction schema 1
+
+//					   ***** TRACKING
+make tracking
+track prepattern method traffic
+track bridging method traffic
+track fitting method traffic
+
+
+//					   ***** NO Beam RECONSTRUCTION 
+
+//					   ***** NO Vertex RECONSTRUCTION
+
+//					   ***** NO RICH1
+
+//					   ***** NO CALORIMETERS
+
+//					   ***** NO MU' PID
+
+
+//  	 	 	 	 	   ***** GEOMETRICAL ZONES
+define zone -1000 99999 from FI01 down  	// Longitudinal case
+//define zone -7500 99999 from FI03 down  	// Transverse case
+
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+// Select entry relevant for longitudinal or transverse, among following 2:
+CsField SOL_field $COMPASS_FILES/maps/mag_fields/SOL/SOL_map_fabrice.dat
+ //CsField SOL_field	 $COMPASS_FILES/maps/mag_fields/SOL/OD_dipole.fieldmap
+
+//CsField SM1m_field_measured $COMPASS_FILES/maps/mag_fields/SM1m/SM1M.map.172.data
+//CsField SM2_field $COMPASS_FILES/maps/mag_fields/SM2/FSM.map.4000.data
+
+//					   ***** MAGNETs INFO
+
+CsMagInfo MySQLDB
+
+
+
+CsMagInfo SM2 0 	// ==0: Do NOT use NMR, !=0: Rescaling factor (applied to NMR corrected map)
+//CsMagInfo Update solenoid		// To be enabled during target rotation
+
+
+
+//					   ***** LOGGER
+error logger log level error 	// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level none
+error logger verbosity normal 	// low, normal, high. 
+
+//	  	  	  	  	   ***** TraFDic (+DET OPTIONS+...)
+
+//include ${CORAL}/src/pkopt/trafdic.2002.opt
+//include ${CORAL}/src/pkopt/trafdic.2003.opt
+//include ${CORAL}/src/pkopt/trafdic.2004.opt
+include ${CORAL}/src/pkopt/trafdic.2006.opt
+
+//	********** OVERWRITE WHAT'S IN "../pkopt/trafdic.????.opt"... **********
+
+//	 	 ...SETTINGS SPECIFIC to FIELD OFF RECONSTRUCTION
+include ${CORAL}/src/pkopt/trafdic.addendum.fieldoff.opt
+
+//	 	 ...SETTINGS SPECIFIC to ALIGNMENT
+
+//  List of detectors excluded from tracking (and hence, from alignment): the
+// list consists of 2 sets:
+//   I) Detectors excluded from standard tracking, which depend upon each data
+//     taking year.
+//  II) Detectors excluded from the alignment procedure, because:
+//       - difficult to align, given their crude ganularity and or their low
+//        sampling rate (case H, MA,...),
+//       - liable to upset the tracking rather than contributes to it (case MB,
+//        MA (and PB?), which are downstream a thickness of absorber that the
+//        momentum-less field-OFF reco cannot take into account.
+//     (Note that whether these are indeed valid reasons for excluding them is
+//     debatable...)
+//			(I)				(II)
+TraF	DetNameOff	V	BM			H	MA	DW	DR	FI08	GM11	
+//TraF	DetNameOff	V	BM	SI03		H	MA	// Exclude also SI03 in 2003
+
+//  Correction for propagation time (as well as X-ray correction or else in
+// drifts): the corrections have to be ported to coral's CsClusters (and then on
+// to the output TTree) => Set bit 0x4 of the bit pattern
+TraF	ReMode	[29]	7	// Propagation+X-ray+latency correction in Drifts (&1: Pattern Recognotion, &2: Fit, &4: Modify CsClusters)	(TEv::FitSegments,BackTrackZ1,ForeTrack2RICHWall,TracksFit2,TracksRefit)
+
+TraF	ReMode	[32]	0	// No ForeTrack to MAs (since MAs are turned off)	(TEv::TracksFit2)
+
+//	 	 ...OTHERWISE
+//TraF	Graph	[0]	0		// For INTERACTIVE coral w/o graphics
+//TraF	iCut	[0]	7		// Trigger selection in TraFDic
+//TraF	Print	[0]	3		// Event-by-event numbering
+//TraF	Print	[8]	3		// EoE
+
+//  When using a detector table produced w/ a COMGeant version < 7.3 => Comment
+// back in the "TraF Target" entry.
+TraF	Target [0-2]	0 0 0	// Target center position
+
+
+//	********** OPTIONS SPECIFIC to ALIGNMENT **********
+main do alignment	// Book/fill alignment TTree
+main magnets	off	// (on|off) default is off
+main chi2 cut	30	// Cut on chi2/ndf
+
+//end

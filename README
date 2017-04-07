@@ -1,0 +1,236 @@
+
+These are installation instructions for CORAL library.
+
+============================================================
+
+                    +-------------+
+                    | Quick Start |
+                    +-------------+
+
+1) Change your directory to the same directory where is
+   located this README file.
+
+2) Run configure script
+    $ ./configure
+   Type ./configure --help to get list of available options.
+   See also several configuration examples at the end of
+   this file.
+
+3) Update your environment variables
+   a) for bash/ksh run
+    $ . setup.sh
+      Note the leading dot!
+   b) for csh/tcsh run
+    $ source setup.csh
+
+4) Compile CORAL
+    $ make -j3
+
+5) Run your program. For example:
+    $ cd src/user
+    $ make
+    $ Linux/myprogram coral.options
+   
+6) You can insert your code to src/user/main.cc file.
+   Note still that CORAL is put to best use when linked w/ PHAST, see PHAST
+  distribution for the howto.
+
+============================================================
+
+                 +-----------------------+
+                 | Detailed instructions |
+                 +-----------------------+
+
+  Operation system requirements
+  -----------------------------
+
+ CORAL should work on any UNIX platform where are installed the following
+programs:
+
+   1. gcc     (GNU Compilers Collection, including C,C++,Fortran)
+   2. gmake   (GNU make)
+
+ We do not restrict users to work with a some particular versions of these
+programs, we have checked that code works with
+
+      gcc 3.4, gcc 4.1, gcc 4.4, gcc 4.7
+
+(On lxplus @CERN, the default gcc version can be overwritten by sourcing the
+setup script circulated w/ the gcc distribution, e.g.:
+   source /afs/cern.ch/sw/lcg/contrib/gcc/4.7/i686-slc6-gcc47-opt/setup.csh )
+
+ CORAL was actually tested only on Linux operation system with the following
+distributions:
+
+   1. CERN SLC 4, CERN SLC 5, CERN SLC 6
+   2. Debian 4.0
+
+ Architectures: tested are the i386 and x86-64 family of computers. For the
+latter, the 64-bit environment poses problems, connected w/ CORAL still
+relying for parts on CERNLIB. => Recommended, and enabled by default, is the
+"-m32" option of gcc, which sets int, long, and pointer types to 32 bits,
+and generates code that runs on any i386 system and on x86-64 systems w/ a
+32-bit environment.
+
+ **Special remarks**
+
+  The statements that you need GNU tools 'gcc' and 'gmake' are too strong.
+  We do not use any special tricks available in these tools, so very
+ probably you _can_ compile CORAL with _any_ modern C/C++/Fortran compiler
+ and with 'make' program available on your OS. But we _never_ checked this.
+
+  The only system-dependent files used in CORAL are C++/Fortran interface.
+  The rest of the code is system-independent, the CORAL is a standard
+ C/C++/Fortran program.
+
+  Libraries
+  ---------
+  
+   CORAL uses several external libraries. Some of them are mandatory
+  (CORAL will not compile and work without these libraries) and the others
+  are optional (they will give you extra features and possibilities).
+  
+  a) Mandatory Libraries
+
+     To compile CORAL you definitely need
+
+     -- CERN library 
+     -- CLHEP (Class Library for High Energy Physics)
+     
+     If you don't have these packages, install them first and then continue
+     with the CORAL installation.
+
+  b) Optional libraries
+
+    -- ROOT         (The replacement of CERN library http://root.cern.ch)
+       Allows:
+       * ROOT histograms package usage
+       * ROOT output of reconstructed events
+       
+       You can use, e.g., ROOT version 5.34.04 or 3.34.09.
+
+       On AFS @CERN, there are several ROOT versions compiled with various
+      gcc versions, under various SLC OS versions and environments.
+       Cf. /afs/cern.ch/sw/lcg/app/releases/ROOT/
+       E.g. ...ROOT/5.34.09/i686-slc6-gcc47-opt/root/
+
+    -- DATE library (the library from ALICE experiment for raw events)
+       Allows reading real events from a data stream or a file.
+       If you do not plan to work with real data, you can ignore this
+      library.
+
+  Getting CORAL
+  -------------
+  
+   CORAL is under SVN control.
+   Cf. svn.cern.ch/reps/coral
+
+  Configuration
+  -------------
+
+   Default is expected to be OK on lxplus:
+    $ ./configure    
+
+   Run
+    $ ./configure --help
+   to get a list of options
+
+   Several examples of alternative CORAL configurations:
+
+   1) Enable gcc option `-Wparentheses'. It warns, among others, when
+     operators are nested whose precedence people often get confused about.
+     Which happens to be often the case in CORAL, as of 2013/09.
+      If you want to benefit from this option, append it to the list of
+     default CFLAGS (execute "./configure --help" to get that list).
+    $ ./configure --with-CFLAGS='-O2 -DUSE_ObjectsCounter -Wparentheses'
+
+   2) Enable gcc option `-Wcast-qual'. It's disabled for gcc version >= 4.7.
+    $ ./configure --with-CFLAGS='-O2 -DUSE_ObjectsCounter -Wcast-qual'
+
+   3) CORAL with _full_ optimisation:
+    $ ./configure --with-CFLAGS='-O3 -DUSE_ObjectsCounter'
+
+   4) Use shared libraries instead of the default: static ones:
+    $ ./configure --enable-shared
+      If you compile CORAL with the --enable-shared option, you will not be
+     able to debug the code from CORAL libraries.
+
+   5) You can specify exact path to a library with the configuration script.
+     For example:
+    $ ./configure --with-ROOT=/afs/cern.ch/compass/delivery/tools/root-3.00.06 \
+                     --with-CLHEP=/usr/local
+     That configuration option will overwrite the default procedure for ROOT
+    and CLHEP versions checking via corresponding environment variables.
+
+ **Special remarks**
+
+  If your libraries (CLHEP, ROOT, ...) are compiled with gcc version vX.Y.Z,
+ you must use the gcc compiler with the same major version numbers X and Y
+ for CORAL compilation.
+
+  All the above tricks are needed only if you have something non-standard on
+ your machine. In most cases, you do not need to know them.
+
+  Setting environment variables
+  -----------------------------
+
+  If the configuration procedure was successful, you will receive
+ this message:
+  ********************************************************************
+  * Run 'source setup.csh' or '. setup.sh' to set env. variables     *
+  * Type 'make' to compile the library                               *
+  ********************************************************************
+  According to this message you have to run one of the above scripts:
+  a) If you use csh or tcsh, run
+    $ source setup.csh
+  b) If you use ksh or bash, run
+    $ . setup.sh
+       ^
+     Please pay attention to the leading dot!!!
+  c) You don't know what is your shell: execute 
+    $ echo $SHELL
+
+  Compilation
+  -----------
+  
+  Just type 'make' and wait for 5-20 minutes.  The time depends on the
+ hardware you are using.
+
+  Parallel compilation greatly reduces compilation time:
+    $ make -j12
+	
+  You can pass special options for MAKE program.  For example:
+    $ make CFLAGS='-O3'
+
+  For verbose compilation use:
+    $ make VERBOSE=1
+
+  The standard 'make' command will build only the libraries (CORAL,
+ DaqDataDecoding and Reco).  To build everything (including tests, tools and
+ examples) run 'make all'.
+
+  
+  Running the example program
+  ---------------------------
+  
+  $ make user
+  $ cd src/user
+  $ Linux/myprogram trafdic.mc.<year>.opt
+  
+  This program (with the supplied options file) will reconstruct MC-events
+ and draw them on an event display.
+
+============================================================
+
+                  +---------------+
+                  | Troubleshoots |
+                  +---------------+
+
+  If something does not work, send an E-mail to coral-weekly@cern.ch
+  Include the following information to your mail:
+  a) SVN revision you are using (execute "svn info" to get it).
+  b) Your CORAL configuration command line (it's stored in "config.log").
+  c) The command and error message you got with it.
+
+
+============================================================

@@ -1,0 +1,13 @@
+//
+include ${CORAL}/src/tests/calorimeters_led_laser/coral_2010_general.opt
+// make calorimeters reconstruction
+include ${CORAL}/src/tests/calorimeters_led_laser/calorim_led_2010.opt 	 
+// 					   ***** DETECTOR TABLE...
+//detector table $COMPASS_FILES/geometry/2010/detectors.84847.ECal2CaLib.dat
+detector table $COMPASS_FILES/geometry/2010/detectors.86202.transv.dat 
+//					   ***** MAPPING
+decoding map $COMPASS_FILES/maps/2010.xml
+//					   ***** INPUT DATA...
+Data files /castor/cern.ch/compass/data/2010/raw/calib_data/cdrpccoeb22-84379-t1ffef010.001.raw
+Data files /castor/cern.ch/compass/data/2010/raw/calib_data/cdrpccoeb22-84379-t1ffef010.002.raw
+

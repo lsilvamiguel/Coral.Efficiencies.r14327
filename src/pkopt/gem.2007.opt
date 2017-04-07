@@ -1,0 +1,122 @@
+// $Id: gem.2007.opt,v 1.1 2008/06/27 17:43:15 ketzer Exp $
+
+// GEM options for 2007, w/ 11 GEMs
+
+// Copied from gem.2004.opt
+// Removed RollOverCorrection which is necessary ONLY for 2001 data!
+
+// Thresholds for strip and cluster amplitudes in units of sigma
+GM       Threshold [0-1] 3.  5.
+
+// Polygon cut on amplitude ratios in A2/A3 (x) - A1/A3 (y) plane: (x,y) pairs
+GM01X1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM01Y1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM01U1__ AmplitudeRatio [0-7] .2  .06 1.1  .06 1.1  1.   .2  1.
+GM01V1__ AmplitudeRatio [0-7] .15 .03 1.1  .03 1.1  1.   .15 1.
+GM02X1__ AmplitudeRatio [0-7] .2  .06 1.44 .06 1.44 1.32 .2  1.32
+GM02Y1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM02U1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM02V1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM03X1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM03Y1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM03U1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM03V1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM04X1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM04Y1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM04U1__ AmplitudeRatio [0-7] .15 .03 1.1  .03 1.1  1.   .15 1.
+GM04V1__ AmplitudeRatio [0-7] .15 .03 1.1  .03 1.1  1.   .15 1.
+GM05X1__ AmplitudeRatio [0-7] .15 .03 1.32 .03 1.32 1.21 .15 1.21
+GM05Y1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM05U1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM05V1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM06X1__ AmplitudeRatio [0-7] .2  .06 1.44 .06 1.44 1.32 .2  1.32
+GM06Y1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM06U1__ AmplitudeRatio [0-7] .2  .06 1.44 .06 1.44 1.32 .2  1.32
+GM06V1__ AmplitudeRatio [0-7] .2  .06 1.44 .06 1.44 1.32 .2  1.32
+GM07X1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM07Y1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM07U1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM07V1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM08X1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM08Y1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM08U1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM08V1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM09X1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM09Y1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM09U1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM09V1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM10X1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM10Y1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM10U1__ AmplitudeRatio [0-7] .15 .03 1.1  .03 1.1  1.   .15 1.
+GM10V1__ AmplitudeRatio [0-7] .15 .03 1.1  .03 1.1  1.   .15 1.
+GM11X1__ AmplitudeRatio [0-7] .15 .03 1.5  .03 1.5  1.4  .15 1.4
+GM11Y1__ AmplitudeRatio [0-7] .15 .03 1.5  .03 1.5  1.4  .15 1.4
+GM11U1__ AmplitudeRatio [0-7] .15 .03 1.5  .03 1.5  1.4  .15 1.4
+GM11V1__ AmplitudeRatio [0-7] .15 .03 1.5  .03 1.5  1.4  .15 1.4
+
+// Amplitude corrections to be appled to C = (X,Y,U,V) so that its
+// amplitude matches that of P=(Y,X,V,U)
+// Obtained by fitting measured 2D distributions of a2's of clusters of
+// cdr10007-32133 with
+// "~compass/detector/saclay/root/LinearRegression.C"
+GM01X1__ AmplitudeCorr [0-2]	  1.3	0.992	 7.95e-05
+GM01Y1__ AmplitudeCorr [0-2]	 13.2	0.952	-3.99e-05
+GM01U1__ AmplitudeCorr [0-2]	  7.9	0.859	 0.000107
+GM01V1__ AmplitudeCorr [0-2]	  2.2	1.145	-0.000145
+
+GM02X1__ AmplitudeCorr [0-2]	-11.2	1.152	0
+GM02Y1__ AmplitudeCorr [0-2]	  9.7	0.868	0
+GM02U1__ AmplitudeCorr [0-2]	 -2.8	0.984	 3.16e-05
+GM02V1__ AmplitudeCorr [0-2]	  8.4	1.050	-0.000103
+
+GM03X1__ AmplitudeCorr [0-2]	 -2.9	0.859	0
+GM03Y1__ AmplitudeCorr [0-2]	  3.4	1.164	0
+GM03U1__ AmplitudeCorr [0-2]	  8.4	0.825	0
+GM03V1__ AmplitudeCorr [0-2]	-10.2	1.212	0
+
+GM04X1__ AmplitudeCorr [0-2]	-14.6	1.136	0
+GM04Y1__ AmplitudeCorr [0-2]	 12.9	0.880	0
+GM04U1__ AmplitudeCorr [0-2]	 -5.9	1.085	0
+GM04V1__ AmplitudeCorr [0-2]	  5.4	0.922	0
+
+GM05X1__ AmplitudeCorr [0-2]	-10.1	1.253	0
+GM05Y1__ AmplitudeCorr [0-2]	  8.0	0.798	0
+GM05U1__ AmplitudeCorr [0-2]	  1.2	1.087	0
+GM05V1__ AmplitudeCorr [0-2]	 -1.1	0.920	0
+
+GM06X1__ AmplitudeCorr [0-2]	-13.5	1.155	0
+GM06Y1__ AmplitudeCorr [0-2]	 11.7	0.866	0
+GM06U1__ AmplitudeCorr [0-2]	  6.4	0.997	 7.2e-05
+GM06V1__ AmplitudeCorr [0-2]	  9.8	0.970	-7.33e-05
+
+GM07X1__ AmplitudeCorr [0-2]	 -8.4	1.063	 7.09e-05
+GM07Y1__ AmplitudeCorr [0-2]	 18.7	0.886	-2.06e-05
+GM07U1__ AmplitudeCorr [0-2]	 13.6	1.028	0
+GM07V1__ AmplitudeCorr [0-2]	-13.2	0.972	0
+
+GM08X1__ AmplitudeCorr [0-2]	-22.8	1.098	0
+GM08Y1__ AmplitudeCorr [0-2]	 20.7	0.911	0
+GM08U1__ AmplitudeCorr [0-2]	 -6.3	0.969	0
+GM08V1__ AmplitudeCorr [0-2]	  6.5	1.032	0
+
+GM09X1__ AmplitudeCorr [0-2]	-13.6	1.238	0
+GM09Y1__ AmplitudeCorr [0-2]	 11.0	0.808	0
+GM09U1__ AmplitudeCorr [0-2]	 -2.8	1.070	0
+GM09V1__ AmplitudeCorr [0-2]	 2.6	0.934	0
+
+GM10X1__ AmplitudeCorr [0-2]	-12.3	1.091	0
+GM10Y1__ AmplitudeCorr [0-2]	 11.2	0.917	0
+GM10U1__ AmplitudeCorr [0-2]	 -2.1	1.191	0
+GM10V1__ AmplitudeCorr [0-2]	  1.8	0.839	0
+
+GM11X1__ AmplitudeCorr [0-2]	-12.3	1.091	0
+GM11Y1__ AmplitudeCorr [0-2]	 11.2	0.917	0
+GM11U1__ AmplitudeCorr [0-2]	 -2.1	1.191	0
+GM11V1__ AmplitudeCorr [0-2]	  1.8	0.839	0
+
+// Clustering method: 0=simple clustering (1 hit=1 cluster), 1=full clustering
+GM Clustering 1
+
+// Hit time window for MC hits (hit time smeared with 12 ns RMS)
+GM       MCHitTime [0-1] -50. 50.
+

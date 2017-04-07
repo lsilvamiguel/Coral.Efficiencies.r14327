@@ -1,0 +1,75 @@
+ This is the user directory. And it provides what an user directory usually
+provides, viz.:
+  I) Options files.
+ II) Templates for "UserEvent" and "UserBeginning/EndOfJob".
+III) Makefile for building an executable.
+     Note still that coral software is only put to best use when it's
+    interfaced w/ PHAST, cf. the "coral" sub-dir of your PHAST distribution, and
+    the README there.
+     In particular, executables built from this directory will NOT be able to
+    produce mDSTs.
+     Yet, the present options files include all what's needed to run a PHAST
+    job.
+
+ I) Options files
+-----------------
+  - They should be able to run an example job as is.
+  - Otherwise they have be edited: cf. comments in any file's header for
+   instructions on how to proceed.
+  - There are several kinds:
+
+  i) Standard options files for Real Data (RD) =
+
+             "trafdic.<year>[.extension].opt"
+
+     - Are valid for magnets on data.
+     - Otherwise, are supposed to cover all of data taking, with:
+      - Automatic search for relevant geometry info based upon run number.
+      - Unique set of options for the rest.
+       Yet, to be edited for specifying input data file, selection criteria,
+       output, or else... Cf. comments in file's header.
+     - Muon files are  meant for both longitudinal and transverse. Have to edit
+      the entry specifying the target field map for the latter.
+
+    NOTA BENE:
+     - The files themselves are NOT part of the coral distribution: they are
+      instead compiled from an ".opt.c" template, to handle the settings that
+      depend upon the particular computer system one is running on. The same
+      compilation mechanism allows one to produce special options files, e.g.
+      for histogramming residuals, etc.., by specifying "C2OPT_FLAG" as an
+      argument to the "make trafdic.<year>.opt" command line.
+     - Do not confuse these "trafdic.*.opt" files of the "user" directory,
+      w/  "trafdic.*.opt" in the "../pkopt" directory.
+
+ ii) MC files:
+
+             "trafdic.mc.<year>.opt"
+
+     - Several COMGeant versions are provided for, with alternative entries
+      specified in commented lines. Cf. comments in file's header.
+
+iii) More specific files: cf. comments in files' header.
+
+II) Code
+-------
+  i) main
+ ii) User files
+    - The user should modify only these.
+    - They are:
+
+      CoralUser.cc
+      CoralUser.h
+
+    - There are three empty functions inside:
+
+      CoralUserInit
+      CoralUserEvent
+      CoralUserEnd
+
+    - CoralUserInit: It can be used for initialization stuff (
+                    histograms booking etc...).
+
+    - CoralUserEvent: Event analysis processes should be put here.
+
+    - CoralUserEnd: For final procedures.
+

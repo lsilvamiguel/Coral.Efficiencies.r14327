@@ -1,0 +1,8 @@
+// $Id: rw_2006.opt,v 1.2 2007/07/07 20:47:35 ybedfer Exp $
+
+// Options file for combined RICHwall+ECal1 clusterisation.
+
+RW_Recons EnergyCorrection 1
+RW_Recons CoordCorrection  1
+RW_Recons PhotonSelection  0 	// Reserved for future use (dixit G.Khaustov)
+RW_Recons HistogramLevel   0

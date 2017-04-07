@@ -1,0 +1,39 @@
+//					   ***** EVENT SELECTION
+events to read 3000000 	// # of events to read
+//events to skip 1945//41049-78172#116438559 //714//41049-78172#116413939 473//41049-78172#116409119 443//41049-78172#116408519 473//116409119 //2744//41049-78172#116454539
+// BoS Veto. 
+//events BOS_skip 1.151	// Status of hardware veto unknown as of 09/12 => Keep software veto commented out.
+//selection trigger mask f		// Trigger selection (hexadecimal)
+//selection trigger strict
+// seed for random number generations:
+//					   ***** HISTOGRAMMING
+histograms package ROOT
+histograms home trafdic.root
+//					   ***** THIS IS A DATA RUN
+Data job
+
+hadron run 	// ...of the hadron type
+//
+random number engine JamesEngine
+random number seed 19990102
+//					   ***** LOGGER
+error logger log level error 	// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level none
+error logger verbosity normal 	// low, normal, high. 
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+CsMagInfo SM2 0 	// =0: No NMR. !=0: Use NMR w/ numerical parameter as rescaling factor. (Note: From: Catarina Marques Quintans. Sent: Thu 2/5/2009 7:02 PM.  The DCS group submitted to the mySQL database the SM2 NMR readings for the 2008 data taking. But the evaluation of their impact is not clear: in order to enable them, we would probably need to specify a non-unity scaling factor. Yet to be defined...)
+//					   ***** RICH1
+//make rich1 reconstruction
+CsRICH1UpGrade CONFIG 	// RICH upgrade: 12 APV 4 MAPMT
+//					   ***** Vertex RECONSTRUCTION
+//make vertex reconstruction
+vertex pattern method averaging
+vertex fitting method kalman
+// 					   ***** DECODING
+//make decoding 	// <nothing>, MCExact
+//					   ***** RECONSTRUCTION SCHEMA
+reconstruction schema 1
+//					   ***** CALIBRATION
+use calibration
+CDB use MySQLDB
+CDB server wwwcompass 	// This is, as of 07/05, pointing to "lxfsrb6103" located in computer center (reachable outside Cern)

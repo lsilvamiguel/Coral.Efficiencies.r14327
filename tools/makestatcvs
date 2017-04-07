@@ -1,0 +1,48 @@
+#! /bin/bash -e
+#
+# Create CVS commit statistics using StatCVS
+
+HOST=lxplus.cern.ch
+TARGET=/afs/cern.ch/compass/delivery/coral/www/StatCVS
+DATE=`date --rfc-3339=date`
+
+if ! which statcvs > /dev/zero; then
+   echo "statcvs executable not found!"
+   exit 1
+fi
+
+CORALDIR=`mktemp -d`
+OUTPUTDIR=`mktemp -d`
+LOG=`mktemp`
+OLDDIR=`pwd`
+echo 'Hit <Enter> to checkout a clean copy!'
+read
+cd $CORALDIR
+cvs -q co coral
+cd coral
+
+echo 'Hit <Enter> to fetch CVS logs!'
+read
+cvs log > $LOG
+
+echo 'Running statcvs...'
+JAVA_ARGS=-mx128m statcvs -title CORAL -output-dir $OUTPUTDIR -include '**/*.c:**/*.C:**/*.cc:**/*.cpp:**/*.cxx:**/*.F:**/*.h:**/*.hpp:**/*.inc:**/*.pl:**/*.py:**/*.sh:**/*.csh' -exclude '**/*.opt.c:**/pkopt/*:doc/**' -disable-twitter-button $LOG .
+
+echo 'Hit <Enter> to start scp!'
+read
+
+while ! scp -r $OUTPUTDIR $HOST:$TARGET/html-new; do
+    echo 'Error!  Hit <Enter> to try again!'
+    read
+done
+
+echo 'Hit <Enter> to move copied files into the correct place!'
+read
+
+while ! ssh $HOST "mv $TARGET/html{,-old}; mv $TARGET/html{-new,}; perl -pi.old -e '/StatCVS/ && s[\d\d\d\d-\d\d-\d\d][$DATE]' $TARGET/../contents.html; rm -rf $TARGET/html-old"; do
+    echo 'Error!  Hit <Enter> to try again!'
+    read
+done
+
+cd "$OLDDIR"
+rm -rf $CORALDIR $LOG $OUTDIR

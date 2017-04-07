@@ -1,0 +1,195 @@
+
+RICHONE : version 4.00 PMT
+----------------------------
+Commit    060612   from Acid
+
+
+CsGeom.cc : reading of "rindexUV" and "rindexVS" (17 lines)   added
+CsCsRICH1Detector.h : members indexUV_ and indexVS_   added
+                      methods getIndexUV() and getIndexVS()   added
+                      method setMCCFRefIndVS()   added
+CsCsRICH1Detector.cc :
+      readCalibration() : modified (3+1 lines added)
+      setMCCFRefIndVS() : method   added
+
+
+
+CsRCRecConst.h : polishing
+                 CFRefIndUV_, CFRefIndVS_ and methods   added
+                 MCCFRefInd_, MCCFRefIndUV_, MCCFRefIndVS_ and methods   added
+                 nZeroUV_, nZeroVS_ and methods   added
+CsRCRecConst.cc : polishing
+                  CFRefIndUV_, CFRefIndVS_ def., print   added
+                  MCCFRefIndUV_, MCCFRefIndVS_ def., print   added
+                  nZeroUV_, nZeroVS_ def., print   added
+      CFRefIndVS() : method   added
+
+
+CsRCExeKeys.h, .cc : members selPMTonly_ and selAPVonly_ and methods
+                     and reading from opt and printing   added
+
+
+CsRCDetectors.h :
+      catNfromName() : method added
+      catNfromTBname() : method added
+CsRCDetectors.cc :
+      setLocalGeo() : calc. and (*ic)->setXYLimMn/xW(.); (9 lines)   added
+
+
+
+CsRCCathode.h : polishing
+                hCatx_, hCaty_, isPMT_, isAPV_ and methods   added
+                x/ycePMTW_ and method   added
+                x/yCorPPadWC_ and method   added
+                x/ycePadWC_ and method   added
+                methods xcePMTWC(.), xcePPadWC(.)   added
+                x/yLimMn/xW_ and methods (get and set)   added
+CsRCCathode.cc : polishing
+                 hCatx/y_ definitions, copying, printing   added
+                 isPMT_, isAPV_ definitions, copying, printing   added
+                 PMT cathode local geometry   added !!!
+                 x/yCoPPadPMT_ definitions, copying, printing   added
+                 x/ycePPadPMT_ definitions, copying, printing   added
+                 xcePMTWC(.), xcePPadWC(.) : methods   added
+                 x/yLimMn/xW_ def.(=0.) and copy
+
+CsRCEventPads.h : polishing
+      genMCRings() : mathod added
+CsRCEventPads.cc : polishing
+      getEventPads() : padx/y, nPadx/y   out (prov.)
+                       padx/y, nHCatx/y   new def. (for histo.s)
+                       if( cat->isPMT() ) nHCatx *= 4; ...
+                       Provisional INTERFACE for tests (myfile)   added
+      genMCRings() : mathod added
+
+
+CsRCCluster.h : isPMT_, isAPV_ and methods   added
+CsRCCluster.cc : polishing
+                 #include "CsRCDetectors.h, CsRCCathode.h"   addde
+                 isPMT_, isAPV_ definitions, copying, printing   added
+
+
+CsRCEventClusters.h : polishing
+                      doClustering( int ) and doClusteringAPV( int )   added
+CsRCEventClusters.cc : polishing
+      getClusFromPads() : new def. of padx/y and hCatx/y introduced
+                          if( cat->isPMT() ) ... else   added
+      doClustering() : -> interface to doClustering(c) and doClusteringAPV(c)
+      doClustering(c) : old doClustering() for one cathode (c)
+                        new def. of padx/y and hCatx/y introduced
+                        NO loop on cathodes
+                        continue -> return
+                        flag_   out (?)
+      doClusteringAPV(c) : dummy
+
+
+CsRCEventPartPhotons.cc : 
+      getEventPartPhotons() : ... bkgrPhotons() -->///
+                              rawSignal() -->///
+      checkSignal() : 
+      moniCFRefInd() : histo.s 1558 (n-1 VS), 1556,1557 (n-1 vs mom)   added
+
+
+CsRCPartPhotons.h : thetaIpo/UV/VS_[31] and methods   added
+      compThetaIpo() : method   added
+      setPhoTheNorm() : method   added
+      nPhotExpct() : method   added
+CsRCPartPhotons.cc : polishing
+      CsRCPartPhotons(...) :  thetaIpo/UV/VS_[31]   added
+      getPartPhotons() : padx/y, nPadx/y, hCatx/y; nPadx/y   out
+                         ///ref to corrPMTopt (9 lines)   added
+      doSelCathodes() : redefinition of padx/y, hCatx/y; nPadx/y   out
+      yDetLLimit() : padx/y, nPadx/y, hCatx/y; nPadx/y   out
+      compThetaIpo() : method   added
+      checkLikelihood() : theIpo --> thetaIpo_[kPaTy];  and  ///...
+      CsRCPartPhotons() : compThetaIpo()   referenced
+      getLikeAll() : theIpo -> theIpow, theIpow = (*ih)->getThetaIpo(.   added
+      getQsquare() : theIpo -> theIpow, theIpow = (*ih)->getThetaIpo(.   added
+      setPhoTheNorm() : method   added
+      nPhotExpct() : method   added
+      getThetaLikeMax() : method getRelMaxima() activated and no (prov.) ???
+
+
+CsRCPhoton.h : #include "CsRCCluster.h"   added
+               methods isPMT() and isAPV()   added
+               the0_, theNorm_   added
+               method the0(), theNorm()   added
+               method facVStoUV()   added
+               method getThetaIpo()   added
+               CFRefInd_, thetaIpo_[5] and methods   added
+               pPartPhot_ end method   added
+               CsRCPhoton() : ..., CsRCPartPhotons*,...   added
+               methods thePhoVStoUV(), thePhoUVtoVS()   added
+               methods thetaVStoUV(), thetaUVtoVS()   added
+               methods setTheToNorm(), setTheTo0()   added
+CsRCPhoton.cc : polshing
+      CsRCPhoton() : ..., CsRCPartPhotons* pPartPhot, ...   added
+                     CFRefInd_, thetaIpo_[5] def. (4+7 lines) and copy   added
+                     pPartPhot_ def. and copy   added
+                     the0_, theNorm_ def. and copy   added
+      facVStoUV() : method added
+      getThetaIpo() : method added
+      thePhoVStoUV(), thePhoUVtoVS() : methods added
+      thetaVStoUV(), thetaUVtoVS() : methods added
+
+
+CsRCLikeAll05.h : dump_, xHole_, yHole_, rPipe_, nPhotEx_, useOldCode_   added
+                  fracUsePhi_[100], ..., phoBack_[500], ...   added
+CsRCLikeAll05.cc : 
+      normSignal() : useOldCode_   added
+                     else  if( kDetClu == 1 ) { in++; id++; }   ???
+                     nPhotEx = papho->nPhotExpct( theIpo );   added
+                     fracUsePhi_[stepp] = ..., fracUsePhiSet_ = ...   added
+                     hist hRC1510   added
+      normBackgr() : hist hRC1511   added
+      likeSignal() : nPhotEx = nPhotEx_;
+                     if( fracUsePhiSet_ ) { ... probSig = fracUsePhi_[kFrac]
+                     ...   added
+                     hist hRC1512, hRC1513   added
+      likeBackgr() : if( useOldCode_ ) ...
+                     if( phoBackSet_ ) { ... backgr = phoBack_[pPhot->kPhot()]
+                     ...   added
+
+
+CsRCEventRings.cc : polishing
+      getEventRings() : (*ipf)->setPhoTheNorm();   added
+                        flagPhoSignal() -->///
+                        (*ir)->getRingBf() -->///
+                        (*ir)->getRingWa() -->///
+                        (*ir)->getRing3S() -->///
+                        checkRingPH() -->///
+                        checkNoise() -->///
+                        ringSignal() -->///
+      checkSignal() : theIpo = papho->thetaIpo( kPaTy ); if( theIpo >= 0. ...
+                      papho->lPhotons() --> ring->lPhotons()
+      partChiSqIdent() : theIpo = ...->thetaIpo( kPaTy ); if( theIpo >= 0. ...
+                         if( theRecoR != theRecoFt ) {   added
+      partRingIdent() : theIpo = ...->thetaIpo( kPaTy ); if( theIpo >= 0. ...
+      ringSelection() : ringSignal( (*ir) ) -->///
+CsRCRing. : 
+            methods getRingBf, getRingWa, getRing3S -> ///
+CsRCRing.cc : 
+              methods getRingBf, getRingWa, getRing3S -> ///
+              methods getRingBf, getRingWa, getRing3S -> rich_waiting!
+      getRingPk() : lDoublePhotons_... (*ih)->pPartPhot()...   added
+
+
+CsRCEventAnalysis.h : offTheRing(), offTheRing3(), getCorrTheta() ->///
+CsRCEventAnalysis.cc :
+      cluStructure(() : -->///
+      dataMonitor() : theIpo = (*ir)->pPartPhot()->thetaIpo( kPaTy ) 3x2 lines
+      PIDMonitor() : theIpo = papho->thetaIpo( kPaTy )  3x2 lines
+                     theIde = papho->thetaIpo( kTyMin )  3x2 lines
+                     theIde = papho->thetaIpo( kPaTy )  3x2 lines
+      offTheRing(), offTheRing3(), getCorrTheta() -> rich_waiting!
+
+
+CsRCHistos.h, cc : histo.s 1556, 1557 (n-1 vs mom) and 1558 (n-1 VS)   added
+                   histo 3554 (theta photon x2)   added
+
+
+CsRCEventDisplay.cc : polishing
+                      new def. of padx/y and hCatx/y introduced
+                      padx -> 8. (once)
+                      theIpo .......
+

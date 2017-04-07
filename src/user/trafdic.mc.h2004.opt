@@ -1,0 +1,238 @@
+// $Id: trafdic.mc.h2004.opt,v 1.3 2011/02/15 22:27:32 ybedfer Exp $
+
+// coral options file for MC data in 2004 hadron setup.
+
+// NOTA BENE: For optimum reconstruction of 2004 hadron setup data, CORAL has
+// to be compiled w/ variable "PR_HADRON_2004" set.  (This is not needed for
+// hadron data of later years.)
+
+// This options file is to be completed by:
+//   I) Specifying input data one wants to process instead of the default
+//     "~guskov/zebradat.2.fz"
+//  II) Selecting accordingly the statement including options specific to
+//     trafdic (cf. in fine).
+//      There is at present the choice between 1 option:
+//      - 2004                        <-> ../pkopt/trafdic.mc.hadron.opt
+//     NOTA.BENE: Check included trafdic file to determine whether it refers to
+//     an IDEAL GEOMETRY, i.e. W/O detector inefficiencies, or
+//     a  REALISTIC GEOMETRY
+// III) Adding whatever options are needed to enable a given output, e.g.
+//     mDST (default, but active only if executable is phast-compatible, cf.
+//     "./README").
+//  IV) (Possibly) Trigger selection
+
+// Derived from "trafdic.mc.opt,v 1.25"
+// $Log: trafdic.mc.h2004.opt,v $
+// Revision 1.3  2011/02/15 22:27:32  ybedfer
+//  Cosmetics...
+//
+// Revision 1.2  2010/10/27 23:28:35  suhl
+// * enlarge the zone between SM2 and ECAL2/HCAL2/Muon Wall to include the beam killer in front of ECAL2. For some reason, there must not be any detector before ECAL2/HCAL2/Muon Wall in the same zone
+//
+// Revision 1.1  2010/07/13 13:22:21  tnagel
+// renamed hadron.mc.opt ---> trafdic.mc.h2004.opt
+//
+// Revision 1.13  2010/07/12 15:34:51  tnagel
+// replaced absolute path by reference to ${COMPASS_FILES}/...
+//
+// Revision 1.12  2010/02/08 13:57:31  tnagel
+// reflect HADRON_SETUP ---> PR_HADRON_2004 rename in the comments
+//
+// Revision 1.11  2006/07/10 17:52:58  ybedfer
+//  - Change input for new zebra file produced by Alexey.
+//  - Comment out RICH reco: not useful and seems to get coral to crash in
+//   certain circumstances.
+//
+// Revision 1.10  2005/10/07 14:09:11  ybedfer
+//  "MC response MCSmeared" for ECAL's (This is not set in "calorim_mc.opt",
+// contrary to what's done for HCAL's).
+//
+// Revision 1.9  2005/10/07 12:56:53  ybedfer
+//  "rich1.mc.2003.opt".
+//
+// Revision 1.8  2005/10/07 11:03:21  ybedfer
+//  - Alexei's new MC generation.
+//  - Get the file up-to-date w/ upgrades to:
+//   - TrafDic/PHAST codes.
+//   - Hadron-specific options:
+//     - Vertexing.
+//     - Comment extra "SmoothPos" entries.
+//  - Nominal refraction index = N2.
+//  - Comment out special ECAL2 smearing option (obsolete?).
+//
+// Revision 1.7  2004/06/08 03:01:49  ybedfer
+//  "trafdic.2003.opt" and "trafdic.2004.opt" no longer part of CVS distribution.
+//
+// Revision 1.6  2004/04/23 19:16:14  ybedfer
+//  - ECAL2 smearing (as was formerly set in hadron-specific "calorim.opt".
+//
+// Revision 1.5  2004/04/07 03:54:48  ybedfer
+//  - No longer refer to hadron-specific beam and calo options files.
+//    - "hadron.calorim_mc.opt" differed very little from standard
+//     "calorim_mc.opt", viz. by a ECAL smearing entry, which is added to this->file
+//     instead. This entry is commented out, for the time being, the ECAL code being
+//     anyway bugged: it's upsetting trafdic.
+//    - "hadron.beam_mc.opt" was bugged.
+//  - RICH options file reference updated.
+//  - Field maps from comgeant "data" directory.
+//  - "trafdic" options file renamed "trafdic.mc.hadron.opt".
+//  - Some smoothing points added (not sure it's useful...)
+//
+
+
+//                                         ***** PHAST OUTPUT
+// - Active only if used on a PHAST-compatible executable, cf. "./README"
+// - Cf. "$PHAST/coral/README" for the details of the options
+mDST	file		${HOME}/phast.mc.root
+// - Information reduction bit pattern: "mDST select".
+mDST	select		0	// 0 = No information reduction whatsoever.
+// - One may want to output more info, as exemplified infra:
+//mDST hits		HL	// MegaDST...
+//mDST MCgen		0	// MC generator info
+//mDST	MChits		SI01X	MM01X	DC01X	FI05X	GM03X	ST03X	FI06X	GM09X	ST04X
+
+
+//					   ***** HISTOGRAMMING
+histograms package ROOT
+
+histograms home    ${HOME}/trafdic.mc.root
+
+
+
+
+Monte Carlo job				// ***** THIS IS AN MC RUN
+
+Monte Carlo file	/castor/cern.ch/user/g/guskov/zebra_m/zebradat.0.fz
+
+// 					   ***** DETECTOR TABLE...
+
+//...is specified in the TraFDic include options file, cf. in fine.
+
+
+
+// 					   ***** MATERIAL MAPS
+
+//...is specified in the TraFDic include options file, cf. in fine.
+
+
+
+
+
+//					   ***** EVENT SELECTION
+events to read 40000			// # of evts to read
+//events to skip 259
+//selection trigger mask 15		// Trigger selection
+
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+//reset random seed every new event
+
+pattern method 1        // not used yet
+tracking method 1       // not used yet
+
+// 					   ***** DECODING
+make decoding 	 	// <nothing>, MCExact
+
+//  	 	 	 	 	   ***** CLUSTERING
+make clustering 	// <nothing>, MCExact, MCSmeared, MCQuantized
+
+//					   ***** RECONSTRUCTION SCHEMA
+reconstruction schema 1
+
+//					   ***** TRACKING
+make tracking
+track prepattern method traffic
+track bridging   method traffic
+track fitting    method traffic
+
+
+//					   ***** Beam RECONSTRUCTION 
+//make beam reconstruction
+//include ${CORAL}/src/pkopt/beam_2003.opt
+//                   Overwrite what's set in "beam.opt"
+BeamRecons    useTRAFFIC  1    // >0: Traffic is used, =0: standalone beampackage is used
+PID_doBeamID	selAllBeams	1
+
+//					   ***** Vertex RECONSTRUCTION
+make vertex reconstruction
+vertex pattern method averaging
+vertex fitting method kalman
+include ${CORAL}/src/pkopt/vertex.2002.opt
+//                   Overwrite what's set in "vertex.opt"
+CsAverPattern  Hist	1	// 0 - Off, 1 - ON
+CsAverPattern  findSec	1	// 0 - Off, 1 - ON
+CsAverPattern  Print [ 0 ]	0	// Prefilter info.
+CsAverPattern  Print [ 1 ]	0	// Error info. 
+// track is considered as accepted if its momentum is smaller
+// than "AcceptTill" percents of beam track
+CsAverPattern	AcceptTill	120	// in %
+//                     Z Dist(from centre)  DCA(number of sigmas)
+CsAverPattern	CUTS		4800			10
+CsKalmanFitting  Hist	1	// 0 - Off, 1 - ON
+CsKalmanFitting  Print [ 0 ]	0	// Kalman filter info.
+CsKalmanFitting  Print [ 1 ]	0	// Global fit info.
+CsKalmanFitting  Print [ 2 ]	0	// IKF info.
+CsKalmanFitting  RefPlane	-2000	// in mm
+CsKalmanFitting  RefBeam	-4300	// in mm
+CsKalmanFitting  RefMargin	500	// in mm
+// Chi2 increment cuts:		DirChi2Trk	InvChi2Trk
+CsKalmanFitting  CUTS		7		10.75
+// Vertex Chi2 cut:
+CsKalmanFitting  Chi2VCut	10.5
+
+
+//					   ***** RICH1
+//make rich1 reconstruction
+include ${CORAL}/src/pkopt/rich1.mc.2003.opt
+RICHONE	C4F10RefrIndex	1.00027		// N2 nominal refraction index
+
+//					   ***** CALORIMETERS
+make calorimeters reconstruction
+include ${CORAL}/src/pkopt/calorim_mc.opt
+//                   Overwrite what's set in "calorim.opt"
+EC01P1__ MC response MCSmeared		// Special setting for hadron
+EC02P1__ MC response MCSmeared		// Special setting for hadron
+
+//					   ***** MU' PID
+include ${CORAL}/src/pkopt/trigger.2003.opt
+
+//  	 	 	 	 	   ***** GEOMETRICAL ZONES
+define zone -3530  3500 before M1
+define zone  3500 17000 between M1 and M2
+define zone 17000 33000 between M2 and Muon Wall
+define zone 33000 99999 after Muon Wall
+
+define zone -8000 -3530 before the target
+
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+
+CsField SM1m_field_measured	${COMPASS_FILES}/maps/mag_fields/SM1m/SM1M.map.172.data
+CsField SM2_field		${COMPASS_FILES}/maps/mag_fields/SM2/FSM.map.5000.data
+
+//					   ***** LOGGER
+error logger log level		error	// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level	none
+error logger verbosity		normal	// low, normal, high. 
+
+//	  	  	  	  	   ***** TraFDic (+DET OPTIONS+...)
+include ${CORAL}/src/pkopt/trafdic.mc.h2004.opt
+
+
+//                   Overwrite what's set in "../pkopt/trafdic.mc.hadron.opt"
+TraF	SmoothPos [0]	 745		// Smooth track at Rich entrance
+//TraF	SmoothPos [1]	1400		// Required to have correct smoothing @ RICH (to be confirmed..)
+//TraF	Graph	[0]	0		// For INTERACTIVE coral w/o graphics
+//TraF	Print [ 0 ]	7		// Event-by-event numbering.
+//TraF	Print [ 8 ]	7		// EoE
+//TraF	SmoothPos [2-4]	2100	3200	4440	// To have correct Smoothing in zone 0x4 (All 3? To be confirmed...)
+
+
+// ********** SPECIAL SETTING TO HISTOGRAM GEMs Amplitude Correlation **********
+// (in "TEv::RDMonitor", which need be recompiled w/ "RDMon_DIGIT_DATA" and
+// "RDMon_DIGIT_GM" defined)
+//TraF	Hist	[ 1]	21	// MCMonitor (&2:D0Kpi,&4:Scat'd mu,&8:Lppi)
+//TraF	Hist	[18]	2	// Residuals: &Groups of tracks histo'ed
+// (in "TEv::Quadruples", which need be recompiled w/ "Quadruples_HISTO" defined)//end

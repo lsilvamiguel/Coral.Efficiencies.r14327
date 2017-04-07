@@ -1,0 +1,11 @@
+// Option file for ECAL0 FEM monitoring
+EC00P1__ correct_leds_by_fem_signal
+EC00P1__ FEM_NAME EC00FEM_
+EC00P1__ FEM_IS_IN_USE YES
+EC00P1__ FEM_AMOUNT 4
+EC00P1__ FEM_NORM_IDs: 0 1 2 3
+// This settings is not optimal in case of several fems for normalization Something to think about.
+EC00P1__ FEM_RANGE_MIN 2.
+EC00P1__ FEM_RANGE_MAX 3901.
+EC00P1__ FEM_REF_DEFAULT 1000.
+

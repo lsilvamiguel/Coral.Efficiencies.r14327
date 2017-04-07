@@ -1,0 +1,57 @@
+//
+// MONTE-CARLO FOR HADRON2009T51 PRODUCTION
+//
+
+// use trafdic.mc.h2009.opt as basis
+include ${CORAL}/src/user/trafdic.mc.h2009.opt
+
+// copied from template_Primakov2009_hadron.opt
+Traf ReMode [26] 1 // Bridging over target
+
+// copied from template_Primakov2009_hadron.opt
+TraF dCut [84] .00	// SI route enlargement w.r.t. resolution (for when badly aligned)	(TSetup::Init,TEv::PrePattern2,BridgeSegments2)
+TraF dCut [85] .00 	// SI position uncertainties correction term (for when badly aligned)	(TEv::ImportClusters)
+
+// copied from template_Primakov2009_hadron.opt
+TraF DetNameOff VO VI HK HI05 DW02Y1 DW02X2 SI02X1 MP
+
+// copied from template_Primakov2009_hadron.opt
+TraF iPRpar [ 40 - 47 ] 3 3 11 2 4 9 3 2 	// Take lack of SI02X into account => 2+3/4 SI + 1 FI
+
+// copied from template_Primakov2009_hadron.opt
+mDST	select	0	// 0: no selection
+
+// commented-out this stuff because it crashes CORAL
+//mDST	DAQdigits	RP CE RA RM HBC01 HM01P1 HM01P2 HO04 // To keep the DAQ digits of the Mainz and Munich counters
+mDST hits HO04
+//mDST hits HO04 SI FI GP GM
+
+//					***** SETUP FILES
+
+// for the moment we cannot use RD detectors.dat and dico files because of
+// incompatibilities (detector number mismatches), hopefully this issue will
+// be resolved at some point in the future.
+//  And also, it can be done only if the offsets (and other alignment par's) in
+// .ffr cards defining the COMGeant setup match exactly the RD detectors.dat's.
+//  - Which is not straightforward: would necessitate a set of .ffr per period
+//   of data taking (offsets in RD detectors.dat's fluctuate over time).
+//  - Which is not that useful (compared to magnitude of the task and procided
+//   .ffr contain average offsets reasonably approaching RD ones): the residual,
+//   small diffs in offset between MC and RD (corresponding to the fluctuations
+// mentioned supra) won't affect much the setup acceptance.
+// Note: decoding maps are not used in MC
+
+//decoding	map	/afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t51/maps
+//detector	table	/afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t51/alignement/new/
+//TraF		Dicofit	/afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t51/dico/new/
+
+CsMaterialMap Zone_1 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t51/material/material.target.ni2009.00.dat
+CsMaterialMap Zone_2 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t51/material/material.saclay.h2009.00.map
+CsMaterialMap Zone_3 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t51/material/material.straw.h2009.00.map
+CsMaterialMap Zone_4 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t51/material/material.rich.h2009.00.map
+CsMaterialMap Zone_5 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t51/material/material.hcal1.h2009.00.dat
+CsMaterialMap Zone_6 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t51/material/material.muf1.h2009.00.dat
+CsMaterialMap Zone_7 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t51/material/material.muf2.h2009.00.map
+CsMaterialMap Zone_8 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t51/material/material.muf3.h2009.00.map
+CsMaterialMap ELossTarget /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t51/material/material.target_de.ni2009.00.dat
+

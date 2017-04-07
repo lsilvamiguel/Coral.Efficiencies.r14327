@@ -1,0 +1,18 @@
+/// **********  CsRICH1UpGrade  MC options
+
+CsRICH1UpGrade CONFIG
+CsRICH1UpGrade FillMCHito No
+
+/// **********  CsRICH1UpGrade special option to select only intime mc hits
+// CsRICH1UpGrade  SelectInTimeMCHits No
+// CsRICH1UpGrade  IgnoreMCHits
+
+//  Marks for MAPMT Planes:                     M       M                   M       M
+CsRICH1UpGrade RedFactor [ 0 -15 ]  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.
+
+
+include ${CORAL}/src/pkopt/rich1_upgrade_apv_mc.opt	
+
+include ${CORAL}/src/pkopt/rich1_upgrade_mapmt_mc.opt	
+
+/// ********** End of CsRICH1UpGrade APV MC options

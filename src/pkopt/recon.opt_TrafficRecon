@@ -1,0 +1,86 @@
+//------------------------------
+//
+//   RECON (track reconstruction)
+//   control options
+//
+//------------------------------
+
+ReC     Switch              0                //if 0 - switch on Recon;  if > 0 switch off Recon    
+
+ReC     McPar [0]           1    // MC option: 0 (no MC info);            1 (full MC quality check) 
+                                 //            2 (as 0 but with ntuple ): 3 (as 1 but with ntuple) 
+ 
+ReC     McPar [1-2]    8  8   // min number of hits in tel.1 and tel.2 for acc. track (external hits)
+
+ReC     inPar  [0]    1316    // 10000*print+1000*mode1+100*mode + 10*ffex + number of iterations
+                              // print - switch for full printout 0 - off, 1 - on
+                              // mode1 - switch for reiteration in spline 0 - off,1-8  - on
+                              // mode - parameter for control removing segments before SM1 (0-8)
+                              // ffex - switch for fringe field reconstruction and extrapolation:
+                              // 0 - all off, 1 - all on, 2 - ff off,extrap. on 3 - ff on extrap. off
+                              // number of iteration allowed: 1-8
+                            
+
+ReC     inPar [1]          80        //min. number of hits used for correct reconstruction
+
+ReC     inPar [2]          5         //parameter for refit in spline (for experts)
+
+ReC     roadPar [0-1]     0.0001   0.0001              // roadwidth in y (det.1 - for target shot)
+
+ReC     roadPar [2-5]     0.0001   0.0001  0.01  0.01 // roadwidth in z (det.1-2 - for target shot)
+
+ReC     roadPar [6-9]     0.001  0.001  0.003 0.003 // roadwidth in theta (det.1-2, double set)
+
+ReC     roadPar [10-13]   0.04 0.02 0.005   0.07 // roadwidth in y,z and theta for fringe field 
+                                                 // reconstruction and for extrapolation (last)
+ReC     roadPar [14-16]   0.2   0.3   0.25       // fringe field parameters
+
+
+                  // parameters defining initial effective active regions
+
+ReC     activeRegion [0-1] 0.0  0.0        // active region in telescope 1 (0/0 default)
+
+ReC     activeRegion [2-3] 0.0  0.0        // active region in telescope 2  
+
+ReC     nbPlanes [0-5] 6 8   3 4   5 7  //min. nb. of addit. planes in tel.1 (th and all)(3 setups)
+
+ReC     nbPlanes [6-9] 2 11  3 5       // min. nb. of addit. planes in tel.2 (th and all)  
+
+                    
+                  //tolerances in assoc (zp) for proj.        
+ReC    ReProj  [0-7]     0.08   0.12    0.16   0.2   0.22   0.24   0.26   0.26    
+
+                  //tolerances in assoc (z) for proj. 
+ReC   ReProj [8-15]      0.03  0.06   0.1   0.13   0.15   0.18   0.2   0.25   
+
+ReC    roadLengh [0-3]    0.0015    0.0023     0.0013     0.0013  
+
+                  //chi parameters
+ReC    chiPar [0]         65.0         //max chi2/nd in segment fit (normal reconstruction)
+
+ReC    chiPar [15]        65.0        // max chi2/nd in segment fit for fringe field
+
+ReC    chiPar [13-14]    20.0  25.0   // chi2/nd for fringe field and extrapolation from Rich to SM2
+
+ReC    chiPar [1-3]       2.0  2.0  3.0 
+
+ReC    chiPar [4-6]       4.0  4.0  5.0 
+
+ReC    chiPar [7-9]       5.0  5.0  7.0 
+
+ReC    chiPar [10-12]     10.0  10.0  20.0
+
+            //target parameters (temporary here !!!   xtarg0,hltarg,ytarg,ztarg)
+ReC    ReTarget [0-3]   0.0     0.6      0.0125     0.0125     
+
+
+
+//end
+
+
+
+
+
+
+
+

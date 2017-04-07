@@ -1,0 +1,33 @@
+#!/bin/csh
+echo "\nConfiguring Coral... \n\n"
+cd ../..
+./configure
+source setup.csh
+
+echo "\nConfiguring decoding library... \n\n"
+cd src/DaqDataDecoding
+# ./configure
+make clean
+# lsrun make -j3 MAKE='make -j3'
+make -j 3
+
+echo "\nCompiling MySQLDB interface \n\n"
+cd ../condb/mysqldb/MyInterface
+make clean
+# lsrun make -j3
+make -j 3
+
+echo "\nCompiling GEM library \n\n"
+cd ../../../geom/gem
+make clean
+make -j 3 LIB_TYPE=static
+
+echo "\nConfiguring Coool... \n\n"
+cd ../../coool
+./configure
+
+echo "\nCompiling Coool \n\n"
+make clean
+# lsrun make -j3 MAKE='make -j3'
+make -j 3
+

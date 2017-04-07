@@ -1,0 +1,17 @@
+#	Experiment hall layout configuraiton file.
+#
+#
+#
+
+station	SF1	// at z = 164.0
+	reference	260.0	260.0	74	( 260.0,  260.0, -90.0)
+	reference	-260.0	260.0	74	(-260.0,  260.0, -90.0)
+	reference	260.0	-260.0	74	( 260.0, -260.0, -90.0)
+end station
+
+station	SF1	// at z = 215.5
+	reference	260.0	260.0	125.5	( 260.0,  260.0, -90.0)
+	reference	-260.0	260.0	125.5	(-260.0,  260.0, -90.0)
+	reference	260.0	-260.0	125.5	( 260.0, -260.0, -90.0)
+end station
+

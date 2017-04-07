@@ -1,0 +1,261 @@
+// $Id: trafdic.mc.2008.opt 14069 2015-09-17 20:44:46Z lsilva $
+
+// Options file for TraFDic on 2008 MC w/ hadron setup
+
+// Caveat: The default here corresponds to <0 hadron data. Some changes would
+// have to be introduced for >0 hadron data.
+
+//  This file sums up the main options. Other options are specified elsewhere
+// and referenced here by "include <path_to_2ndary_options_file>" statements.
+// All options can be entered several times, whether in main or secondary files.
+// The last one, in the stream of entries and "include" statements, always wins.
+
+//  For the simulation of a particular mass production: check the present
+// conform to the production ones.
+//  For any other particular application, this file has to be edited or, better,
+// ``included and overwritten''. Cf. the TWiki page:
+// "wwwcompass.cern.ch/twiki/bin/view/DataReconstruction/CoralSoftware#Options_files"
+
+//  !!!NOTA BENE!!!: Working aroud RUN-TO-RUN MISALIGNMENT, cf. dedicated block
+// of options infra, is disabled by default, in conformity RD options file
+// "../trafdic.2008.minus.opt".
+
+// Originally copied from "../trafdic.mc.2007.opt,v1.1"
+
+
+//                                         ***** phast OUTPUT
+// - Active only if used on a phast-compatible executable, cf. "./README"
+// - Cf. "$PHAST/coral/README" for the details of the options
+mDST	file		${HOME}/phast.mc.root
+// Information reduction bit pattern: "mDST select".
+// NO EVENT SELECTION to be requested. Indeed! No discarding of events allowed
+// for unbiased estimate of tracking efficiency.
+mDST	select		8	// 8: Only first and last helix of every track is stored.
+//mDST	MCgen		0	// MC generator info
+// MC hits: Select a set of det's covering all of acceptance, outside magnetic field
+mDST	hits		HH RP HK FI01	// ...
+mDST	MChits		HH RP HK FI01	// Supply PHAST's helper class w/ RPD hits and trigger elements to generate DT0
+//mDST	MChits		RP01R	SI04	SI05	MM01	DC00	MM02	// One can append a list of other (abbreviated) TB names to "RP01R", if needed.
+
+
+//					   ***** HISTOGRAMMING
+histograms package ROOT
+
+histograms home    ${HOME}/trafdic.mc.root
+
+
+
+
+Monte Carlo job				// ***** THIS IS AN MC RUN
+
+hadron run					// ...of the hadron type
+
+//		CG,v7.3.h2008.03
+
+//Monte Carlo file	/castor/cern.ch/user/v/valexakh/hadron/piminus190/2008/fz/hadron_2008.160.full.2008.03.outpipe.fz.1	// .1 -> .9
+
+//		CG,v7.4.h2008.04
+
+Monte Carlo file	/castor/cern.ch/user/c/comgeant/data/mc/hadron/2008/fz/hadron2008.full.2008.04.outpipe.fz.2	// .2 -> .10
+//Monte Carlo file	/afs/cern.ch/compass/scratch/weekly/d02/comgeant/h2008/hadron2008.full.2008.04.outpipe.fz.2	// .2 -> .10. It's a temporarily available disk copy of supra.
+//Monte Carlo file	cchpsscompass:/hpss/in2p3.fr/group/compass/mc/2008/hadron2008.full.2008.04.outpipe.fz.2	// .2 -> .10
+//Monte Carlo file	/castor/cern.ch/user/u/uman/mc/diffractive/piminuseta/gen/events.outpipe.2.fz_0193
+
+// 					   ***** DETECTOR TABLE...
+
+//...is specified in the "./pkopt/trafdic.mc.h2008.opt" file included infra.
+// It can be re-defined if the default there does not fit: cf. alternative
+// "detector table" entry infra.
+
+
+
+
+//					   ***** EVENT SELECTION
+events to read 40000			// # of events to read
+//events to skip 259
+//selection trigger mask 7fffff		// No trigger selection in the hadron setup, because I(Y.B.) guess the trigger simulation (in particular the RPD part) is not properly simulated.
+
+
+// seed for random number generations:
+random number	engine	JamesEngine	// JamesEngine, DRand48Engine, etc...
+random number	seed	19990102	// Special seed 0: following general convention, truely random seed is chosen, read from Linux kernel entropy source
+//reset random seed every new event	// For debugging purposes
+
+pattern method 1        // not used yet
+tracking method 1       // not used yet
+
+// 					   ***** DECODING
+make decoding 	 	// <nothing>, MCExact
+
+//  	 	 	 	 	   ***** CLUSTERING
+make clustering 	// <nothing>, MCExact, MCSmeared, MCQuantized
+
+//					   ***** RECONSTRUCTION SCHEMA
+reconstruction schema 1
+
+//					   ***** TRACKING
+make tracking
+track prepattern method traffic
+track bridging   method traffic
+track fitting    method traffic
+
+// 					   ***** ROOTGeometry
+CsROOTGeometry file	$COMPASS_FILES/geometry/2008/ROOTGeometry/detectors.lh2.r354.C	// LH2: this the file used in 08W37/slot4 mass prod.
+CsROOTGeometry massDefault	.1396	// for muons use .1057 instead
+TraF	ELossStraggling 	1
+
+
+//					   ***** Beam RECONSTRUCTION 
+//make beam reconstruction	// No BMS in 2008 => No beam reco required.
+//                   Beam PID
+PID_doBeamID selAllBeams 1
+
+//					   ***** Vertex RECONSTRUCTION
+make vertex reconstruction
+vertex pattern method averaging
+vertex fitting method kalman
+include ${CORAL}/src/pkopt/vertex.2002.opt	// No change w.r.t. 2002
+//                   Overwrite what's set in "vertex.opt"
+CsAverPattern	Hist		1	// 0 - Off, 1 - ON
+CsAverPattern	findSec   	1	// 0 - Off, 1 - ON
+CsAverPattern	Print [ 0 ]	0	// Prefilter info.
+CsAverPattern	Print [ 1 ]	0	// Error info. 
+// Track is considered as accepted if its momentum is smaller
+// than "AcceptTill" percents of beam track
+CsAverPattern 	AcceptTill	105	// in %
+// 	 	 	Z Dist 		   DCA(number of sigmas)
+CsAverPattern	CUTS		2550			10 	// Z cut so that vertex search domain includes GP01
+CsKalmanFitting  Hist		1	// 0 - Off, 1 - ON
+CsAverPattern TimePrimCut 10 	// in sigmas
+CsKalmanFitting  Print [ 0 ]	0	// Kalman filter info.
+CsKalmanFitting  Print [ 1 ]	0	// Global fit info.
+CsKalmanFitting  Print [ 2 ]	0	// IKF info.
+CsKalmanFitting  RefPlane	500	// in mm
+CsKalmanFitting  RefBeam	-1500	// in mm
+CsKalmanFitting  RefMargin	500	// in mm
+// Chi2 increment cuts:		DirChi2Trk	InvChi2Trk
+CsKalmanFitting  CUTS		7		10.5
+// Vertex Chi2 cut:
+CsKalmanFitting  Chi2VCut	10
+CsKalmanFitting  BeamP0 	190 	// Beam reference momentum (for histo purposes)
+
+//					   ***** RICH1
+make rich1 reconstruction
+include ${CORAL}/src/pkopt/rich1.mc.2006.01.opt	// No 2008 update available yet
+CsRICH1UpGrade 	CONFIG		// RICH upgrade: 12 APV 4 MAPMT
+RICHONE 	BackgrParam05    ${CORAL}/src/pkopt/back-para-52613lon-2006.new-vector74	// Not sure this is the most appropriate background file...
+// Have RICH somewhat less vebose than what's set in "rich1.2006.opt"
+RICHONE 	PrintDetMirr	0
+RICHONE 	AcknoMethods	0   // prints methods in use
+RICHONE 	PrintKeys	0   // 1 = print keys read,  0 = No print
+RICHONE 	PrintConsts	0   // 1 = print rec. constants read,  0 = No print
+
+//					   ***** CALORIMETERS
+make calorimeters reconstruction
+//  We have at our hand two different calorimetry options files: one designed
+// specifically for MC, viz. "calorim_mc.opt", and one as it is used for real
+// data. To enable either of the in total three be sure the properly set up the
+// file included or at the appropriate MoreRecoOptions lines below.
+include 	${CORAL}/src/pkopt/calorim_mc.2008.opt 	 	// Dedicated MC
+//include 	${CORAL}/src/pkopt/calorim_2008.opt		// Real Data
+//                                         ** Rich Wall + ECAL1 reconstruction
+make RW charge reconstruction 	// RW+calo charge reco
+include ${CORAL}/src/pkopt/rw_ch_2008.opt
+
+//					   ***** FLUX SCALERS
+include ${CORAL}/src/pkopt/trigger.2008.opt
+
+//  	 	 	 	 	   ***** GEOMETRICAL ZONES
+define zone      -350    3500   before M1
+define zone      3500   21000   between M1 and M2
+define zone     21000   32800   between M2 and Muon Wall
+define zone     32800   99999   after Muon Wall
+
+define zone     -8000    -350   before the target
+
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+
+CsField SM1m_field_measured	$COMPASS_FILES/maps/mag_fields/SM1m/SM1M.map.172.data
+CsField SM2_field	$COMPASS_FILES/maps/mag_fields/SM2/FSM.map.5000.data
+
+
+//					   ***** LOGGER
+error logger log level   error		// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level none
+error logger verbosity   normal		// low, normal, high. 
+
+
+//	  	  	  	  	   ***** TRACKING
+
+include 	${CORAL}/src/pkopt/trafdic.mc.h2008.opt		// CG,v7.4 2008.04
+
+//		***** OVERWRITE WHAT'S SET IN "../pkopt/trafdic.mc.h2008.opt"
+
+// Reset the beam definition ("trafdic.mc.h2008.opt" corresponds to <0 hadron data taking).
+//TraF	iCut	[15]	1	// Beam charge.		(TEv::TracksFit2,GetIncidentTracks)
+// Alternative detectors.dat and dico. E.g. for incident pi+ instead of pi-:
+//detector table  	~/public/2008/detectors.h2008.04.real.dat
+//TraF	Dicofit		$COMPASS_FILES/geometry/mc/dico/dico.h2008.04
+
+// ***** SIMULATING RUN-TO-RUN MISALIGNMENT
+// - To be enabled when RUN-BY-RUN alignment is not available in the RD mass one
+//  wants to simulate. RUN-TO-RUN misalignment is then worked around by
+// artificiallly blowing up SI routes and uncertainties:
+//TraF	dCut	[84]	.0050	// SI route enlargement w.r.t. resolution
+//TraF	dCut	[85]	.0040	// SI position uncertainties correction term
+
+// ***** HADRON SPECIFICS in the track reconstruction scheme:
+// - Bridging over target:
+Traf	ReMode	[26]	1	// Always try bridging over target
+// - Enable double bridging:
+TraF	ReMode	[18]	15	// Backtrack. &0x1: Zone 1 (&0x2: even w/out P). &0x4: Zone 2, &0x8: Double Bridging
+// - Fast fit in Bridging conditioned by RICH pipe:
+TraF	ReMode	[46]	1	// Track fit in Bridging: fast fit (except for tracks through RICH pipe) terminated by one-pass full KF. 
+TraF	ReMode	[14]	15	// Dico fit: 0xf = in PR and in Bridging (for init'ing P)
+TraF	dCut	[97]	25.	// Preliminary chi2/Nhits for track candidate bridged w/ FullKF
+TraF	dCut	[ 9]	25.	// Final chi2/Nhits cut for bridged track candidate
+// - Arbitration between 0x3 and 0x6 bridges
+TraF	dCut	[94]	0	// Disabled
+// - SI space point cleaning
+TraF	iCut	[36]	4	// Check consistency of SI space points w/ multiplicity >= 4.
+//TraF	ReMode	[47]	3	// CPU saving in Bridging: 0x1: Recycle FullKF fit, 0x2: No systematic refit after cleaning.
+
+// Redefine the TBNAMES of DETECTORS to be EXCLUDED FROM PATTERN RECOGNITION:
+// - In any case, some detectors ("DW02X2", "HI", "HO03") have to be left turned off , cf. explanations in "../pkopt/trafdic.mc.h2008.opt".
+// - But one may want, or may have, to turn off some more.
+// - "DW02Y1" broke one of its wire end of August 2008, probably between 08W35#70113 and 08W35#70116, cf. "wwwcompass.cern.ch//runLogbook/dirphp/show_comment.php?commnb=24375" => It has to be turned off depending upon the period (>=08W35) and the mass production of the real data (check the options file used therein) one wants to emulate, as is done in the following, commented out, entry.
+//TraF	DetNameOff	VO	VI	DW02X2	DW02Y1	HI05
+// ==> ==> Implications:
+// - DETECTORS being EXCLUDED may imply updating some PR options, e.g.:
+//TraF	ReMode	[17]	0	// Disable GEM amplitude correlations, if any GEM is among the turned-off detectors.
+LR associate  DW02Y1__   DW02Y2__ 45.0	  0.5 	0	// To be disabled if "DW02Y1" is turned off
+
+//TraF	Graph	[0]	0	// coral's graphics switches off automatically under BATCH @ CERN, gridKa and Lyon. This option forces it to do so in any case. 
+//TraF	Print	[ 0]	3	// Event-by-event numbering
+//TraF	Print	[ 1]	1	// MC Info
+//TraF	Print	[ 8]	7	// EoE
+
+//			SMOOTHING POINTS
+// The points @ RICH (resp. Calos) are to be used by RICH (resp. Calo) software.
+TraF	SmoothPos [0]	745.1		// Smooth track at Rich entrance
+// From: Vladimir Kolosov
+// Sent: Thu 2/28/2008 9:14 AM
+// Let's decide to calculate track position 10 cm upstream front surface of a calorimeter.
+// calo  EC01P1__  1399.500 - 45./2       - 10. = 1367.0
+// calo  EC02P1__  3325.200 - 45./2       - 10. = 3292.7
+// calo  HC01P1__  1573.700 -100./2 -22.5 - 10. = 1501.2
+// calo  HC02P1__  3580.000 -120./2       - 10. = 3510.0
+// 2011-04-28: updated to match current detectors.dat
+TraF	SmoothPos [1]	1367.0	// Smooth track at ECAL1
+TraF	SmoothPos [2]	1501.2	// Smooth track at HCAL1
+TraF	SmoothPos [3]	3292.7	// Smooth track at ECAL2
+TraF	SmoothPos [4]	3510.0	// Smooth track at HCAL2
+
+// ********** SPECIAL SETTING TO HISTOGRAM GEMs Amplitude Correlation **********
+// (in "TEv::RDMonitor", which need be recompiled w/ "RDMon_DIGIT_DATA" and
+// "RDMon_DIGIT_GM" defined)
+//TraF	Hist	[ 1]	21	// MCMonitor (&2:D0Kpi,&4:Scat'd mu,&8:Lppi)
+//TraF	Hist	[18]	2	// Residuals: &Groups of tracks histo'ed
+// (in "TEv::Quadruples", which need be recompiled w/ "Quadruples_HISTO" defined)
+//end

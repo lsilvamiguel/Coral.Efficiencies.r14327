@@ -1,0 +1,40 @@
+// $Id: pixelgem.2006.opt,v 1.4 2011/02/18 15:06:23 suhl Exp $
+
+// PixelGEM options for 2006 w/ 1 PixelGEM
+
+// Thresholds for strip and cluster amplitudes in units of sigma
+GP Threshold [0-1] 3.  5.
+
+// Polygon cut on amplitude ratios in A2/A3 (x) - A1/A3 (y) plane: (x,y) pairs
+GP AmplitudeRatio [0-7] -0.05 -0.05 1.8 -0.05 1.8 1.6 -0.05  1.6
+
+// Clustering method: 0=simple clustering (1 hit=1 cluster), 1=full clustering
+GP Clustering 1
+
+// Config mask for PixelGEM clustering procedure:
+// bit 0 (lsb): enable hit division between adjacent clusters
+// bit 1      : enable diagonal clustering
+// bit 2      : enable time use of time information for clustering
+// bit 3      : enable size splitting
+// bit 4      : enable/disable cluster position size splitting
+// bit 5      : switch between r (1) condition and x&y (0) condition in pos-clust
+// bit 6+7    : enable/disable hit sharing (0 : no sharing; 1 : to all; 2 : fraction)
+GP ClusterConfigMask 179
+
+// Crosstalk suppression parameters
+// in 2006 only the prototype was present, parameters as in M.Kraemers diploma thesis
+GP CrossTalkParams [0-1]  0.35    0.35
+
+// Set parameters for the position correction of pixel clusters
+GP PosCorrs [ 0- 3]  0.04405 -0.9458   2.605   -1.741   // position correction for clusters of category  10 (in X direction)
+GP PosCorrs [ 4- 7]  0.04405 -0.9458   2.605   -1.741   //                                               11 (in Y direction)
+GP PosCorrs [ 8-11]  0.06881  0.       0.       0.      //                                              104 (in X direction)
+GP PosCorrs [12-15]  0.06242  0.       0.       0.      //                                              104 (in Y direction)
+GP PosCorrs [16-19]  0.07351  0.       0.       0.      //                                              105 (in X direction)
+GP PosCorrs [20-23] -0.08670  0.       0.       0.      //                                              105 (in Y direction)
+GP PosCorrs [24-27] -0.08463  0.       0.       0.      //                                              106 (in X direction)
+GP PosCorrs [28-31]  0.06750  0.       0.       0.      //                                              106 (in Y direction)
+GP PosCorrs [32-35] -0.08397  0.       0.       0.      //                                              107 (in X direction)
+GP PosCorrs [36-39] -0.08520  0.       0.       0.      //                                              107 (in Y direction)
+GP PosCorrs [40-43]  0.       0.       0.       0.      //                                              200 (in X direction)
+GP PosCorrs [44-47]  0.       0.       0.       0.      //                                              200 (in Y direction)

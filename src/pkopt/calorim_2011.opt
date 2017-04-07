@@ -1,0 +1,176 @@
+// $Id: calorim_2011.opt 13223 2012-02-01 15:36:38Z suhl $
+
+
+//      Possible RecoOptions:
+//      ---------------------
+// Option                               Possible values         Default value
+// ------                               ---------------         -------------
+// DEBUG                                some integer            -1
+// PARTICLE_DEFAULT                     some integer            Particle::GAMMA
+// CALIB                                YES, NO                 NO
+// CALIB_ENERGY                         some float              0
+// ENABLE_TIME_CALIB                    YES, NO                 NO
+// TIME_GATE_CALIB                      some float              5.0
+// CLUSTER_SEARCH                       YES, NO                 NO
+// CLUSTER_SEARCH_ONLY                  YES, NO                 NO
+// USE_HINT_PARTICLES                   YES, NO                 NO
+// FIT                                  SIMPLE, NORMAL          SIMPLE
+// HIST                                 YES, NO                 YES
+// HIST_ENERGY_MAX                      some float              200.
+// PARTICLE_ENERGY_THRESHOLD            some float              0.3
+// CELL_ENERGY_THRESHOLD                some float              0.1
+// CLUSTER_SEARCH_CELL_ENERGY_THRESHOLD some float              0.02
+// CLUSTER_SEARCH_CELL_AMPL_DEVIATION   some float              2
+// USE_PROB_NOISE                       YES, NO                 NO
+// PROB_CELL_NOISE                      some float              0.01
+// CALIB_EVENT_RECONSTRUCTION           YES, NO                 NO
+// Specific Fortran reconstruction options:
+// FORTRAN_RECONSTRUCTION               YES, NO                 NO
+// FAST_RECONSTRUCTION                  YES, NO                 NO
+// HBOOK                                YES, NO                 NO
+// BAD_CELL_CHECK                       YES, NO                 NO
+// VARIABLE_THRESHOLDS                  YES, NO, READ           NO
+// ECA2_TIME_0                          some float              0.
+// ECA2_TIME_WIDTH                      some float              5.0
+// CALIB_JOUJOU                         YES, NO                 NO
+
+EC01P1__ MoreRecoOptions PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1 TOLERANCE_FOR_NEARBY_CELLS=15.0
+EC02P1__ MoreRecoOptions PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1
+HC01P1__ MoreRecoOptions PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1
+HC02P1__ MoreRecoOptions PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1
+
+EC01P1__ MoreRecoOptions DEFAULT_CALIBRATION=0.03
+EC02P1__ MoreRecoOptions DEFAULT_CALIBRATION=0.03
+HC01P1__ MoreRecoOptions DEFAULT_CALIBRATION=0.03
+HC02P1__ MoreRecoOptions DEFAULT_CALIBRATION=0.05
+
+EC01P1__ MoreRecoOptions HIST=YES
+EC02P1__ MoreRecoOptions HIST=YES
+HC01P1__ MoreRecoOptions HIST=YES
+HC02P1__ MoreRecoOptions HIST=YES
+
+// for ECAL1 and ECAL2 use LED calibration by default
+EC01P1__ MoreRecoOptions USE_LED_REF_CALIB_CORRECTION=YES USE_LED_REF_CALIB_CORRECTION_IN_SPILLS=YES
+EC02P1__ MoreRecoOptions USE_LED_REF_CALIB_CORRECTION=YES USE_LED_REF_CALIB_CORRECTION_IN_SPILLS=YES
+
+// Kolosov "SIMPLE" reconstruction
+EC01P1__ MoreRecoOptions FIT=SIMPLE
+
+// Kolosov "SIMPLE" reconstruction
+//EC02P1__ MoreRecoOptions FIT=SIMPLE
+// Lednev "FORTRAN" reconstruction
+//EC02P1__ MoreRecoOptions RECONSTRUCTION=FORTRAN HBOOK=NO FAST_RECONSTRUCTION=NO
+// S. Uhl "Combined" reconstruction
+EC02P1__ MoreRecoOptions RECONSTRUCTION=COMBINED CELL_ENERGY_THRESHOLD=0.2 CELL_ADC_THRESHOLD=7. MIN_SHOWER_DISTANCE=0.7
+EC02P1__ MoreRecoOptions CORRECT_LONGITUDINAL_LEAKAGE=FALSE USE_RECO_COMBINED_CALIB=TRUE
+
+HC01P1__ MoreRecoOptions FIT=SIMPLE
+HC02P1__ MoreRecoOptions FIT=SIMPLE
+
+
+
+// EC01P1__ MC response MCSmeared
+// EC02P1__ MC response MCSmeared
+// HC01P1__ MC response MCSmeared
+// HC02P1__ MC response MCSmeared
+
+// EC01P1__ MC response MCExact
+// EC02P1__ MC response MCExact
+// HC01P1__ MC response MCExact
+// HC02P1__ MC response MCExact
+
+EC01P1__ BookHistograms
+EC02P1__ BookHistograms
+HC01P1__ BookHistograms
+HC02P1__ BookHistograms
+
+
+EC02P1__ SADC_DECODE_VERSION 1
+EC02P1__ SADC_DELTA 0
+EC02P1__ SADC_PED_MIN 0
+EC02P1__ SADC_PED_MAX 4
+EC02P1__ SADC_SIGNAL_MIN 5
+EC02P1__ SADC_SIGNAL_MAX 25
+EC02P1__ SADC_FRONT 7
+EC02P1__ SADC_FRONT_GATE 3
+EC02P1__ SADC_CONVERT2MAX 0.105
+
+EC02P1__ MSADC SrcIDs: 616 617 618 619 620 621
+EC02P1__ new_sadc_decoding
+EC02P1__ add_timeinfo_to_cs_digits
+//EC02P1__ add_sadcinfo_to_cs_digits
+//EC02P1__ add_all_sadcinfo_to_cs_digits
+
+
+
+EC02P1__ RAW_AMP_CUT_DELTA 4.
+EC02P1__ RAW_TIME_CUT_MIN -50.
+EC02P1__ RAW_TIME_CUT_MAX  50.
+
+EC01P1__ RAW_AMP_CUT_DELTA 4.
+EC01P1__ RAW_TIME_CUT_MIN -50.
+EC01P1__ RAW_TIME_CUT_MAX  50.
+
+EC01P1__ new_style_sadc_timing
+EC01P1__ new_sadc_decoding
+EC01P1__ add_timeinfo_to_cs_digits
+//EC01P1__ add_sadcinfo_to_cs_digits
+//EC01P1__ add_all_sadcinfo_to_cs_digits
+
+HC01P1__ new_sadc_decoding
+HC02P1__ new_sadc_decoding
+
+
+HC02P1__ RAW_AMP_CUT_DELTA 4.
+HC02P1__ RAW_TIME_CUT_MIN -50.
+HC02P1__ RAW_TIME_CUT_MAX  50.
+
+HC01P1__ RAW_AMP_CUT_DELTA 4.
+HC01P1__ RAW_TIME_CUT_MIN -50.
+HC01P1__ RAW_TIME_CUT_MAX  50.
+
+HC02P1__ add_timeinfo_to_cs_digits
+HC01P1__ add_timeinfo_to_cs_digits
+
+
+// Definition of the shower profiles used in S. Uhl's Combined reconstruction.
+// Values for EC02 are taken from Anatoli Lednev's FORTRAN reconstruction, the
+// ones for EC01 have been fitted to electron calibration data by S. Uhl.
+
+EC01P1__ ShowerProfile Lednev
+EC01P1__ ShowerProfileParams olga       [0-3]    3.668  -2.668   2.085   2.085
+EC01P1__ ShowerProfileParams mainz      [0-3]    0.910   0.090   3.211   5.e-17
+EC01P1__ ShowerProfileParams gams       [0-3]    0.277   0.723   0.701   5.119
+
+EC02P1__ ShowerProfile Lednev
+EC02P1__ ShowerProfileParams gams       [0-3]    1.191  -0.191   6.664  43.777
+EC02P1__ ShowerProfileParams rhgams     [0-3]    1.191  -0.191   6.664  43.777
+EC02P1__ ShowerProfileParams shashlik   [0-5]    0.885  -0.14    0.255   8.104  55.86    1.52
+
+// parametrization of per cell energy error
+// sigmaE(E) = sqrt(a*a*E + b*b*E*E + c*c)
+//                                               a       b       c
+EC02P1__ ParamEnergyError               [0-2]    0.15    0.015   0.05
+
+// parametrization of time error
+// sigmaT(E) = sqrt(a*a/E + b*b/E*E + c*c)
+//                                               a       b       c
+EC02P1__ ParamTimeError                 [0-2]    0.9055  1.3077  0.5831
+
+// minimal cluster size for certain number of showers
+// for the moment I am copying the behaviour of Anatoli Lednev's reconstruction
+//
+// | cluster size | number of showers allowed |
+// +--------------+---------------------------+
+// |       1      |              1            |
+// |       2      |              2            |
+// |       3      |              3            |
+// |       4      |              4            |
+// |       5      |              4            |
+// |       6      |              5            |
+// |       7      |              5            |
+// |       8      |              6            |
+// |       9      |              6            |
+// |      10      |              6            |
+// |     ...      |              6            |
+EC02P1__ RecoCombined NrAllowedShowers  [0-5]    0   2   3   4   6   8

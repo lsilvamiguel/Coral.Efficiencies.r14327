@@ -1,0 +1,43 @@
+                      Ntuple #1 contents.
+There are 4 blocks:
+Header 
+------
+run           - run number;
+ev            - event number;
+MC_TRACK	
+--------
+trac          - number of MC tracks for the current event (max 50);
+Px(trac)      - Px
+Py(trac)      - Py
+Pz(trac)      - Pz for track number "trac" in the current event;
+E(trac)       - energy of the particle corresponding to track #"trac";
+Trnum(trac)   = (trac-1);
+Part(trac)    - Particle code (GEANT) for track # "trac";
+Vorig(trac)   - # of vertex where track # "trac" was born;
+Vlst(trac)    - # of last vertex on the track # "trac" (=0 in case NO ANY);
+MC_VERT
+-------
+vert          - number of MC vertices in the current event (max 30);
+X(vert)
+Y(vert)
+Z(vert)       - vertex position;
+Tof(vert)     - Time of Flight;
+Mtrk(vert)    - # of the mother track for vertex "vert";
+Ndtr(vert)    - # of daughter tracks born at vertex "vert";
+Dtr1(vert)    - # of first daughter track;
+Nvrt(vert)    = vert;
+RE_TRACK
+--------
+rtra          - number of REconstructed tracks in the current event (max 30);
+RX(rtra)      
+RY(rtra)      
+RZ(rtra)      - first hit position;
+RPx(rtra)     
+RPy(rtra)     
+RPz(rtra)     - track "rtra" momuntum;
+Chi2ndf(rtra) = "Chi2" / (number of degrees of freedom);
+Trnum_mc(rtra)- number of corresponding MC track (see block MC_TRACK);
+Nhit(rtra)    - number of the hits on the track;
+Cov1(rtra)
+ ...
+ Cov15(rtra)  - covariance matrix elements.

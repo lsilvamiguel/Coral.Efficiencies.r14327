@@ -1,0 +1,86 @@
+// $Id: pixelgem.2010.opt,v 1.4 2011/02/18 15:06:23 suhl Exp $
+
+// PixelGEM options for 2010 w/ 4 PixelGEMs
+
+// Thresholds for strip and cluster amplitudes in units of sigma
+GP Threshold [0-1] 4.  5.
+
+// Polygon cut on amplitude ratios in A2/A3 (x) - A1/A3 (y) plane: (x,y) pairs
+GP AmplitudeRatio [0-7] -0.05 -0.05 1.8 -0.05 1.8 1.6 -0.05  1.6
+
+//  Polynomial corrections to be applied to C = (X,Y,U,V) so that its
+// amplitude matches that of P=(Y,X,V,U)
+// Obtained by fitting measured 2D distributions of the amplitudes of
+// "W27/cdr2200[2,5]-85821.raw" with "~compass/detector/saclay/root/GEMPolys.C".
+// ( Raw, cf. "RDMon_GM_DEFAUT" in "TEvRDMonitor.cc", amplitudes are 1st fitted,
+//  yielding the AmplitudeCorr entries infra.
+//   Then, as a check, the data chunks are re-processed, w/ ammplitudes
+//  corrected by these AmplitudeCorr polynomials, yielding the correlations
+//  which are listed as commented out entries and found to closely approach
+//  (0,1,0) , as expected.
+//   Note: GP01 Amplitude correlations are ignored (in TraFDic).)
+GP02X1__ AmplitudeCorr [0-2]     17.1   0.991    -5.8e-05
+GP02Y1__ AmplitudeCorr [0-2]      2.2   0.928    8.17e-05
+GP02V1__ AmplitudeCorr [0-2]     13.8   0.939    -9.9e-06
+GP02U1__ AmplitudeCorr [0-2]      9.2   0.979    4.65e-05
+
+GP03X1__ AmplitudeCorr [0-2]     20.9   1.027   -4.82e-05
+GP03Y1__ AmplitudeCorr [0-2]     10.0   0.860    8.32e-05
+GP03V1__ AmplitudeCorr [0-2]     15.7   0.834    7.92e-05
+GP03U1__ AmplitudeCorr [0-2]     19.1   1.031   -3.74e-05
+
+//GP02X1__ AmplitudeCorr [0-2]      1.4   0.993    7.31e-06
+//GP02Y1__ AmplitudeCorr [0-2]     17.9   0.926    2.37e-05
+//GP02V1__ AmplitudeCorr [0-2]     -0.2   1.004   -5.32e-06
+//GP02U1__ AmplitudeCorr [0-2]     22.3   0.919    3.26e-05
+
+//GP03X1__ AmplitudeCorr [0-2]      1.9   0.995    2.33e-06
+//GP03Y1__ AmplitudeCorr [0-2]     29.4   0.890    3.79e-05
+//GP03V1__ AmplitudeCorr [0-2]      0.4   1.000    1.37e-06
+//GP03U1__ AmplitudeCorr [0-2]     30.7   0.872    3.27e-05
+
+// Clustering method: 0=simple clustering (1 hit=1 cluster), 1=full clustering
+GP Clustering 1
+
+// Config mask for PixelGEM clustering procedure:
+// bit 0 (lsb): enable hit division between adjacent clusters
+// bit 1      : enable diagonal clustering
+// bit 2      : enable time use of time information for clustering
+// bit 3      : enable size splitting
+// bit 4      : enable/disable cluster position size splitting
+// bit 5      : switch between r (1) condition and x&y (0) condition in pos-clust
+// bit 6+7    : enable/disable hit sharing (0 : no sharing; 1 : to all; 2 : fraction)
+GP ClusterConfigMask 179
+
+// Crosstalk suppression parameters
+// in 2009 only the new readout design was present, parameters as in M.Kraemers diploma thesis
+// but there were problems with crosstalk in the multiplexed analog signal
+// to switch of the cut set
+// GP CrossTalkParams [0-1]  0.3   1.1
+GP CrossTalkParams [0-1]  0.3   0.55
+GP TimeCrossTalkParam     0.0 // no time cross talk suppression (this would also be the 
+                              // default, line could be commented out or removed)
+
+// Set parameters for the position correction of pixel clusters
+GP PosCorrs [ 0- 3]  0.04405 -0.9458   2.605   -1.741   // position correction for clusters of category  10 (in X direction)
+GP PosCorrs [ 4- 7]  0.04405 -0.9458   2.605   -1.741   //                                               11 (in Y direction)
+GP PosCorrs [ 8-11]  0.06881  0.       0.       0.      //                                              104 (in X direction)
+GP PosCorrs [12-15]  0.06242  0.       0.       0.      //                                              104 (in Y direction)
+GP PosCorrs [16-19]  0.07351  0.       0.       0.      //                                              105 (in X direction)
+GP PosCorrs [20-23] -0.08670  0.       0.       0.      //                                              105 (in Y direction)
+GP PosCorrs [24-27] -0.08463  0.       0.       0.      //                                              106 (in X direction)
+GP PosCorrs [28-31]  0.06750  0.       0.       0.      //                                              106 (in Y direction)
+GP PosCorrs [32-35] -0.08397  0.       0.       0.      //                                              107 (in X direction)
+GP PosCorrs [36-39] -0.08520  0.       0.       0.      //                                              107 (in Y direction)
+GP PosCorrs [40-43]  0.       0.       0.       0.      //                                              200 (in X direction)
+GP PosCorrs [44-47]  0.       0.       0.       0.      //                                              200 (in Y direction)
+
+// Cluster-size specific spatial resolution in units of strips/pixels
+// as switching this option on will replace the 1/sqrt(12) resolution used by
+// default, this will have an heavy impact on the reconstruction. Therefore it
+// should only be used in case of, i.e., detector studies for the moment
+// resolutions obtained from run 70384
+// cluster size               1       2       3      >=4
+// GP StripClusSizeRes [0-3]   0.38    0.26    0.16    0.13
+// cluster size               1      >=2
+// GP PixelClusSizeRes [0-1]   0.102   0.080

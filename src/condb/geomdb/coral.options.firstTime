@@ -1,0 +1,73 @@
+//
+// coral option file
+//
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+
+// pattern method: (not used yet)
+pattern method 1
+
+// tracking method: (not used yet)
+tracking method 1
+
+//Histogramming
+histograms package HBOOK
+//histograms package ROOT
+histograms home    coral.root
+
+// This is an MC run
+Monte Carlo job
+Monte Carlo file /afs/cern.ch/compass/delivery/simevt/testout/pc/events.output.x001.fz 
+//Monte Carlo ntfile /afs/cern.ch/compass/delivery/simevt/testout/pc/events.output.x001.ntp
+
+// detector table
+//detector table /afs/cern.ch/compass/delivery/simevt/testout/pc/detectors.dat
+detector table /afs/cern.ch/user/m/miyachi/public/coral/data/0-0-5.01/detectors.dat
+
+// Set some limits on number of events
+events to read 20
+events to skip 10
+
+// DECODING. options: <nothing>, MCExact
+//make decoding MCExact
+make decoding
+
+// CLUSTERING. options: <nothing>, MCExact, MCSmeared, MCQuantized
+//make clustering MCExact
+//make clustering MCSmeared
+//make clustering MCQuantized
+make clustering
+
+// define geometrical zones
+define zone 0 3500 before M1
+define zone 3500 17000 between M1 and M2
+define zone 17000 32000 between M2 and Muon Wall
+define zone 32000 99999 after Muon Wall
+
+// Magnetic field maps
+CsField SOL_field  /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SOL/OXFORD.map.01.data
+CsField SM1m_field /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.01.data
+CsField SM2_field  /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM2/FSM.map.2000.data
+
+// options for the logger
+error logger log level -2
+error logger verbosity -2
+
+
+Geom g3callFile /afs/cern.ch/user/m/miyachi/public/coral/data/0-0-5.01/g3calls.dat
+Geom ffr_directory	/afs/cern.ch/compass/delivery/comgeant/0-0-5.01/data/geom/
+Geom ffr_general	geom_general_05.ffr
+Geom ffr_muon		geom_muon_05.ffr
+//Geom ffr_hadron		geom_hadron_05.ffr
+
+CDB	geo	/afs/cern.ch/user/m/miyachi/public/coral/conf/update/GEODB.conf
+//CDB     geo     /afs/cern.ch/user/m/miyachi/compass/coral/src/condb/config/GEODB.conf
+
+GDB	system	COMGEANT
+//GDB	system	COMPASS
+
+Data year   1999
+Data period cdb
+Data type   raw

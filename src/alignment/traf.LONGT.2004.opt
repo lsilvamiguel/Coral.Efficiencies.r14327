@@ -1,0 +1,194 @@
+//					   ***** HISTOGRAMMING
+histograms package ROOT
+
+histograms home /afs/cern.ch/user/m/mstolars/w0/CORAL_CVS/coral/src/alignment/ftraf/traf.LONGT.root.03P1I.plus
+
+
+
+Data job				// ***** THIS IS A DATA RUN
+
+Data type   raw
+Database select oracle
+Data file  /castor/cern.ch/compass/data/2004/raw/???/cdr15002-31615.raw  //??????
+
+
+//Data year   2004
+//Data period ???
+//Data run select ????	// As of 03/02: have to unsetenv COMPASS_TESTDB
+//Data container cdr15005-????
+
+
+// 					   ***** DETECTOR TABLE...
+
+detector table /afs/cern.ch/compass/detector/geometry/2004/detectors.2004.dat 
+
+
+
+
+// 					   ***** MATERIAL MAPS
+
+CsMaterialMap Zone_1 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.target.m2002.03.map
+CsMaterialMap Zone_2 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.saclay.m2002.03.map
+CsMaterialMap Zone_3 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.straw.m2002.03.map
+CsMaterialMap Zone_4 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf2.m2002.03.map
+CsMaterialMap Zone_5 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf3.m2002.03.map
+CsMaterialMap Zone_6 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.hcal1.m2002.03.map
+CsMaterialMap Zone_7 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf1.m2002.03.map
+CsMaterialMap Zone_8 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.rich.m2002.03.map
+CsMaterialMap ELossTarget /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.target_de.m2002.03.map
+
+use calibration 	 	 	// ***** CALIBRATION
+CDB use MySQLDB
+//CDB server pccoeb03 	// pccoeb03 is located in 888 (powercuts at times!..)
+CDB server tbed014d 	// tbed014d is in computer center (fewer powercuts)
+//CDB entrytime 2002-10-31-19:53:00	// Files registered before specif'd date
+
+DW FileDB /afs/cern.ch/user/l/leberig/public/marcin/new2/
+
+
+//use calibration  
+//CDB use FileDB   
+//CDB location /afs/cern.ch/compass/detector/calibrations/2003
+
+
+decoding map /afs/cern.ch/compass/detector/maps/2004.xml	// ***** MAPPING
+
+
+events to read 1000		// ***** EVENT SELECTION
+events to skip 5000
+//events BOS_skip 1.22			// skip first ~400(? cf. Jürgen) ms in spill
+//selection trigger mask 7		// Trigger selection (hexadecimal)
+
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+//reset random seed every new event
+
+include ${CORAL}/src/pkopt/IS_MWPC.opt
+
+
+pattern method 1        // not used yet
+tracking method 1       // not used yet
+
+// 					   ***** DECODING
+make decoding 	 	// <nothing>, MCExact
+
+//  	 	 	 	 	   ***** CLUSTERING
+make clustering 	// <nothing>, MCExact, MCSmeared, MCQuantized
+
+reconstruction schema 1			// ***** RECONSTRUCTION SCHEMA
+
+make tracking				// ***** TRACKING
+track prepattern method traffic
+track bridging   method traffic
+track fitting    method traffic
+
+
+make beam reconstruction		// ***** Beam RECONSTRUCTION 
+include ${CORAL}/src/pkopt/beam_2003.opt
+//                   Overwrite what's set in "beam.opt"
+BeamRecons    useTRAFFIC  1    // >0: Traffic is used, =0: standalone beampackage is used
+
+
+make vertex reconstruction		// ***** Vertex RECONSTRUCTION
+vertex pattern method averaging
+vertex fitting method kalman
+include ${CORAL}/src/pkopt/vertex.2002.opt
+//                   Overwrite what's set in "vertex.opt"
+CsAverPattern  Hist	1	// 0 - Off, 1 - ON
+CsAverPattern  findSec	1	// 0 - Off, 1 - ON
+CsAverPattern  Print [ 0 ]	0	// Prefilter info.
+CsAverPattern  Print [ 1 ]	0	// Error info. 
+// track is considered as accepted if its momentum is smaller
+// than "AcceptTill" percents of beam track
+CsAverPattern	AcceptTill	105	// in %
+//                     Z Dist(from centre)  DCA(number of sigmas)
+CsAverPattern	CUTS		1600			10
+CsKalmanFitting  Hist	1	// 0 - Off, 1 - ON
+CsKalmanFitting  Print [ 0 ]	0	// Kalman filter info.
+CsKalmanFitting  Print [ 1 ]	0	// Global fit info.
+CsKalmanFitting  Print [ 2 ]	0	// IKF info.
+
+include ${CORAL}/src/pkopt/rich1.2003.opt	// ***** RICH1
+include ${CORAL}/src/pkopt/calorim.opt		// ***** CALORIMETERS
+include ${CORAL}/src/pkopt/trigger.2003.opt	// ***** MU' PID
+
+
+//  	 	 	 	 	   ***** GEOMETRICAL ZONES
+define zone 0 3500 before M1
+define zone 3500 17000 between M1 and M2
+define zone 17000 32500 between M2 and Muon Wall
+define zone 32500 99999 after Muon Wall
+define zone -9000 0 before the target
+
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+
+CsField SOL_field /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SOL/smctgt_solenoide.fieldmap
+
+CsField SM1m_field /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.01.data
+
+CsField SM1m_field_measured /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.172.data
+
+CsField SM2_field  /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM2/FSM.map.4000.data
+
+//CsMagInfo Solenoid /afs/cern.ch/user/m/mstolars/public/align/2003/polarization.2003.list
+
+CsMagInfo MySQLDB
+
+//					   ***** LOGGER
+error logger log level   error		// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level none
+error logger verbosity   normal		// low, normal, high. 
+
+
+
+//	  	  	  	  	   ***** TraFDic (+DET OPTIONS+...)
+
+include ${CORAL}/src/pkopt/trafdic.2004.opt
+
+
+// ALIGNMENT
+main do alignment // when commented, alignment tree is neither booked nor filled
+main magnets on   // (on|off) default is off
+main chi2 cut 30  // cut on chi2/ndf
+main require cop // uncomment this if you want to keep only track with momentum
+
+
+// TRAFFIC OPTIONS
+  TraF Graph [0]  0 
+//TraF iCut  [0]  7   // Trigger selection
+TraF dCut  [22] 2.5 // tolerance (in deg) to consider planes like the same projection 
+CsBuildPart Hist 1
+
+
+// In the course of the alignment procedure, one might have to resort
+// to a non official (i.e. the one retrieved from official directory
+// by automatic search) dictionary
+ 
+//TraF Dicofit  /afs/cern.ch/user/m/mstolars/w0/CORAL_CVS/coral/src/track/lattice/dicofit.plus
+TraF Dicofit /afs/cern.ch/compass/detector/geometry/2004/dico/dico.2004.plus
+
+//SI       ClusterTime [1-2] -15 15
+
+TraF DetNameOff VO VI //HI HO HM HL
+
+
+// SMOOTHED HELICES FOR EXTRAPOLATIONS  
+
+
+
+TraF	SmoothPos [0]	100.	
+TraF	SmoothPos [1]	230.
+TraF	SmoothPos [2]	450.	
+TraF	SmoothPos [3]	550.	
+TraF	SmoothPos [4]	920.	
+TraF	SmoothPos [5]	1550.	
+TraF	SmoothPos [6]	2030.	
+TraF	SmoothPos [7]	2350.	
+TraF	SmoothPos [8]	3950.	
+TraF	SmoothPos [9]	5000.	
+
+// end
+

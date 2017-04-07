@@ -1,0 +1,169 @@
+//-----------------------------------
+//
+//   RICHONE (rich reconstruction)
+//   control options
+//
+//-----------------------------------
+
+//---   CsRCExecKeys.cc   ------
+RICHONE   PrintKeys              0     // 1 = print keys read,  0 = No print
+
+//---   execution keys ( answer YES or NO ) :
+RICHONE   EventDisplay          NO
+
+RICHONE   EventAnalysis         YES
+RICHONE   MCMonitor             YES
+RICHONE   DataMonitor           YES
+RICHONE   PartIdent             YES
+
+RICHONE   ParticleFilter        NO
+RICHONE   ParticleSelection     NO    // MC only
+RICHONE   ExitWindowCheck       YES
+RICHONE   ParticleCorrection    YES
+RICHONE   ParticleResolution    NO    // MC only
+
+//---   pad clustering
+RICHONE   doClustering          YES
+RICHONE   doClusteringCo        YES
+
+//---   correction for quartz window
+RICHONE   doQuartzWcorr         NO
+
+//---   ring definition
+RICHONE   doBkgFilter           YES
+RICHONE   doPhiPeakFilter       NO
+RICHONE   doThreeSigmaCut       NO
+
+//---   mirror alignment
+RICHONE   doMirrorCorr          NO
+RICHONE   doMirrorAlign         YES
+// mirror elements to be aligned : NONE, ALL, UP, DOWN  or  name list
+RICHONE   MirrorElemName        MT53  MT25  MB42
+//RICHONE   MirrorElemName        NONE
+
+//---   print level ( 0 - 2 , 0 => NO print ) :
+RICHONE   AcknoMethods          0   // prints methods in use   ( 1 )
+RICHONE   kPrintRichRec         0   // prints RichRec info   ( 1 )
+RICHONE   kPrintEventParts      0   // prints EventParticles obj   ( 1 - 2 )
+RICHONE   kPrintEventPads       0   // prints EventPads obj   ( 1 - 2 )
+RICHONE   kPrintEventClus       0   // prints EventClusters obj   ( 1 - 2 )
+RICHONE   kPrintPartPhotons     0   // prints EventPartPhotons obj   ( 1 - 3 )
+RICHONE   kPrintEventRings      0   // prints EventRings obj   ( 1 - 3 )
+RICHONE   kPrintEventAnalysis   0   // prints EventAnalysis obj   ( 1 )
+RICHONE   kPrintEventDisplay    0   // prints EventDisplay obj   ( 1 )
+
+RICHONE   printFrequency     1000   // prints exec times (& memory) every printFrequency events
+
+RICHONE   PrintDetMirr          0   // prints Detectors and Mirrors data; 1 = print, 0 = No print
+
+
+//---   CsRCRecConst.cc   ------
+RICHONE   PrintConsts                 1             // 1 = print constants read, 0 = No print
+
+//---   Histogramming
+RICHONE   BookHistograms              YES           // YES = monitoring HISTOGRAMS requested (def.=NO)
+RICHONE   MomentumRange    [ 0 - 1 ]  0.   90.      // momentum range in histograms (def.=0., 0.)
+RICHONE   HistoOffset                 2000          // HBOOK monitoring HISTOGRAMS number offset (def.=2000)
+
+//---   Particles
+RICHONE   momMinAcc                   1.8           // GeV/c: mimimum momentum accepted (def.=1.8)
+//---   Peak search
+RICHONE   PHmipCut                 1000.            // cluster PH cut to discard MIP through ph. chamb. (def.=1000.)
+RICHONE   CathodeUseReg    [ 0 - 1 ]  200. 200.     // Cathode useful region for pad selection, mm (def.=200., 200.)
+RICHONE   C4F10RefrIndex              1.00153       // C4F10 nominal refraction index (def.=1.00153)
+RICHONE   QuartzRefrIndex             1.458         // quartz refraction index (def.=1.458)
+RICHONE   ParticlePathFrac            0.5           // fraction of particle path for PHOTON 'EMISSION' point (def.=0.5)
+RICHONE   PeakScanWindow   [ 0 - 1 ]  5   5         // peak scan window (channels = mrad) (def.=5, 5)
+RICHONE   nMore                       2             // peak scan window +/- nMore channels (= mrad) (def.=0)
+RICHONE   ThetaPeakBins               100           // binning of theta peak ( bins ) (def.=100)
+RICHONE   ThetaPeakRange   [ 0 - 1 ]  0.  100.      //                       ( range ) mrad (def.=0., 100)
+
+//---   Background Filter
+RICHONE   nMinPhotons                 0             // minimum number of photons per ring (def.=0)
+RICHONE   SigmaSingPhot               0.770         // average sigma single photon, mrad (def.=0.770)
+RICHONE   nSigmaCut        [ 0 - 1 ]  1.  3.        // cut at n sigma's ( for kDoClu = 0 and kDoClu = 1 ) (def.=1., 3.)
+//---   Phi Peak Filter
+RICHONE   nBinsInPhi                  120.          // number of bins in phi (def.=120)
+RICHONE   nBinThreshold               1             // threshold for bin content (def.=1)
+RICHONE   BinWeight                   0.5           // weight of the bin (def.=0.5)
+//---   THREE sigma (single photon) CUT
+RICHONE   Sigma3SCut                  1.000         // average sigma single photon, mrad ( default, redefined ) (def.=1.)
+
+//---   Mirror Alignment
+RICHONE   MinThetaAlign               53.           // minimum Cerenkov angle for mirror alignment, mrad (de.=53.)
+RICHONE   MaxInternalRad              70.           // maximum internal particle acceptance radius, mm (def.=70.)
+
+//---   Event Analysis
+RICHONE   nPhotMinRing                 5            // minimum number of photons in the ring to be accepted (def.= 0)
+RICHONE   momMinProc                   2.5          // GeV/c: mimimum momentum processed (def.=1.8)
+RICHONE   nSigmaCut                    3.           // n sigma cut for ring analysis (def.=3.)
+//RICHONE   thetaMaxLk                   58.          // theta max for like analysis (def.=58.)
+RICHONE   thetaMaxLk                   70.          // theta max for like analysis (def.=58.)
+RICHONE   nZero                        29.6         // Nzero RICH constant (def.=30.)
+
+//---   Event Display
+RICHONE   nEveDSkip                    0            // nr. of Events to skip before display (def.=0)
+RICHONE   nEveDisplay                 100           // nr. of Events to be displayed (def.=0)
+RICHONE   DisplayMode                 ALL           // ALL, REC = reconstr.only, NOREC = NOT reconstr.only (def.=none)
+
+
+//---   READING/WRITING myfile
+RICHONE   readMyFile                  NO            // read pre-processed files; read only 1 Coral event.
+RICHONE   myFileType                   1            // = 0: OLD (Dima) files;  = 1: NEW (Paolo) files
+//RICHONE   readMyFileName          /afs/cern.ch/compass/scratch/d10/schiavon/ph6-48k-linux.qfile
+//RICHONE   nProMyEvs                 48000           // events to read (<=48000)
+//RICHONE   readMyFileName          /afs/cern.ch/compass/scratch/d13/schiavon/myfile.gfile
+//RICHONE   readMyFileName          /afs/cern.ch/compass/scratch/d10/schiavon/myfile-18k-15t.gfile
+RICHONE   readMyFileName          /afs/cern.ch/compass/scratch/d10/schiavon/myfile-18k-22t-t25-laam2n3s.gfile
+//RICHONE   readMyFileName          /afs/cern.ch/compass/scratch/d13/schiavon/myfile-18k-1t-bks-onepart.gfile
+RICHONE   nProMyEvs                 17900           // events to read (<=17900)
+//RICHONE   readMyFileName          /afs/cern.ch/compass/scratch/d13/schiavon/myfile-33k6-2t-t25-laam2n3s.gfile
+//RICHONE   nProMyEvs                 33000           // events to read (<=33000)
+
+RICHONE   writeMyFile                 YES            // write NEW pre-processed files (type 1)
+RICHONE   writeMyFileName         /afs/cern.ch/compass/scratch/d13/schiavon/myfile.gfile
+
+
+//---   MC Digitization Constants
+RICHONE   PrintMCDig                  0             // 1 = print constants read, 0 = No print
+RICHONE   DoPhoGen                    YES           // simulate photon interaction
+RICHONE   ElecNoise                   NO           // simulate electronic noise : Yes, No, Only            !!!
+//RICHONE   Threshold                   3.            // signal threshold, sigma (ref= 3.)
+RICHONE   Threshold                   2.5           // signal threshold, sigma (ref= 3.)     !!!
+RICHONE   DoFeedback                  YES           // simulate feedback photon generation
+RICHONE   DoReflection                YES           // simulate photon scattering on CsI surface
+RICHONE   DoQEtest                    NO            // do QE test for Cerenkov photons
+RICHONE   PedSigma         [ 0 - 3 ]  64.  21.  1.15  0.30  // mean pedestal, sigma of pedestals, mean value of noise, mean sigma of noise
+// CsI quantum efficiency ( Eph 5.5-7.9 eV )
+RICHONE   CsIQuantumEff    [ 0 -24 ]  0.00025  0.00035  0.0005  0.005  0.0075  0.0125  0.01775  0.0235  0.04  0.064  0.094  0.116  0.1585  0.192  0.207  0.23  0.2525  0.27  0.2845  0.3035  0.32  0.34  0.345  0.36  0.37
+// feedback rate in ADC^-1 for 16 cathodes
+RICHONE   Alfa             [ 0 -15 ]  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03
+// mean Pulse Height
+RICHONE   PHslo            [ 0 -15 ]  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.
+// overall QE reduction factor for 16 cathodes
+RICHONE   RedFactor        [ 0 -15 ]  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.
+
+
+//---  Analysis functions parameters :
+RICHONE   getCutXq         [ 0 - 1 ]  36.7   0.89    // getCutXq : from 6*3k ref files ( 6.01/lepto_full )
+RICHONE   getCutYq         [ 0 - 1 ]  27.9   0.93    // getCutYq : from 6*3k ref files ( 6.01/lepto_full )
+//RICHONE   likeBackFrac     [ 0 - 1 ]  0.78  -0.0068  // likeBackFrac1 : from 6*3k ref files ( 6.01/lepto_full ) thr=3.
+//RICHONE   likeBackFrac     [ 0 - 1 ]  0.905 -0.00623 // likeBackFrac1 : from 6*3k ref files ( 6.01/lepto_full ) thr=2.5
+//RICHONE   likeBackFrac     [ 0 ]      0.025          // likeBackFrac2 : from 6*3k ref files ( 6.01/lepto_full ) thr=3.
+//RICHONE   likeBackFrac     [ 0 ]      0.0133         // likeBackFrac2 : from 6*3k ref files ( 6.01/lepto_full ) thr=2.5  alpha*th
+RICHONE   likeBackFrac     [ 0 ]      0.00021        // likeBackFrac2 : from 6*3k ref files ( 6.01/lepto_full ) thr=2.5  alpha*th*th
+//RICHONE   likeBackFrac     [ 0 ]      0.00014        // likeBackFrac2 : from 11*3k ref files ( 6.06/lepto_full ) thr=2.5  alpha*th*th
+//RICHONE   sigmaRing                  15.62           // sigmaRing3 : from 6*3k ref files ( 6.01/lepto_full )
+//RICHONE   offTheRing                 -20.            // offTheRing3 : from 6*3k ref files ( 6.01/lepto_full )
+//RICHONE   sigmaPhoRec                 47.8           // sigmaPhot5 : from 6*3k ref files ( 6.01/lepto_full )
+//RICHONE   sigmaPhoPid      [ 0 - 4 ]  0.89  0.0082  -0.0516  0.0548  0.0537    // sigmaPhot6 : from 6*3k ref files ( 6.01/lepto_full )
+
+
+
+
+
+
+
+
+
+

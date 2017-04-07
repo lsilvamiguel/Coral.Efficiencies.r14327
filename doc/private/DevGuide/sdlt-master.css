@@ -1,0 +1,59 @@
+/*---------------------------------------------------*/
+/* CERN, European Laboratory for Particle Physics    */
+/*                                                   */
+/* Software Documentation Layout Templates           */
+/*                                                   */
+/* HTML Cascading Style Sheet file       2 June 1999 */
+/*---------------------------------------------------*/
+
+body {
+        background-color: #ffffff;
+}
+.startofdoc, .endofdoc {
+        background-color: #ffffcc;
+}
+.contextlinks {
+        background-color: #ffffff;
+}
+.runningheaderdoctitle {
+        font-style: Italic;
+}
+a {
+        text-decoration: none;
+}
+.Acronym {
+        font-variant: small-caps;
+        letter-spacing: normal;
+}
+.Symbol {
+	font-family: Symbol;
+}
+.SymbolFont {
+	font-family: Symbol;
+}
+.Removed {
+	text-decoration: line-through;
+}
+.Changed {
+	text-decoration: overline;
+        border-width: 1pt;
+}
+.Keyword {
+	font-style: Italic;
+	font-weight: Bold;
+}
+.ToolOption {
+        font-family: Helvetica, sans-serif;
+        background-color: #eeeeee;
+}
+.ZapfDingbatsFont {
+        font-family: ZapfDingbats
+}
+.FirstLetter {
+	font-size: 200%;
+	font-weight: Bold;
+	vertical-align: text-top;
+        float: left;
+}
+
+/*---------------------------------------------------*/

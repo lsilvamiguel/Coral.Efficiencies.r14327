@@ -1,0 +1,7 @@
+// Threshold for hits and clusters amplitudes in units of sigma
+MP	Threshold [0] 5.
+MP	Threshold [1] 7.5
+
+// Time Cuts
+MP TimeCuts [0] -30
+MP TimeCuts [1]  40

@@ -1,0 +1,5 @@
+The content of this directory is independent from Reco 
+calorimeters reconstruction library based on good old
+fortran code used by GAMS experiment for several yars.
+The code is developed and documented by the author Anatoli Lednev.
+Please contact: Anatoli.Lednev@cern.ch

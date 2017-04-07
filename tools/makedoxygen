@@ -1,0 +1,40 @@
+#! /bin/bash
+#
+# Create doxygen documentation and install it on the official web server.
+
+HOST=lxplus.cern.ch
+TARGET=/afs/cern.ch/compass/delivery/coral/www/RefGuideCVS
+DATE=`date --rfc-3339=date`
+
+if ! which doxygen > /dev/zero; then
+   echo "doxygen executable not found!"
+   exit 1
+fi
+
+CORALDIR=`mktemp -d`
+SERVERTMP=delete_me_`basename $CORALDIR`
+OLDDIR=`pwd`
+echo 'Hit <Enter> to checkout a clean copy!'
+read
+cd $CORALDIR
+cvs -q co coral
+cd coral
+
+echo 'Running doxygen...'
+doxygen tools/doxygen/coral.doxygen-1.6
+
+echo 'Hit <Enter> to start scp!'
+read
+
+while ! scp -r html $HOST:$TARGET/$SERVERTMP; do
+    echo 'Error!  Hit <Enter> to try again!'
+    read
+done
+
+echo 'Hit <Enter> to move copied files into the correct place!'
+read
+
+ssh $HOST "mv $TARGET/html{,-old} && mv $TARGET/{$SERVERTMP,html} && perl -pi.old -e '/RefGuideCVS/ && s[\d\d\d\d-\d\d-\d\d][$DATE]' $TARGET/../contents.html && rm -rf $TARGET/html-old"
+
+cd "$OLDDIR"
+rm -rf $CORALDIR

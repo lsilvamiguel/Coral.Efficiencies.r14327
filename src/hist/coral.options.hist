@@ -1,0 +1,6 @@
+//Histogramming
+histograms package HBOOK
+histograms home    coral.hbook
+
+// detector table
+detector table detectors.dat

@@ -1,0 +1,90 @@
+// $Id: gem.2002.opt,v 1.3 2003/02/21 17:42:29 ketzer Exp $
+
+// GEM options for 2002
+
+// $Log: gem.2002.opt,v $
+// Revision 1.3  2003/02/21 17:42:29  ketzer
+// MC hit time window selectable via key in option file
+//
+// Revision 1.2  2003/02/02 14:27:29  ybedfer
+//  Adjusted bottom side of polyline for AmplitudeRatio:
+//   - systematically more realaxed,
+//   - plane dependent.
+//  On run #22019, looking at amplitude ratios 2D histo output in RDmonitor,
+// checking that it improves %age primary vertices and # of K0s.
+//
+
+// Thresholds for strip and cluster amplitudes in units of sigma
+GM       Threshold [0-1] 3.  5.
+
+// Polygon cut on amplitude ratios in A2/A3 (x) - A1/A3 (y) plane: (x,y) pairs
+GM       AmplitudeRatio [0-7] .2  .1  1.2  .1  1.2  1.1  .2  1.1
+GM01X1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM01Y1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM01U1__ AmplitudeRatio [0-7] .2  .06 1.1  .06 1.1  1.   .2  1.
+GM01V1__ AmplitudeRatio [0-7] .15 .03 1.1  .03 1.1  1.   .15 1.
+GM02X1__ AmplitudeRatio [0-7] .2  .06 1.44 .06 1.44 1.32 .2  1.32
+GM02Y1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM02U1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM02V1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM03X1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM03Y1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM03U1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM03V1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM04X1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM04Y1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM04U1__ AmplitudeRatio [0-7] .15 .03 1.1  .03 1.1  1.   .15 1.
+GM04V1__ AmplitudeRatio [0-7] .15 .03 1.1  .03 1.1  1.   .15 1.
+GM05X1__ AmplitudeRatio [0-7] .15 .03 1.32 .03 1.32 1.21 .15 1.21
+GM05Y1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM05U1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM05V1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM06X1__ AmplitudeRatio [0-7] .2  .06 1.44 .06 1.44 1.32 .2  1.32
+GM06Y1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM06U1__ AmplitudeRatio [0-7] .2  .06 1.44 .06 1.44 1.32 .2  1.32
+GM06V1__ AmplitudeRatio [0-7] .2  .06 1.44 .06 1.44 1.32 .2  1.32
+GM07X1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM07Y1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM07U1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM07V1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM08X1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM08Y1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM08U1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM08V1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM09X1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM09Y1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM09U1__ AmplitudeRatio [0-7] .2  .06 1.32 .06 1.32 1.21 .2  1.21
+GM09V1__ AmplitudeRatio [0-7] .2  .06 1.2  .06 1.2  1.1  .2  1.1
+GM10X1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM10Y1__ AmplitudeRatio [0-7] .15 .03 1.2  .03 1.2  1.1  .15 1.1
+GM10U1__ AmplitudeRatio [0-7] .15 .03 1.1  .03 1.1  1.   .15 1.
+GM10V1__ AmplitudeRatio [0-7] .15 .03 1.1  .03 1.1  1.   .15 1.
+
+// Polygon in A2/A3 (x) - A1/A3 (y) plane for ADC roll over corr.: (x,y) pairs
+GM01U1__ RollOverCor1 [0-5] 0.9 0. 2.0 0. 2.0 2.2
+GM01U1__ RollOverCor2 [0-7] 0. 0.02 0.4 0.3 0.4 2.0 0. 2.
+GM01V1__ RollOverCor1 [0-5] 0.9 0. 2.0 0. 2.0 2.2
+GM01V1__ RollOverCor2 [0-7] 0. 0.02 0.4 0.3 0.4 2.0 0. 2.
+GM01X1__ RollOverCor1 [0-5] 0.9 0. 2.0 0. 2.0 2.2
+GM01X1__ RollOverCor2 [0-7] 0. 0.02 0.4 0.3 0.4 2.0 0. 2.
+GM01Y1__ RollOverCor1 [0-5] 0.9 0. 2.0 0. 2.0 2.2
+GM01Y1__ RollOverCor2 [0-7] 0. 0.02 0.4 0.3 0.4 2.0 0. 2.
+GM02U1__ RollOverCor1 [0-5] 0.9 0. 2.0 0. 2.0 2.2
+GM02U1__ RollOverCor2 [0-7] 0. 0.02 0.4 0.3 0.4 2.0 0. 2.
+GM02V1__ RollOverCor1 [0-5] 0.9 0. 2.0 0. 2.0 2.2
+GM02V1__ RollOverCor2 [0-7] 0. 0.02 0.4 0.3 0.4 2.0 0. 2.
+GM02X1__ RollOverCor1 [0-5] 0.9 0. 2.0 0. 2.0 2.2
+GM02X1__ RollOverCor2 [0-7] 0. 0.02 0.4 0.3 0.4 2.0 0. 2.
+GM02Y1__ RollOverCor1 [0-5] 0.9 0. 2.0 0. 2.0 2.2
+GM02Y1__ RollOverCor2 [0-7] 0. 0.02 0.4 0.3 0.4 2.0 0. 2.
+GM03U1__ RollOverCor1 [0-5] 0.9 0. 2.0 0. 2.0 2.2
+GM03U1__ RollOverCor2 [0-7] 0. 0.02 0.4 0.3 0.4 2.0 0. 2.
+GM03V1__ RollOverCor1 [0-5] 0.9 0. 2.0 0. 2.0 2.2
+GM03V1__ RollOverCor2 [0-7] 0. 0.02 0.4 0.3 0.4 2.0 0. 2.
+GM03X1__ RollOverCor1 [0-5] 0.9 0. 2.0 0. 2.0 2.2
+GM03X1__ RollOverCor2 [0-7] 0. 0.02 0.4 0.3 0.4 2.0 0. 2.
+GM03Y1__ RollOverCor1 [0-5] 0.9 0. 2.0 0. 2.0 2.2
+GM03Y1__ RollOverCor2 [0-7] 0. 0.02 0.4 0.3 0.4 2.0 0. 2.
+
+// Hit time window for MC hits (hit time smeared with 12 ns RMS)
+GM       MCHitTime [0-1] -50. 50.

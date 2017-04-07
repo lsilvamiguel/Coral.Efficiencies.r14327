@@ -1,0 +1,59 @@
+//
+// coral option file. Benigno 2000/10/09
+//
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+
+//Histogramming
+histograms package HBOOK
+histograms home    coral.hist
+
+// This is an MC run
+Monte Carlo job
+Monte Carlo file /afs/cern.ch/compass/scratch/d06/COMGeant/d0/dzero.full_p-up.outpipe.fz
+
+// detector table
+detector table /afs/cern.ch/compass/delivery/simevt/reffiles/lepto/muplus100/6.00/detectors.dat
+
+// Set some limits on number of events
+events to read 100
+//events to skip 00
+
+// reconstruction options 
+reconstruction schema 1     // at present only one schema available
+make decoding               // options: <nothing>, MCExact
+make clustering             // options: <nothing>, MCExact, MCSmeared, MCQuantized
+make tracking               // tracking
+track prepattern method  recon  
+track bridging   method traffic
+track fitting    method traffic
+
+// define geometrical zones
+define zone 0 3500 before M1
+define zone 3500 17000 between M1 and M2
+define zone 17000 32000 between M2 and Muon Wall
+define zone 32000 99999 after Muon Wall
+
+// Magnetic field maps
+CsField SOL_field  /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SOL/OXFORD.map.01.data
+CsField SM1m_field_measured /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.172.data
+//CsField SM1m_field /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.01.data
+CsField SM2_field  /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM2/FSM.map.2000.data
+
+// options for the logger
+error logger log level error 
+error logger verbosity normal
+error logger store level none
+
+// packages options
+include ${CORAL}/src/pkopt/traffic.opt
+include ${CORAL}/src/pkopt/recon.opt
+include ${CORAL}/src/pkopt/rich1.opt
+//include ${CORAL}/src/pkopt/beam.opt
+include ${CORAL}/src/pkopt/leftright.opt
+
+
+// overwritten packages options
+TraF 	Graph [0]    0

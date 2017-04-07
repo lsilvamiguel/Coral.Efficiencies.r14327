@@ -1,0 +1,13 @@
+This is calorimeter's part of COMPASS software.
+Note, that subdirectory with name "Reco" contains code that is NOT
+CORAL part. This is independent general-purpose library for
+reconstruction of data from any cellular calorimeter.
+
+With "make Linux/calorim" you can produce executable ./Linux/calorim.
+The source calorim.cc is just a sort of coral user's program.
+In the output ...root file one can find a lot of histograms which might
+be useful for calorimeters tests and calibrations.
+Examples of calorimeters reconstruction options can be found in the files
+../src/pkopt/calorim.opt calorim_mc.opt.
+
+Please send your questions comments and bug reports to Vladimir.Kolosov@cern.ch

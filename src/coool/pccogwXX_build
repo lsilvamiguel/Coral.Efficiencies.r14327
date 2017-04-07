@@ -1,0 +1,50 @@
+#!/bin/csh
+
+#pccogwXX_build
+# Created on: May 17, 2009
+#     Author: promme
+# based on D.Neryet script cern_build and private communication with him
+# modified 31.05.12 by linking against a newer root version
+
+source /online/soft/root/root_v5.28.00d/bin/thisroot.sh
+export ROOTSYS=/online/soft/root/root_v5.28.00d
+export PATH=$PATH:${ROOTSYS}/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${ROOTSYS}/lib
+
+echo "\nConfiguring Coral... \n\n"
+cd ../..
+echo " for up to date configure settings in coral check /online/soft/coool/configure_to_do.txt"
+echo " running ./configure for coral "
+./configure --without-LHCXX --with-TRAFDIC --with-CFLAGS="-Wall -O2 -DUSE_ObjectsCounter" --without-ORACLE --with-COMPASS-Date=/date --with-MySQL=/online/soft/mysql --with-COMPASS_FILES=/online/detector
+source setup.csh
+
+echo "\nConfiguring decoding library... \n\n"
+cd src/DaqDataDecoding
+make clean
+make -j 3
+
+echo "\nCompiling MySQLDB interface \n\n"
+cd ../condb/mysqldb/MyInterface
+make clean
+make -j 3
+
+echo "\nCompiling GEM library \n\n"
+cd ../../../geom/gem
+make clean
+make -j 3 LIB_TYPE=static
+
+echo "\nCompiling MuMega library \n\n"
+cd ../mumega
+make clean
+make -j 3 LIB_TYPE=static
+
+echo "\nConfiguring Coool... \n\n"
+cd ../../coool
+echo " for up to date configure settings in coral check /online/soft/coool/configure_to_do.txt"
+echo " running ./configure for coool "
+./configure --enable-shared --with-CFLAGS="-Wall -O2 -DUSE_ObjectsCounter" --with-DATE_LIB=/date --with-DATABASE=/online/soft/mysql --with-CERN_LIB=/cern/pro --with-RFIO=/usr
+
+echo "\nCompiling Coool \n\n"
+make clean
+make -j 3
+

@@ -1,0 +1,188 @@
+This Document provides a short description of MurphyTV.
+
+1. How to connect to a data source 
+
+In the main window ( the little one ) ,you can directly enter a source in the
+"Data Source" text entry field.
+
+If you want to look at a local file, simply enter the name here.
+(Or click on [...] for a fileselection dialog)
+For remote files (RFIO) enter Filename@Hostname 
+To connect to the online data stream, enter @Hostname:
+After you entered the data source ,press ENTER or click on [Connect]
+to start analysing the data.
+The status bar below should now say "Connected" (For online data, it can take
+a few seconds )
+
+You can connect at any time to a new data source.
+If you do this, all the informations gathered from the old data are lost.
+
+You can click on [Disconnect] to stop analysing data.
+The informations gathered so far are not lost in this case. 
+
+You can also enter a mapping file (or directory with mapping files) in the "Mapping File"
+text entry field.
+This is only used to display the names of the detectors connected to a sourceID.
+It is not mandatory to use a mapping file.
+
+2. How to display the Errors
+
+In the main window, click on [Display] .Another window pops up.
+(The Display window does not affect the data analysis in any way.
+You can open and close it at any time.)
+
+There are 6 different sections :
+
+2.1 The "Monitor" section
+
+On the top, you see some general informations:
+
+-The run number,as well as the date and time and Trigger Number of the event which 
+ is currently analysed. 
+
+-The number of events analysed.
+
+-The total number of errors found in the analysed events, as well as this number per
+ analysed event.
+ 
+-The number of different SourceIDs (e.g. CATCH boards) found in the data
+
+-The number of SourceIDs which appeared in some events (or are in the list mentioned),
+ but not in all events.
+ 
+-The number of SourceIDs on which not a single error was found.
+
+-The avarage event size (including all kind of headers )
+
+Below , you see a message window. If an error appears on a sourceID ,or if the avarage 
+number of events with an error on a sourceID changes dramatically, a short message is 
+displayed here. 
+
+At the bottom, there is an alarm text. It turns red if new error messages appear.
+If you have read them, click on the button at the right to turn the alarm off till
+there are new error messages again.
+
+To get a description of the different errors, go to the "Errors" section.  
+
+2.2 The "Errors" section
+
+Here you have a table in which for each kind of error it is displayed:
+
+-How often it occured.
+
+-How often it occured on the selected SourceID. You can enter this sourceID in the
+ "SrcID=" text entry field.
+ 
+-How many of the events are infected with this error.
+
+-The same for the selected sourceID. 
+
+-The number of sourceId's on which the error occured.
+
+The counts are normed to the number of recorded events until you uncheck the
+"Normalize" check box.
+
+If you check the "Show only errors on SrcID" checkbox, only errors are shown which
+appear on the selected sourceID.
+If you enter a sourceID, this option is automatically selected.
+
+If you click on an error, a short description is displayed at the bottom.
+
+If you double-click on an error, the "Catches" section is displayed with the error
+selected as the special interest. Do this to learn on which sourceIDs the error occures. 
+
+
+2.3 The "Catches" section
+
+This is an overview over all SourceIDs in the data, as well as about the Ports of a selected
+SourceID.
+
+The upper table contains for each SourceID the following informations:
+
+-Type: The abbreviations taken from [Compass Notes 8-2001] for the different detectors, for which different SourceID ranges are reserved. 
+ 
+-#Errors: The number of errors on this SourceID.  
+
+-#Headers: The number of header words coming from the frontends of the SourceID.
+ This does NOT include the SLink Header
+ (For GEMs, all words are currently counted as data, so this should be zero)
+ 
+-#Data: The number of data words coming from the frontends of the SourceID.
+
+-BadEvnt: The number of events which had one or more errors.
+
+-Special: The number of errors of the type you can select in the "Special" combo box.
+ Use this combo box if you want to know which SourceIDs are producing the error you
+ are interested in.
+
+-eg. at :The first trigger number where the error selected with the "Special" combo box
+ occured. This is useful if you want to see the error with eventDumpAll in the data
+ yourself.
+ If this is 2^N for some errors this may indicate that there is an hardware bit error
+ somewhere.
+
+The number of errors,header and data words can be normed to the number of recorded
+events with the "Normalize" check box.(Value NOT in %, 1.000 means 1 error per event). 
+You can chose how to sort the list by clicking on the buttons at the top of the table.
+
+If you double-click a line ,the "Errors" Tab is displayed with this sourceID selected.
+Do this to get a list of all error types that occured on a sourceID.
+
+If you click on a SourceID, in the lower table for each Port or GeographicID on
+that SourceID the number of errors,data and header words are displayed.
+
+Some informations are associated only to a port number in the data, others to a
+GeoID, and some to both. Latter case is used to associate also the geoId based
+informations to port numbers, and geoIDs to port numbers.
+If the program does not know that some informations associated to geoID xyz came
+from port# uvw there is one line displayed for port# uvw and geoID "???", and
+another for port# "???" and geoID xyz.
+
+For GEMs, this table is always empty.
+
+In the "Attached Detectors" window at the bottom, the names of the detectors connected
+to the selected sourceID are displayed. This information comes from the mapping file(s).
+If no mapping file(s) are selected, no names are displayed.
+
+
+2.4 The "History" section
+
+Here you can see the number of errors plotted versus trigger number.
+Number of errors means the number of recorded errors which fall in one 5000 trigger-
+number bin normalised to the number of recorded events in that bin.
+
+You can display all errors, all errors of a given category or single errors.
+Select this with the combo boxes on the bottom.
+
+
+2.5 The "Event Sizes" section
+
+In this histogram the distribution of the total event size (including headers) coming
+from a given SourceID is displayed.
+The SourceID can be selected in the "SourceID" text entry.
+
+2.6 The "Data Flow" section
+
+Here the total event size per recorded event is plotted versus the trigger number.
+The histogram's bin size is 5000 Trigger numbers.
+
+
+3. Command line options
+
+To open the display window at start use -d
+To connect to a data source at startup use -s DataSource  
+To specify a mapping file use -m Mapfile
+To specifiy a file containing a list of all CATCHES in compass, use -C
+To analyze ONLY events with calibration triggers, use -C
+To display  MurphyTV in a small window with small fonts, use -f
+
+
+4. How to contact the author
+
+Send bug reports, critics and suggestions to :
+
+Christian.Schill@cern.ch
+
+
+
+

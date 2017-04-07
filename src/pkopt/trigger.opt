@@ -1,0 +1,20 @@
+// the information which serve for muon track identification.
+// Gives detectors which work in coinsidence.
+
+Trigger  det  HI04X1_d  HI05X1_d
+Trigger  det  HI04X1_u  HI05X1_u
+
+Trigger  det  HL04X1_m  HL05X1_m
+
+Trigger  det  HM04X1_d  HM05X1_d  HM04Y1_d  HM05Y1_d
+Trigger  det  HM04X1_u  HM05X1_u  HM04Y1_u  HM05Y1_u
+
+
+// Correspondance between hodoscope name (second letter) and trigger mask.
+// Mask can not be "0".
+
+//             name  mask
+Trigger  mask    I    2
+Trigger  mask    L    8
+Trigger  mask    M    4
+

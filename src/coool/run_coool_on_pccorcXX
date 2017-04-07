@@ -1,0 +1,26 @@
+#run_coool_on_pccorcXX
+
+# Created on: May 17, 2009
+#     Author: promme based on scripts by D.Neryet
+     
+# export ROOTSYS=/online/soft/root/root_v5.10.00
+# export ROOTSYS=/online/soft/alternative.root/root_v5.16.00
+# export LD_LIBRARY_PATH=$ROOTSYS/lib
+# export DYLD_LIBRARY_PATH=$ROOTSYS/lib
+source /online/soft/root/root_v5.28.00d/bin/thisroot.sh
+export ROOTSYS=/online/soft/root/root_v5.28.00d
+export PATH=$PATH:${ROOTSYS}/bin
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:${ROOTSYS}/lib
+echo $ROOTSYS
+echo $LD_LIBRARY_PATH
+# geomfile=/online/detector/geometry/2006/detectors.2006.dat
+geomfile=/online/detector/geometry/2008/detectors.69549.hadron.dat
+# geomfile=/online/detector/geometry/2007/detectors.57022.2.5T.plus.dat
+
+./src/coool -map /online/detector/maps \
+     -geom $geomfile \
+     -group /online/detector/monitor/groups.xml \
+     -cfg /online/detector/monitor/default_params \
+     -workenv /online/daq/shift \
+     $*
+

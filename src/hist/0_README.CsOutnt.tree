@@ -1,0 +1,142 @@
+Branches description of root output:
+
+                  ** MC VERTEX BLOCK **
+
+	NtrkMC         Number of MC tracks.
+        Px             X component of the momentum.
+        Py     	       Y component of the momentum.
+        Pz     	       Z component of the momentum.
+        Energy         Energy of track
+        GeantID        GEANT's particle ID
+        VertOrID       Index of origin vertex
+        VertLastID     Index of the last vertex on the track
+        NHits[4]       Number of hits (excluding hits from interaction products)
+                       in detector groups (1)
+
+                  ** MC TRACK BLOCK **
+                    
+        NvrtMC         Number of MC vertices.
+	X              X coordinate
+	Y     	       Y coordinate
+	Z              Z coordinate
+        TimeFlight     Time-of-flight to vertex
+        MothTrackID    Mother track index
+        NDaughtTr      Number of daughter tracks in the vertex
+        FDTrackID      First daughter track index
+
+                  ** RECONSTRUCTED TRACK BLOCK **
+
+        NtrkTR         Number of reconstructed tracks.
+        TrkType        Track type (1)
+        MCTrackID      Corresponding MC track index (or -1)
+        NHits          Number of hits(clusters) on the track
+        TrackCh2       Total track's Chi2
+        TrackParF[6]   Track parameters in the first point (2)
+        TrackCovF[15]  Covariance matrix in the first point (3)
+        TrackParL[6]   Track parameters in the last point (2)
+        TrackCovL[15]  Covariance matrix in the last point (3)
+
+                  ** RECONSTRUCTED VERTEX BLOCK **
+  
+        NvrtTR         Number of reconstructed vertices.
+	X              X coordinate
+	Y     	       Y coordinate
+	Z	       Z coordinate
+        sX             error of X coordinate
+	sY     	       error of Y coordinate
+	sZ	       error of Z coordinate
+        Chi2           Chi-square of vertex
+
+	NTrks          Number of tracks in the vertex ( it = 0,(NTrks-1) ).
+        ID[it]         Corresponding reconstructed track index of track it (it<10)
+        dXdZ[it]       Slope dX/dZ of track it (it<10)
+        dYdZ[it]       Slope dY/dZ of track it (it<10)
+	Cop[it]        q/p of track it (it<10)
+	sdXdZ[it]      dX/dZ error of track it (it<10)
+        sdYdZ[it]      dY/dZ error of track it (it<10)
+	sCop[it]       q/p error of track it (it<10)
+
+                  ** CALORIMETER RECONSTRUCTION BLOCK **
+
+	NCalorimParticles Number of calorimeter's particles
+	E                 Energy
+        X                 X coordinate
+        Y                 Y coordinate
+
+	
+
+(1) All tracking detectors are divided on 4 groups : 1(in front of SM1), 
+                                                     2(between SM1 and SM2), 
+                                                     3(between SM2 and muon wall),
+                                                     4 (downstream muon wall).
+    Track type could be: 1, 2, 3, 4, 12, 23, 34, 123, 234, 1234 i.e. 
+    it shows which detector groups this track was found in. 
+
+(2) x, y , z, dx/dz, dy/dz, q/P. 
+    x,y,z are measured in [mm];q/P - charge/Momentum[Gev] 
+
+(3) Only lower triangle of the covariance matrix is stored: 
+                                                     
+              ---    x     y   dx/dz dy/dz q/P
+
+               x     1                      
+
+               y     2     3                 
+
+             dx/dz   4     5     6           
+
+             dy/dz   7     8     9    10       
+
+              q/P   11    12    13    14    15
+
+
+----------------------------------------------------------------------------------
+
+To work with tree in your analysis in a Root session, you should do following:
+i) Create and load shared library:
+   1) in directory coral/src/hist/Linux   execute
+       g++ -shared -g CsOutput.o CsOutputDict.o -o libCsOutput.so
+      It will create shared library libCsOutput.so .
+   3) Copy libCsOutput.so to your working directory or make
+      the link to this file.
+   2) At a beginning of root session load this library
+       gSystem->Load("libCsOutput")
+
+ii) Create skeleton function for this Tree.
+  There are two member function of class TTree which serve to create skeleton
+  function: MakeCode() and MakeClass() .
+
+  a) MakeCode():
+    In a Root session, you should do:
+     root > TFile *f = new TFile("coral.root")
+     root > T->MakeCode("classname.C")
+     root > .x classnam.C
+    The generated code includes the following:
+      - Identification of the original Tree and Input file name
+      - Connection of the Tree file
+      - Declaration of Tree variables
+      - Setting of branches addresses
+      - a skeleton for the entry loop
+
+  b) MakeClass():
+   In a Root session, you should do:
+      root > TFile *f = new TFile("coral.root")
+      root > T->MakeClass("classname")
+      root > .L classnam.C
+      root > classname t
+      root > t.Loop()
+   The function TTree::MakeClass() produces following files: classname.h and classname.C
+   The function void classname::Loop() is the loop skeleton.
+   You should edit it before execution.
+  
+
+
+
+
+
+
+
+
+
+
+

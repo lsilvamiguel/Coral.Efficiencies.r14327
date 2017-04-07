@@ -1,0 +1,125 @@
+
+
+
+- What is MySQLDB ?
+-------------------
+
+MySQLDB is a new handler to access to the calibration data in Coral. It is
+built on CDB scheme like FileDB, then not any change must be done in Coral
+(more exactly, needed changes have already been done a month ago !).
+Calibration data are still stored in files in AFS, but it uses a database
+to access to them. This allows easier and more flexible ways to access to
+these data, in particular it is possible to get calibration files
+registered before a given date, even when new files have been added after.
+
+
+- How it works ?
+----------------
+
+MySQLDB is built arround the MySQL database server used for the electronic
+logbook, pccoeb03 (mirrored in tbed014d). It serves a table where all the
+calibration files are registered. For each file, this table stores:
+. a unique ID of this file
+. the detector name related to this file (the TBname in fact)
+. a detector type name (basically the two first letters of the detector
+name)
+. the type of the calibration file (for most of them it's "default", but
+some detectors, like GEMS, uses different types of files like "timing")
+. the begin and the end times of the validity period
+. the date and time when this file has been registered
+. the name of the user who has registered this file
+. where to find that file
+
+Each of these informations can be used to select calibration files, but
+actually I have implemented in Coral this algorythm: for a given detector,
+a given type and a given date (or a given run, the start of run date is
+taken), it selects the files related to that detector and type, with that
+date included in their validity period, and then it takes the file with
+the more recent registration time. A maximum registration time can be
+given, in this case the file with the more recent registration time before
+that maximum will be taken.
+
+Note that calibration data are still stored in files like FileDB, with
+structures which are the same as FileDB files, but in a different place
+than FileDB (then not in compass/calibration/2002, the real place is not
+too difficult to find...). But, if you want to modify the calibration data
+for a given detector and a given validity period, please DO NOT modify
+these files directly ! Instead, please just add a new file (see below for
+that part). Otherwise it will be not possible to get history of the
+calibration files.
+
+
+- How can I enable that in Coral ?
+----------------------------------
+
+Firstable, you must activate MySQL in Coral (configure flag --with-MySQL
+activated, this is the case by default, don't forget to do a cvs update, I
+have committed some changes recently). Then the option file must have
+these lines:
+
+use calibration
+CDB use MySQLDB
+// and of course no CDB use FileDB !!
+CDB server tbed014d
+// or CDB server pccoeb03
+// pccoeb03 is located in 888 (with powercuts sometime...)
+// tbed014d is located in computer center (less powercuts !)
+// a new server reachable from outside Cern is foreseen for april
+//
+// This option forces MySQLDB to take files registered before this date:
+// CDB entrytime 2002-10-31-19:53:00
+
+and it works !
+
+
+- How can I have a look on the content of the database ?
+--------------------------------------------------------
+
+There are two specific pages in the logbook web server (see at the end of
+the left frame on the logbook pages). One gives a list of all the entries,
+the second allows to do a selection on that list with several criterions.
+A link for each entry gives a look on the calibration file content.
+
+
+- How can I add new files ?
+---------------------------
+
+Actually there are two tools to do that. There are both located in
+coral/src/condb/mysqldb/Utils (do a make in this directory). They both
+require a password to work, which is the Compass standard one.
+
+. addFileInDB add a file to the database (it registers it and copy it to
+the right place). It requires mandatory options and the calibration file
+name to work (like: addFileInDB -begin <begin of validity date> -end <end
+of validity date> -detname <detector name> <calib file>), type addFileInDB
+alone for help.
+
+. loadOldFileInDB is used to register files with FileDB-like names. It
+requires one or many file or directory names as arguments, and it
+registers (and copy to the right place) each file with a good FileDB-like
+name. If some argument are directory names, it scans the content of that
+directory looking for these FileDB-like files. The detector name, type of
+calib, and validity period are taken from the name, the registration time
+is taken from the UNIX file last modification time (and not the time when
+loadOldFileInDB is run), and the owner of the file is taken as registerer
+name (and not the login name who has launched this command). This command
+can be used to synchronize the MySQLDB database from the FileDB directory
+(a file with the same detector name and type, the same validity period,
+and the same registration time as an already registered file is not
+registered a second time). Please run this command with
+/afs.../calibrations/2002 as argument if you add FileDB files in that
+directory (anyway, I plan to do that myself from time to time !)
+
+
+- How can I remove an entry of that database ?
+----------------------------------------------
+
+Arrggghhh NO you can't !! Just add a new file with the right validity
+period, which will overload the old one (this one must be still available
+with a maximum registration time). Well, if some files have been added by
+mistake, we can always do an exception, just contact me...
+
+
+Damien Neyret
+damien.neyret@cern.ch
+

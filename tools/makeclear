@@ -1,0 +1,3 @@
+#!/bin/sh
+find $CORAL -name ".#*" | xargs rm 
+find $CORAL -name "#*#" | xargs rm 

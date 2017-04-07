@@ -1,0 +1,84 @@
+// $Id: gem.mc.2004.opt,v 1.3 2008/11/12 20:43:06 ybedfer Exp $
+
+// GEM options for MC w/ 2004 Setup (w/ 11 GEMs).
+
+// Copied from gem.2004.opt,v 1.1
+// Modified to cancel all AmplitudeCorr entries (These will
+// take their default value of (0,1,0), in agreement w/ MC
+// amplitudes to be given uniform caracteristics in MC).
+// (N.B.: I introduced this GEM's MC file in order to cope
+// w/ the problem regarding AmplitudeCorr mentioned supra.
+// But the same problem arise for AmplitudeRatio's, which
+// should also be uniform in the MC case. I keep the
+// RD entries for the time being, since I do not know what
+// values fit the MC simulated amplitudes. But I cancel all
+// RollOverCor, for which one can expect that reasonable
+// default values are supplied by coral. (Y.B.))
+
+// $Log: gem.mc.2004.opt,v $
+// Revision 1.3  2008/11/12 20:43:06  ybedfer
+//  ...
+//
+// Revision 1.2  2008/05/02 13:27:01  tnagel
+// ported improvedments from hprod_nov05 branch:
+//
+// improving gem.*2004.opt option files:
+//
+// * gem.2004.opt: removed "GM MCHitTime"
+// * gem.mc.2004.opt: It doesn't make sense to have different ratio cuts for different detectors
+//   because their characteristics (implemented in MC) are identical.  Therefore
+//   after discussion with Bernhard, I set a "medium" ratio cut identical for all planes,
+//   hoping for the best...
+// * gem.mc.2004.opt: since we use amplitudeMCDecoding, time gate is widened:  "GM MCHitTime [0-1] -300. 100."
+// * gem.mc.2004.opt: moved several "GM" directives here from trafdic.mc.opt
+// * trafdic.mc.*.opt: moved "GM" directives to gem.mc.2004.opt
+//
+// Revision 1.1.2.2  2008/05/02 13:16:04  tnagel
+// fixed MC GEM time gate
+//
+// Revision 1.1.2.1  2008/05/02 12:54:24  tnagel
+// improving gem.*2004.opt option files:
+//
+// * gem.2004.opt: removed "GM MCHitTime"
+// * gem.mc.2004.opt: It doesn't make sense to have different ratio cuts for different detectors
+//   because their characteristics (implemented in MC) are identical.  Therefore
+//   after discussion with Bernhard, I set a "medium" ratio cut identical for all planes,
+//   hoping for the best...
+// * gem.mc.2004.opt: moved several "GM" directives here from trafdic.mc.opt
+// * trafdic.mc.*.opt: moved "GM" directives to gem.mc.2004.opt
+//
+// Revision 1.1  2004/05/16 20:39:42  ybedfer
+//  Initial version.
+//
+//
+
+// Thresholds for strip and cluster amplitudes in units of sigma
+GM       Threshold [0-1] 3.  5.
+
+
+// It doesn't make sense, to have different ratio cuts for different detectors
+// because their characteristics (implemented in MC) are identical.  Therefore
+// I set a "medium" ratio cut identical for all planes, hoping for the best...
+
+// Polygon cut on amplitude ratios in A2/A3 (x) - A1/A3 (y) plane: (x,y) pairs
+GM       AmplitudeRatio [0-7] .15  .05  1.3  .05  1.3  1.2  .15  1.2
+
+
+// Hit time window for MC hits (hit time smeared with 12 ns RMS)
+// Since we use amplitudeMCDecoding, this should be large, cf. comment in CsGEMDetector.cc:
+// "***** REQUIRE w/in fiducial T Gate, reasonable: -300+100ns"
+GM       MCHitTime [0-1] -300. 100.
+
+
+// moved here from trafdic.mc.opt
+
+GM	amplitudeMCDecoding
+// spSig_ detector space resolution (mm) 
+// eGain_ effective gain - should be tuned to reproduce cluster amlitudes   
+// eGSig_ gain sigma (a.u.) for amplitude correlation, for example.
+// sWidth_ signal width (mm) (should be tuned to have correct number of strips/cluster
+// tRes_ time resolution (ns)
+GM	ampParsMC [0-4]	0.07	2500.	100.	0.30	12.
+GM	ampCorrelationMC
+GEM	make associations
+GM	Master		XV

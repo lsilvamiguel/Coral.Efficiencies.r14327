@@ -1,0 +1,4231 @@
+
+RICHONE : version 4.26
+----------------------
+
+Commit  110204    from Acid
+
+CsRCCathode.cc :
+      plotGeo() : if( kHist >= int( vRC1040.size() ) ) return;  x 2   added
+
+CsRCMirrors.cc :
+      doSelMirrors() : part->setVCorPoPa0( vCorPoPa0_ );   added
+                       part->setCorPaRR( corPaRR_ );   added
+
+CsRCEventPads.cc :
+      checkPMTPPad() : histo 8123...   added
+      checkAPVPad() : histo.s 8135, 8136...   added
+
+CsRCCluster.cc :
+      getBackWgt() : bool printMap = false;   plus 36 lines addded
+      getBackWgtX(...) : //delete fname   added   cppcheck ???
+      getBackWgt(...) : //delete fname   added   cppcheck ???
+
+CsRCParticle.h : Hep3Vector vCorPoPa0_, double corPaRR_   added
+                 inline  void setVCorPoPa0( ... )   added
+                 inline  Hep3Vector vCorPoPa0()	   added
+                 inline  void setCorPaRR( ... )   added
+                 inline  double corPaRR()   added
+CsRCParticle.cc : 
+      CsRCParticle(MC) : vCorPoPa0_ = 0.; corPaRR_ = 0.;   added
+      CsRCParticle(MC) : vCorPoPa0_ = 0.; corPaRR_ = 0.;   added
+      CsRCParticle(MC) : vCorPoPa0_ = 0.; corPaRR_ = 0.;   added
+      CsRCParticle(MC) : vCorPoPa0_ = 0.; corPaRR_ = 0.;   added
+      CsRCParticle(Data) : vCorPoPa0_ = 0.; corPaRR_ = 0.;   added
+      CsRCParticle(copy) : vCorPoPa0_ = part.vCorPoPa0_;   added
+                           corPaRR_ = part.corPaRR_;   added
+
+CsRCEventPartPhotons.cc :
+      checkLikeCorr() : for( int kPaTy=1; kPaTy<=31; kPaTy++   -->
+                        for( int kPaTy=0; kPaTy<31; kPaTy++   cppcheck
+
+CsRCPartPhotons.cc :
+      CsRCPartPhotons() : for( int j=1; j<=31; j++ )   -->
+                          for( int j=0; j<31; j++ ) 3 times   cppcheck
+      clearPartPhotons() : for( int j=1; j<=31; j++ )   -->
+                           for( int j=0; j<31; j++ ) 3 times   cppcheck
+
+CsRCEventAnalysis.h : method singlePhotonCAT()   added
+                      method checkLikeDisTheta()   added
+CsRCEventAnalysis.cc :
+      dataMonitor() : ref. to singlePhotonCAT()   added
+      PIDMonitor() : ref. to checkLikeDisTheta()   added
+      checkOptCorr() : many modif.s and add.s
+      singlePhotonCAT() : method   added
+                          more code (test align)   added
+      checkLikeDisTheta() :  method   added
+
+CsRCHistos.cc : //      static std::vector<CsHist2D*> vRC8500(1-100)   added
+                //      static std::vector<CsHist2D*> vRC8600(1-100)   added
+                //      static std::vector<CsHist2D*> vRC8950(1-10)   added
+
+CsRCUty.h : psatg   function   added
+CsRCUty.cc : psatg   function   added
+
+
+
+
+
+RICHONE : version 4.25ter
+-------------------------
+CVS UP 110204
+
+Commit  ??????    from ??????    by ??????
+
+CsRCCathode.cc :
+      plotGeo() : 5 times ... << '\0' away
+
+again ???
+CsRCCluster.cc :
+      getBackWgt() : char* fname = "   "; -> char* fname = strdup("   ");
+                     string sflo = "   "; -> string sflo("   ");
+      getBackWgtX() : idem
+
+CsRCEventAnalysis.cc : ???
+
+CsRCEventClusters.cc : # define strstream stringstream   killed
+      doClustering() : if( ( iddx == 0 && iddy == 1 && PHratio > ... changed
+      killHaloClus() : strstream ...; --> stringstream ...;   7 times
+                       << '\0'   away                        7 times
+      checkPMTClus() : strstreamhN8200;  --> stringstream hN8200;
+                       << '\0'   away
+
+CsRCEventPads.cc : #define strstream stringstream   killed
+      setThreshold() : << '\0' 4 x 2 times
+      checkPPads() : strstream --> stringstream / << '\0' away   1 times
+      checkPMTPPad() : strstream --> stringstream / << '\0' away   3 times
+      checkAPVPad() : strstream --> stringstream / << '\0' away   6 times
+
+CsRCEventPartPhotons.cc : #define strstream stringstream   killed
+      checkSignal() : strstream --> stringstream / << '\0' away   4 times
+      checkAMPSCorr() : strstream --> stringstream / << '\0' away   21 times
+      checkLikeCorr() : strstream --> stringstream / << '\0' away   9 times
+
+
+CsRCEventDisplay.cc : #define strstream stringstream   killed
+      doEveDisplay() : strstream --> stringstream  8 / << '\0' away   16 times
+      sideDisplay() : strstream --> stringstream / << '\0' away   1 times
+
+CsRCEventParticles.cc :
+      setRunIndex() : << '\0' away   1 times
+
+CsRCEventParticles.TMF.cc :
+      setRunIndex() : << '\0' away   1 times
+
+
+CsRCEventRings.cc : #define strstream stringstream   killed
+      checkAMPSCorr() : strstream --> stringstream / << '\0' away   7 times
+      checkPhotonAngle() : strstream --> stringstream / << '\0' away   5 times
+      checkRichMom() : strstream --> stringstream / << '\0' away   1 times
+      checkPhiTheta() : strstream --> stringstream / << '\0' away   2 times
+      checkRingFit() : strstream --> stringstream / << '\0' away   14 times
+
+CsRCHistos.cc : #define strstream stringstream   killed
+                strstream --> stringstream / << '\0' away   ??? times
+
+CsRCExeKeys.cc : 
+      fillMyFileList() : << '\0' away   5 times
+
+CsRCMirrors.cc : 
+      //doAliMirrors() : strstream --> stringstream  / << '\0' away   3 times
+      doAliMirrors() : << '\0' away   3 times
+      doAliMirrAll() : << '\0' away   2 times
+      doAliMirrPhi() : << '\0' away   17 times
+
+CsRCPartPhotons.cc : #define strstream stringstream   killed
+      getPartPhotons() : << '\0' away   2 times
+      checkLikelihood() : << '\0' away   2 times
+      checkLikeRatios() : << '\0' away   6 times
+      checkLikeReso() : << '\0' away   8 times
+      getLikeProb() : << '\0' away   8 times
+      histLikeProfile() : << '\0' away   1 times
+      histQsqProfile() : << '\0' away   1 times
+      doPMTOptCorr() : strstream --> stringstream / << '\0' away 6 times
+      GetPMTPhotonPosition() : strstream --> stringstream / << '\0' away 4 ti
+
+CsRCLikeAll05.cc : << '\0' away 6 times
+
+CsRCRing.cc : #define strstream stringstream
+      peakScan() : strstream --> stringstream  2 / << '\0' away  4
+      histPeakSearch() : strstream --> stringstream  1 / << '\0' away  2
+      checkChiSquare() : strstream --> stringstream  1 / << '\0' away  1
+      checkLikelihood() : strstream --> stringstream  2 / << '\0' away  2
+      checkLikeVsIndex() : strstream --> stringstream  1 / << '\0' away  1
+      getDetEFit() : strstream --> stringstream  8 / << '\0' away  8
+      checkChiReso() : strstream --> stringstream  9 / << '\0' away  9
+      setTime() : strstream --> stringstream  3 / << '\0' away  3
+
+???
+CsRCTrackMomFit.cc :
+      CsRCTrackThruField() : if( ( kVers == 1 && zzpout < zzpin ) ... changed
+      CsRCTrackThruField() : if( ( kVers == 1 && zzpout < zzpin ) ... changed
+
+???
+CsRCnTup.h : #include "TTree.h" 
+             #include "TVector3.h"   added and many deletions (if USE...)
+CsRCnTup.cc : many deletions (if USE...)
+
+CsRichOne.cc :
+      end() : << '\0' away  1
+      physSelec() : << '\0' away  2
+
+
+
+
+
+
+
+RICHONE : version 4.25bis
+-------------------------
+
+Commit  ??????    from ??????    by ??????
+
+CsRCCluster.cc :
+      getBackWgt() : char* fname = "   "; -> char* fname = strdup("   ");
+                     string sflo = "   "; -> string sflo("   ");
+      getBackWgtX() : idem
+
+CsRCEventClusters.cc :
+      doClustering() : if( ( iddx == 0 && iddy == 1 && PHratio > ... changed
+
+CsRCEventParticles.cc :
+      setRunIndex() : if( pos > sFileName.size() ) continue;   changed (?)
+
+CsRCTrackMomFit.cc :
+      CsRCTrackThruField() : if( ( kVers == 1 && zzpout < zzpin ) ... changed
+      CsRCTrackThruField() : if( ( kVers == 1 && zzpout < zzpin ) ... changed
+
+CsRCnTup.h : #include "TTree.h" 
+             #include "TVector3.h"   added and many deletions (if USE...)
+CsRCnTup.cc : many deletions (if USE...)
+
+evdis(ANDREA)/ ... many corrections ...
+
+
+
+
+
+
+RICHONE : version 4.25
+----------------------
+
+Commit  100310    from Acid
+
+CsRCExeKeys.h :  bool readGf5_; inline bool readGf5()...   added   PROV!
+CsRCExeKeys.cc : 
+      CsRCExeKeys() : readGf5_ = ...   added
+                      if( myFileType_ == 4 ) readGf5_ = true;
+
+CsRCRecConst.cc :
+      CsRCRecConst() : MCCFRefIndUV_ = CFRefIndUV_;
+                       MCCFRefIndVS_ = CFRefIndVS_;
+                       if( lprint ) print(); moved to CsRichOne::doRichOne()
+      CFRefInd() : if( CsRichOne::Instance()->UpRICHJob() ) {... else...
+                   2 times   added
+
+CsRCEventParticles.h : std::vector<double> partVar_; (?)   added
+CsRCEventParticles.cc :
+      getEventParticles() : key->acknoMethod( "CsRCEventParticles::...  added
+      setMyParticle() : bool dumpBf = ...; if( dumpBf )... x 4   added
+                        key->acknoMethod( "CsRCEventParticles::...  added
+                        int nSkip = ...; & rel. -3+11 lines
+                        if( iret < 12 ) {... -7 lines (killed)
+                        " stop reading myFile, EOF reached..." -2 +2 lines
+      initMyFile() : int nSkip = ...; & rel. -3+12 lines
+      openMyFile() : "...opened..." -> "...in use..."
+                     int nSkip = ...; & rel. -2+14 lines
+      setMCParticle() : CsRCExeKeys* key = CsRCExeKeys::Instance();   added
+                        key->acknoMethod( "...   added
+      setMCRecParticle() : CsRCExeKeys* key = CsRCExeKeys::Instance();   added
+                           key->acknoMethod( "...   added
+      setDataParticle() : key->acknoMethod( "...   added
+
+CsRCEventPads.h : std::vector<double> padVar_;   and methods   added
+CsRCEventPads.cc :
+      setMCRecPads() : many upgradings to new RICH... not final
+                       //--- Revised 090216
+      setMyPads() : bool dumpBf = ...; if( dumpBf )... x 3   added
+                    //- skip myFile record trailer + 7 lines   added
+
+CsRCPartPhotons.h : getPMTOptCorr()   added--->moved to CsRCPhoton.h
+CsRCPartPhotons.cc :
+      checkLikeReso() : minor temporary mod.s
+                        if( kIpomMx == selIpoMx ) { ---> /// 
+      histLikeProfile() : nPhotons added to histo.s
+                          std::cout << "histLikeProfile : Profile nr...  added
+      getLikeAll() : temporary mod.s !
+      getPMTOptCorr() : method   added--->moved to CsRCPhoton.cc
+
+CsRCPhoton.h : getPMTOptCorr()   added
+CsRCPhoton.cc : #include "CsRCDetectors.h"
+                #include "CsRCUty.h"
+      getPMTOptCorr() : method added
+
+CsRCEventRings.h : checkRingFit()   added
+CsRCEventRings.cc : #include "CsRCChiSqFit.h"
+                    #include "CsRCCircleFit.h"   added
+      getEventRings() : ref. to checkRingFit()   added
+      checkRingFit() : method   added
+
+CsRCEventAnalysis.h : method checkMCPMTs()   added
+                      method checkDataPMTs()   added
+                      method checkRingEff()   added
+                      method checkOptCorr()   added
+                      method varStr()   added
+CsRCEventAnalysis.cc :
+      MCMonitor() : ref. to checkMCPMTs()   added
+      checkMCPMTs() : method   added
+      dataMonitor() : ref. to checkDataPMTs()   added
+                      ref. to checkRingEff()   added
+                      ref. to checkOptCorr()   added
+      checkDataPMTs() : method   added
+      checkRingEff() : method   added
+      checkOptCorr() : method   added
+      setProbsToTrack() : nProb-->23 : if( nProb > 23 )... (100305)
+                          3 + 2-1 + 3 + 3 + 1-1 + 1-1 + 3 + 3 + 3 lines added
+                        partProbs dump: many modif. with varStr   added
+      varStr() : method   added
+
+CsRCHistos.cc : records of bookings (8200, 8300, 8400)   added
+
+CsRichOne.cc : CSRCRichRec --> CsRichOne in the header
+      doRichOne() : if( cons->printConsts() ) cons->print();   added
+      writeMyFile() : if( CsR...->myFileType() >= 3 ) {.. --> == 3
+      physAppend() : if( !(key->myFileType() >= 3) ... --> == 3
+                     WARNING   added
+
+readbuff.F : added
+openfile.F : added
+
+
+
+
+
+
+RICHONE : version 4.24xxx   (pro memoria)
+-------------------------
+
+Commit  100109    by Sebastian Uhl
+
+CsRCEventParticles.cc : patch to "particle backward projection..."
+
+
+
+
+
+
+RICHONE : version 4.24
+----------------------
+
+Commit  090724    from Acid
+
+CsGeom.cc : updated
+CsGeom.cc : new 'if' sequence to read MC refr. indexes (6 lines commented out)
+
+
+
+
+
+
+RICHONE : version 4.24
+----------------------
+
+Commit  090213    from Acid
+
+CsRCEventParticles.cc :
+      openMyFile() : cout << outFile  << " opened ...(10 lines)   added
+
+CsRCEventPads.cc :
+      setDataPads() : t0Cal = rich->T0_flag(); -->
+                      if( !key->readMyFile() ) t0Cal = rich->T0_flag();
+
+CsRCEventPartPhotons.cc :
+      getEventPartPhotons() : bool checkAMPS, checkLIKE -> 'true'
+      moniCFRefInd() : comments (2 lines)
+      checkAMPSCorr() : if( !CsRCHistos::Ref()... ) return;   added
+      checkLikeCorr() : if( !CsRCHistos::Ref()... ) return;   added
+
+CsRCEventRings.cc :
+      getEventRings() : bool checkAMPS, bCheckRichMom, bCheckPhiTheta
+                        -> 'true'
+      singlePhoton() : filling of vRC6550 (25 lines)   added
+      checkAMPSCorr() : if( !CsRCHistos::Ref()... ) return;   added
+      checkRichMom() : if( !CsRCHistos::Ref()... ) return;   added
+      checkPhiTheta() : if( !CsRCHistos::Ref()... ) return;   added
+
+CsRCEventAnalysis.h :
+      moniCFRefIndR() : method added
+
+CsRCEventAnalysis.cc :
+      dataMonitor() : ref to moniCFRefIndR   added
+      moniCFRefIndR() : method added
+      setProbsToTrack() : comments (4 lines)   added
+
+CsRCHistos.h : std::vector<CsHist2D*> vRC6550;   added
+
+CsRCHistos.cc : booking of vRC6550 (15 lines)   added
+                lines // vector<CsHist2D*> vRC6680[0-19] (6681-6700)   added
+                lines // vector<CsHist2D*> vRC6900[0-37] (6901-6938)   added
+
+CsRichOne.cc :
+      doRichOne() : exit(0); commented out: see main.cc!
+                    or set 'events to read' to 1!
+
+CsRCnTup.h : new version from Giulia with ROOT ntups put in use
+CsRCnTup.cc : new version from Giulia with ROOT ntups put in use
+
+
+
+
+
+
+RICHONE : version 4.23
+----------------------
+
+Commit  090205    from Acid
+
+CsRCEventParticles.cc :
+      setDataParticle() : double zTarget =
+                          CsGeom::Instance()->getTargetCenter();   added
+                          0. --> zTarget   6 times
+
+
+
+
+
+
+RICHONE : version 4.22
+----------------------
+
+Commit  081205    from Acid
+
+CsRCEventRings.h :
+      checkRichMom() : method added
+      checkPhiTheta() : method added
+
+CsRCEventRings.cc :
+      getEventRings() : ref (with if) to checkRichMom()   added
+      getEventRings() : ref (with if) to checkPhiTheta()   added
+      checkRichMom() : method added
+      checkPhiTheta() : method added
+
+CsRCEventAnalysis.cc :
+      moniCFRefInf(...) : histo.s 6670 and related   added
+
+CsRCHistos.cc : comments (6670, 6790, 6800)   added
+
+
+
+
+
+
+RICHONE : version 4.21
+----------------------
+
+Commit  081113    from Acid
+
+CsRCEventPads.cc :
+      setMyPads() : test for PMT channels... ~19 lines   added/set out
+      checkPPads() : if( !CsRCHistos::Ref().bookHis() ... return   added
+
+CsRCEventPartPhotons.cc :
+      getEventPartPhotons() : bool checkLIKE = ... and if(...   added
+      checkLikeCorr() : mod.s and add.s
+                        std::vector<CsHist2D*> vRC6780 and related   added
+                        profile studies   added
+                        std::vector<CsHist2D*> vRC6790 and related   added
+                        many more mod.s and add.s ...
+
+CsRCPartPhotons.cc :
+      getLikeDeriv(...) : bool twoPtDer = ... and related logics   added
+      doPMTOptCorr(...) : set   bAMCorr = true   as default
+                          opt->CsOpt::getOpt( "RICHONE", "PMTOptCorrType"...
+                          ans related (~23 lines)   added
+
+CsRCHistos.cc : comments on vRC6770, vRC6780   added
+
+
+
+
+
+
+RICHONE : version 4.20
+----------------------
+
+Commit  081021    from Acid
+
+CsRCRecConst.cc : cosmetics
+                  std::cout ... outBufferSize_   added
+
+CsRCEventPartPhotons.cc :
+      checkLikeCorr() : mod.s and add.s
+                        std::vector<CsHist2D*> vRC6770 and related   added
+                        if( CsRichOne::Instance()->UpRICHJob() ... modif X 2
+
+CsRCPartPhotons.cc :
+      CsRCPartPhotons::getLikeDeriv(...) :
+        if( CsRichOne::Instance()->UpRICHJob() modif. to
+        if( CsRichOne::Instance()->UpRICHJob()  &&  nProb > 21 ) {
+        if( !CsRichOne::Instance()->UpRICHJob()  ||  nProb <= 21 ... modif. to
+        } else {
+
+CsRCHistos.cc : 2 times booking comments   added
+                (vRC6760, vRC6770)
+
+CsRCEventAnalysis.cc :
+      setProbsToTrack() : partProbs dump modified, titles added
+
+
+
+
+
+
+RICHONE : version 4.19
+----------------------
+
+Commit  081017    from Acid
+
+CsRCRecConst.cc : //outBufferSize_ = 30;   added and killed
+
+CsRCEventParticles.cc : cosmetics
+
+CsRCPad.cc : comments and correction   added
+
+CsRCPartPhotons.h :
+      long double getLikelihoodAPV( const double, int& );
+      long double getLikelihoodPMT( const double, int& );
+      void getLikeDeriv( const int, const double, ...
+      inline  double* probaLKAllAPV() { return probaLKAllAPV_; };
+      inline  double* probaLKAllPMT() { return probaLKAllPMT_; };
+      inline  double* derivLKAllAPV() { return derivLKAllAPV_; };
+      inline  double* derivLKAllPMT() { return derivLKAllPMT_; };
+      inline  void setProbaLKAllAPV( double* proba ) {
+      inline  void setProbaLKAllPMT( double* proba ) {
+      inline  void setDerivLKAllAPV( double* deriv ) {
+      inline  void setDerivLKAllPMT( double* deriv ) {
+      inline  double nPhotAllAPV() { return nPhotAllAPV_; };
+      inline  double nPhotAllPMT() { return nPhotAllPMT_; };
+      inline  void setNPhotAllAPV( const int npho ) { nPhotAllAPV_ = npho; };
+      inline  void setNPhotAllPMT( const int npho ) { nPhotAllPMT_ = npho; };
+      inline  bool likeAPVONLY() const { return likeAPVONLY_; };
+      inline  void setLikeAPVONLY( const bool on ) { likeAPVONLY_ = on; };
+      inline  bool likePMTONLY() const { return likePMTONLY_; };
+      inline  void setLikePMTONLY( const bool on ) { likePMTONLY_ = on; };
+
+      double probaLKAllAPV_[31];
+      double probaLKAllPMT_[31];
+      double derivLKAllAPV_[31];
+      double derivLKAllPMT_[31];
+      int nPhotAllAPV_;
+      int nPhotAllPMT_;
+      bool likeAPVONLY_;
+      bool likePMTONLY_;
+
+      bool GetPMTPhotonPosition( int, int, double, double, double&, double& );
+      bool GetPadCentre( int, double&, double& );
+      double getThetaIpo(...) : methods   added
+
+CsRCPartPhotons.cc :
+      CsRCPartPhotons() and clearPartPhotons() :   added ->
+        for( int j=0; j<31; j++ ) probaLKAllAPV_[j] = partphot...
+        for( int j=0; j<31; j++ ) probaLKAllPMT_[j] = partphot...
+        for( int j=0; j<31; j++ ) derivLKAllAPV_[j] = partphot...
+        for( int j=0; j<31; j++ ) derivLKAllPMT_[j] = partphot...
+        nPhotAllAPV_ = partphot.nPhotAllAPV_;
+        nPhotAllPMT_ = partphot.nPhotAllPMT_;
+        likeAPVONLY_ = partphot.likeAPVONLY_;
+        likePMTONLY_ = partphot.likePMTONLY_;
+        for( int j=0; j<31; j++ ) derivLKAllAPV_[j] = 0.;
+        for( int j=0; j<31; j++ ) derivLKAllPMT_[j] = 0.;
+        nPhotAllAPV_ = 0;
+        nPhotAllPMT_ = 0;
+        likeAPVONLY_ = false;
+        likePMTONLY_ = false;
+        double likeDV = cons->likeDefVa();
+        //long double like = 0.;
+        long double like = likeDV;
+        long double like = 0.;
+
+      getPartPhotons(...) : opt corr.s logics modified...
+	theCluB = theCluP;
+        theCluM = theCluPOt; ... redefined for checking opt corr.s
+
+      getLikelihoodPMT(...) : method added
+      getLikelihoodAPV(...) : method added
+      getLikeAll(...) :
+        if( likeAPVONLY_  &&   (*ih)->isPMT() ) continue;   added
+        if( likePMTONLY_  &&   (*ih)->isAPV() ) continue;   added
+      getLikeDeriv(...) : method added
+
+      doPMTOptCorr(...) : 
+        static std::vector<CsHist2D*> vRC3320;   and related   added
+        static std::vector<CsHist2D*> vRC6620;   and related   added
+        bool bAMCorr = false;     if( bAMCorr ) {   added
+        //- AMPS    bool bPSCorr = true;     if( bPSCorr ) {
+        and related ( GetPMTPhotonPosition(...) )   added
+        many additions and mod.s
+      GetPMTPhotonPosition(...) : method added
+      GetPadCentre(...) : method added
+      getThetaIpo(...) : method added
+
+CsRCEventAnalysis.cc : #include "CsRCUty.h"   added
+      setProbsToTrack() : OutBuffer from 21 to 30: all staff (~70 lines) added
+                          ///if( track ) { ->
+                          if( track  &&  !key->readMyFile() ) { (???)
+                          cosmetics
+      moniCFRefInf() : more code and histo.s   added
+
+CsRCEventPartPhotons.h :
+      checkAMPSCorr() : method added
+      checkLikeCorr() : method added
+
+CsRCEventPartPhotons.cc : #if __GNUC__ >= 3
+                          #define strstream stringstream
+                          #endif   added
+                          cosmetics
+      getEventPartPhotons() : ref to checkAMPSCorr()   added
+      getEventPartPhotons() : ref to checkLikeCorr()   added
+      checkSignal() : histos vRC3390 and related   added
+      checkAMPSCorr() : method added
+      partAllIdent() : double derivLKAPV[31], derivLKPMT[31]
+                       double probaLKAPV[31], probaLKPMT[31]
+                       and related (>~53 lines)   added
+                       (*ipf)->getLikeDeriv(...   added
+                       theIpoUV/VS, compLike and related (12 lines)   added
+      checkLikeCorr() : method added
+
+CsRCEventRings.h :
+      checkAMPSCorr() : method added
+
+CsRCEventRings.cc :
+      getEventRings() : ref to checkAMPSCorr()   added
+      checkAMPSCorr() : method added
+      singlePhotonPMT() : CsRCExeKeys* key = CsRCExeKeys::Instance();   added
+                          key->acknoMethod( "Cs...   added
+
+CsRCHistos.h : histo 3060   added
+CsRCHistos.cc : 8 times booking comments   added
+                (vRC3310, vRC3320, vRC3390, vRC3395)
+                (vRC6630, vRC6635, vRC6640, vRC6650)
+                (vRC6660)
+                (vRC6700, vRC6710, vRC6750)
+                histo 3060   added
+                2 times h-limits changed
+
+CsRCOptCorr.h : Full cosmetics
+                static CsRCOptCorr* instance_;   added
+      ExtendGrid() : method   added
+      ExtrapG(...) : method   added
+      checkNo9999() : method   added
+
+CsRCOptCorr.cc : Full cosmetics
+                 #include <cmath>   added
+                 #include "CsRCExeKeys.h"   added
+                 CsRCOptCorr::instance_ = 0;   added
+      CsRCOptCorr::Instance() : method   added
+      CsRCOptCorr() : ExtendGrid() and checkNo9999()   referenced
+      GetGrid() : additions and modifications
+      ExtendGrid() : method   added
+      ExtrapG(...) : method   added
+      checkNo9999() : method   added
+
+
+
+
+
+
+RICHONE : version 4.18
+----------------------
+
+Commit  070906    from Acid
+
+CsRCExeKeys.cc :
+      print() : 2 blanks added to make "SearchForRings   "
+
+CsRCRecConst.cc : //outBufferSize_ = 23;   added for test and killed
+
+CsRCPad.h : PMTTime_ changed to PMTT0_ 2 times; setPMTT0(...   added
+CsRCPad.cc : PMTTime_ changed to PMTT0_ 8 times
+
+CsRCEventPads.cc :
+      setDataPads() : PMTT0 def., filled and
+                      if( cath->isPMT() ) lPads_.back()->setPMTT0( PMTT0 );
+                      added
+
+CsRCPartPhotons.cc :
+      getHitCathodes() : filling of hRC1623 moved up inside loop...
+
+CsRCEventRings.h : method testPhiKzero()   added
+CsRCEventRings.cc : #include "CsRCEventParticles.h"   added
+      singlePhoton() : //------- test 070801 ---------- + 51 lines   added
+                       ...filling of vRC3677-78
+                       //------- test 070801 ---------- + 8 lines   added
+                       ...filling of vRC3661-76
+      ringSelection() : method testPhiKzero()   ref. (->//^^)
+      testPhiKzero() : added
+
+CsRCRing.h : mT0_ and method mT0()   added
+CsRCRing.cc : #include "CsGeom.h"   added
+      setTime() : CsRICH1Detector* rich = ...   added
+                  mT0_ def. and copy   added
+                  mT0 def., computed (2 lines)
+                  if( rich->T0_flag() ) offset = 0.;   added
+                  if( !key->readMyFile() ) mT0_ = mT0;   added
+
+CsRCEventAnalysis.cc :
+      setProbsToTrack() : double mT0 = ring->mT0();   added
+                          double mTime = ring->mTime() + mT0; ...   added
+
+CsRichOne.cc :
+      physSelec() : int evGood_, ... --> evGood_, ... (4 vars)
+                    possible error (no harm) corrected
+
+CsRCHistos.h : std::vector<CsHist2D*>  vRC3660;   added
+               CsHist2D *hRC3677, *hRC3678;   added
+CsRCHistos.cc : booking of vRC3661-76 and hRC3677-78   added
+
+
+
+
+
+
+RICHONE : version 4.17ter
+-------------------------
+
+Commit  070627    from Acid
+
+CsRichOne.cc :
+      doRichOne() : //--- FILL RICH NTUPLE (7 lines) moved down
+                    if(  nPartEv > 0  &&  nPadEv > 0 )   added
+
+
+
+
+
+
+RICHONE : version 4.17bis
+-------------------------
+
+Commit  0706020    from Acid
+
+CsRCEventAnalysis.cc :
+      BMDisplay() : vRC5000 to vRC5300 5 times
+
+CsRCHistos.cc : comments   added
+
+CsRichOne.cc :
+      doRichOne() : if( !readMyFile...   deleted (1+1 lines) !!!
+
+
+
+
+
+
+RICHONE : version 4.17
+----------------------
+
+Commit  070618    from Acid
+
+CsRCExeKeys.h, .cc : kPrintRejections_ def, methods, print, read   added
+
+CsRCEventParticles :
+      setDataParticle() : static float momMaxAcc = 0.;   added
+                          momMaxAcc = cons->momMaxAcc();   added
+                          if( momPart > momMaxAcc ) continue;   added
+                          if( momPart > 170. ) continue;   killed
+                          CsRCExeKeys* key = CsRCExeKeys::Instance();   added
+                          if( key->kPrintRejections() == 1 ) ~ 7 lines
+                          added   10 times
+                          xh = ...
+                          if( hist.hRC1000 ) hist.hRC1000->Fill( xh );
+                          added   16 times
+                          int kTrack = -1; kTrack++ ...   added
+                          if( momPart > 300. )...   killed
+                          if( cop != 0. )...  --> if( cop != 0. ) {...
+                          doEnExtrap, doExExtrap, doBkExtrap...   added
+                 -------- CHECK !!!         
+                          logics of smooted Helix changed... if( smoo... !!!
+                          RICHWALL inserted
+                          return   added
+                          cleaning...!
+
+CsRCEventPads.cc :
+      setDataPads() : CsRCHistos& hist = CsRCHistos::Ref()...   added
+                      if( hist.hRC1000 ) hist.hRC1000->Fill( xh );
+                      added   5 times
+                      bool t0Cal = ... 5 lines (T0)  added
+      checkPMTPPad() : bool t0Cal = ... 3 lines  added
+                       CsRICH1Detector* rich = ...   added
+
+CsRCPad.cc :
+      setPMTpars() : iPPdax/y -> iPPadx/y 4 times
+
+CsRCEventClusters.cc :
+      getEventClusters() : if( hist.hRC1000 ) hist.hRC...   added 5 times
+                           return   added
+
+
+CsRCEventPartPhotons.cc :
+      getEventPartPhotons() : if( key->kPrintRejections... (8 lines)   added
+                              if( hist.hRC1000 ) hist.hRC1000->Fill( xh );
+                              and related   added   9 times
+
+CsRCPartPhotons.h : doPMTOptCorr(...)   modified
+                    new doQzWCorr(...) x 2   added
+                    
+CsRCPartPhotons.cc :
+      getPartPhotons() : cleaning...!
+                         new ref. logics for doPMTOptCorr and doQzWCorr !!!
+                         compute 'corrected' emission angle (20 lines)   added
+                         and deleted!
+                         hRC1101 --> vRC1100 (1101,2,3) and related   added
+                         if( key->kPrintRejections() == 1 )... 9 lines   added
+      doPMTOptCorr() : def. modified...
+                       corrections in progress...
+                       histo.s   added
+      doQzWCorr() : new method(modif. including getCluAngle) x 2  added
+
+CsRCPhoton.h : method flagAllPhotons   added
+CsRCPhoton.cc :#include "CsRCEventPartPhotons.h"   added
+      flagAllPhotons() : method   added
+
+CsRCEventRings.cc :
+      getEventRings() : if( hist.hRC1000 ) hist.hRC...   added 5 times
+
+CsRCRing.h, .cc : nPhotPMT_ def., method, copy   added
+      getRingPk() : nPhotPMT_ = 0 and if( ... nPhotPMT_++;   added
+      getRingMaxLike() : nPhotPMT_ = 0 and if( ... nPhotPMT_++;   added
+      setTime() :  double mTime = 0.; & 15 lines   added
+
+CsRCEventAnalysis.cc :
+      doEveAnalysis() : setProbsToTrack() moved to CsRichOne::doRichOne() !
+      setProbsToTrack() : CsRCHistos& hist = CsRCHistos::Ref()...   added
+                          if( hist.hRC1000 ) hist.hRC1000->...   added 5 times
+                          if( !papho->flag() ) continue; --> //...(killed) !!!
+                          double likeDV = cons->likeDefVa();   added
+                          partProbs defaults (15+3 lines)   added
+                          if( !papho->flag()  ||  !PIDset ) {...
+                            defaults... 20 lines   added
+                            partProbs[ 9 ] = -1.;   added !!!
+                          if( nProb > 21 ) {... 5 lined   added
+                          if( nProb > 21 ) {... 5 lined   added
+                          if( cons->likeType() == "ALL"  &&  !RING ) {...
+                            12 lines   killed !!!
+                          precision... in dump
+                          if( PIDset ) { --> //...(killed)
+                          if( track ) track->... --> if( track ) {...
+                          return   added
+                          cleaning...!
+
+CsRCEventDisplay.cc :
+      doEveDisplay() : many changes... !!!
+                       new histo (APV & PMT) booking and filling...
+
+CsRCHistos.h, .cc : hist 1000 def and booking
+                    2100, 2110, 2120 modif to 2100, 2105, 2110, 2120 ...
+
+CsRichOne.cc :
+      doRichOne() : ana->setProbsToTrack()... 9 lines   added !!!
+      getPartProbs() : if( !(*ipf)->flag() ) continue;   set OFF!
+
+evdis/CsRCDisplay.cc : updated
+
+
+
+
+
+
+RICHONE : version 4.16
+----------------------
+
+Commit  070411    from Acid
+
+CsRCOptCorr.h : added!
+CsRCOptCorr.cc : added!   and   upgraded with all_wavelengths grid
+                 verbose to verbosew (17 times); and verbosex ... (2 times)
+
+GNUmakefile : CsRCOptCorr.$(SRC_EXT) \   added
+
+
+CsRCExeKeys.cc : doCheckLike_ = true;   instead of false!
+                       std::cout << setiosflags(ios::boolalpha);   added
+
+CsRCRecConst.h, .cc : bool likeLog_, def, method, read, print   added
+                      double likeDefVa_, def, method, read, print   added
+
+CsRCCathode.h, .cc : method xcePMTWC(...) changed to ccePMTWC(...)
+                     method xcePPadWC(...) changed to ccePPadWC(...)
+
+CsRCMirrors.h, .cc :
+      vImpMir() : par.s set to 'const' and '&' taken out
+
+CsRCEventParticles.cc :
+      setMyParticle() : float indexVS = 0.; ... 12 lines   added
+                        swap and else   added!
+                        if( key->selPMTonly() ) cons->setCFRefInd( indexVS )
+	                if( key->selAPVonly() ) cons->setCFRefIndVS( index )
+                        added!
+
+CsRCEventClusters.cc :
+      getClusFromPads(...) : ref to xcePPadWC(... changed to ccePPadWC(...
+
+CsRCEventPartPhotons.cc :
+      partAllIdent() : likeDV def. and set 2 times
+                       long double likeMax = 0.; --> -100000.;
+                       long double likeMw = 0.; --> likeDV;
+                       probaLK[kPaTy] = 0.; --> = likeDV; !
+                       if( pLike != 0. ) --> likeDV
+                       long double pLike/Bk = 0. --> long double pLike/Bk = ..
+                       (*ipf)->setPionONLY( false );   added
+                       (*ipf)->setKaonONLY( false );   added
+
+CsRCPartPhotons.h : getThetaWgav()   added
+                    normSg_, normBk_ and methods   added
+                    doPMTOptCorr(...   changed
+CsRCPartPhotons.cc : normSg_, normBk_ copy and clear   added
+                     #include "CsRCOptCorr.h"   added
+      clearPartPhotons() : pLikeMax_ = 0.; --> -100000.;
+      getPartPhotons() : oFlag... and doPMTOptCorr(... ref.   changed
+      getLikeAll() : long double pLike0 = pLike;   added
+                     double likeDV = cons...   added
+                     //sumSig/sumBkg   cleaned 4+7 lines
+                     if( cons->likeLog() ) {... 6 lines   added
+                     many tests ->//
+                     pLike... = 0./-1. --> ... = likeDV;   5 times
+                     normSg_, normBk_ def.
+                     cleaning...
+      checkLikelihood() : double pLike0 = -1.; --> ...= -100000.;
+                          long double pLike = -1.; --> double pLike = ...
+      checkLikeReso() : CsRCExeKeys* key = ...   moved up
+                        CsRCExeKeys::Instance() to key for MC
+                        if( key->myFileType() == 3 ) { ...   added for
+                          Phi mass selection
+                        histo mom from  100, 0., 50. to 60, 0., 60. 9 times
+                        histo 3277, book (2+5 lines), fill (6 lines)   added 
+                        if( cons->likeLog() ) x 3 (1+4+1+6 lines)   added
+                        double pLikemMx = -1.; to ... = -100000.; 2 times
+                        if( pLikem[kIpo] == likeDV ) continue;   added
+                        fit for log Like: meny changes ... lokeLog ...
+                        double sigmaLikeMax = 0.65 to ... = 0.51;
+                        cleaning
+                        double likeDV = cons ...   added
+                        double pLikeBk = 0.; --> likeDV;
+                        int nPf = 24; --> 12;
+                        double dTheIpo = ... / if( ... / .../ --> 3 times
+                        double theWgt = getThetaWgav();   added
+                        if( !thetaLikeSet_ ) ... yh = thetaLike_ - ... added
+      getLikeProfile() : nLikePro_ =   51; to ... = 101;   prov.?
+                         double likeDV = cons ...   added
+                         double pLikeBk = 0.; --> likeDV;
+      getLikeProb() : CsRCExeKeys* key = ...   moved up
+                      if( key->myFileType() == 3 ) { ...   added for
+                      Phi mass selection
+                      double pLikeMxc = -1.; --> -100000.;
+                      likeDV   def.
+                      double pLikeBk = 0.; --> = likeDV;
+                      pLikem[kIpo] = 0.; --> = likeDV;
+                      double pLikemMx = -1.; --> = -100000.;
+      getThetaWgav() : method   added
+      getThetaLikeMax(...) : WARNING : NOT likeLog compatible!   added
+      getThetaLikeMax() : likeDV   defined
+                          likeM = likeDV, likeMax = -100000.   added
+                          if( ... < 0. ) --> if( !cons->likeLog() ... 5 times
+      getThetaLikeMax(obso) : double likeMaxW = -1.; --> -100000.;
+      checkLikelihood() : double pLike0 = -1.; --> 100000.;
+      histLikeProfile() : double likeDV = cons...
+                          double pLikeBk = 0.; --> ... = likeDV;
+      doPMTOptCorr() : method implemented!
+
+CsRCEventRings.h : method checkPMTTimeDif()   added
+                   method checkEventSignal()   added
+CsRCEventRings.cc : 
+      getEventRings() : checkPMTTimeDif() ref.   added
+                        checkEventSignal() ref.   added
+      checkPMTTimeDif() : method   added
+      checkEventSignal() : method   added and set OFF
+
+CsRCRing.cc :
+      checkChiReso() : CsRCExeKeys* key = ...   moved up
+                       CsRCExeKeys::Instance() to key for MC
+                       if( key->myFileType() == 3 ) { ...   added for
+                       Phi mass selection
+      setTime() : histo 8143 book and fill (7 + 10 lines)   added
+      getThetaWgav() : if( coBkg > 0. ) thetaWgav = ...   added
+
+CsRCEventAnalysis.h : method checkThetaLikeMax()   added
+CsRCEventAnalysis.cc : #include "CsRCLikeAll.h"/"CsRCLikeAll05.h"   added
+      checkLikeDistr() : if( part->mom() > 50.) ... to > 60.
+                         if( ... > 0. --> if( cons->likeLog()  || ... 4 times
+                         if( cons->likeLog() ... for var. lims. / rlx -> 10.
+                         if( cons->likeLog() ... 1 times
+                         if( cons->likeLog() ... else ...   2(+2) times
+                         xlm, xlx / rlm, rlx var. lims. to hist   4 times
+                         double likeMax/Max2 = 0. --> -100000.
+                         ... kMax2 > 0 ...   added
+                         likeDV ... and likeBack ... 6+2 times
+      print() : likeDV   def.
+                likeDV   7 times
+                cleaning
+      PIDMonitor() : likeDV   def.
+                     likePion = -1.; --> likeDV   4 times
+                     checkLikeDistr() ref.   moved down...
+                     checkThetaLikeMax() ref.   added
+      checkThetaLikeMax() : method   added
+
+CsRCGauPolFit.cc : nothing...
+
+CsRCHistos.h, .cc : histo 1536, point. and booking   added
+                    -25., 25.) ); --> -10., 10.) ); 8 times in h.2100/2110
+
+CsRichOne.cc :
+      doRichOne() : //checkOutput(); --> //if( !readMyFile ) checkOutput();
+      writeMyFile() : float indexVS = CsRCRecConst::Instance()->CFRefIndVS();
+                      ... 7 lines   added
+CsRCnTup.cc :
+      fillOutNtuple() : Header.Index = CsRCRecConst::Instance()->CFRefIndVS();
+                        added instead of ... CFRefInd();
+                        WARNING   added
+
+
+
+
+
+
+RICHONE : version 4.15
+----------------------
+
+Commit  070130    from Acid
+
+CsRCRecConst.h : nPhotAtSat_[16] and method   added
+                 bPhotAtSat_ and method   added
+CsRCRecConst.cc : nPhotAtSat_[k] default, reading and printing   added
+                  bPhotAtSat_ default and def.
+                  cathN0_[k] = 0.;   set as default!
+
+CsRCParticle.h : method getClosestCat()   added
+CsRCParticle.cc : include "CsRCDetectors.h"   added
+      getClosestCat() : method   added
+
+CsRCPartPhotons.h : method getSplitLimits() new    added
+                    method getSplitCondition() new   added
+                    method getHitCathodes() new   added
+                    bSplitLLimSet_ and method   added
+                    methods x-, yDetLimits()   added
+                    methods thetaUVtoVS(), thetaVStoUV()   added
+                    method nPhotExpctCat()   added
+                    bool pionONLY_ and kaonONLY_ methods and set...s   added
+CsRCPartPhotons.cc :
+      ...copy(), clear() : bSplitLLimSet_   added
+      ...copy(), clear() : pionONLY_ and kaonONLY_  added
+      clearPartPhotons() : vySplitLLimSet_ = false;   added
+      yDetLLimit() : modif. to RICH Up
+      xDetLimits() and yDetLimits() : methods   added  
+      getHitCathodes() : method in progress   added
+      getSplitLimits() : method (new, modif.)   added
+      getSplitCondition() : method (new, modif.)   added
+      nPhotExpctCat() : method in progress   added
+      doSelCathodes() : ref. to getSplitCondition() instead of ...( p )!
+      getLikeAll() : if( dets->ptrToCat( this->pPart()->getClosestCat()...
+                     4 lines   added
+
+CsRCEventPartPhotons.cc :
+      partAllIdent() : (*ipf)->setPionONLY( false );   added
+                       if( kPaTy == 8 ) (*ipf)->setPionONLY( true );   added
+                       (*ipf)->setKaonONLY( false );   added
+                       if( kPaTy == 11 ) (*ipf)->setKaonONLY( true );   added
+
+CsRCPhoton.cc : thetaUVtoVS(), thetaVStoUV() methods modified !!!
+
+CsRCLikeAll05.cc :
+      normSignal() : nPhotExS = papho->nPhotExpctCat( theIpo );   ???
+                     bool testHist = true; and... 6 lines   added
+                     if ( testHist ) { booking... 22 lines   added
+                     if ( testHist ) { filling... 21 lines   added
+
+CsRCLikeAllMap.cc : //- WARNING: OBSOLETE!   added
+
+CsRCHistos.h : *hRC1623 and vRC1350 (1351-66)   added
+               and vRC1370 (1371-86)   added
+CsRCHistos.cc : histo 1623 booked ( getCatFromPart() )
+                histo.s 1351-66 booked ( nPhotExpctCat() )
+                histo.s 1371-86 booked ( nPhotExpctCat() )
+                #include "CsRCDetectors.h"   added
+                CsRCDetectors* dets = ... static int nCat...   added
+                16 -> nCathode 10 times
+
+
+
+
+
+RICHONE : version 4.14bis
+-------------------------
+
+Commit  061221    from Acid
+
+CsRCEventPads.c :
+      checkPPads() : if( !CsRichOne::Instance()->UpRICHJob...   added
+
+CsRCEventRings.cc :
+      checkPhotonAngle() : if( !CsRichOne::Instance()->UpRICHJob...   added
+      singlePhotonPMT() : if( !CsRichOne::Instance()->UpRICHJob...   added
+
+
+
+
+
+
+RICHONE : version 4.14
+----------------------
+
+Commit    061221    from Acid
+
+CsRCRecConst.cc : defaults modified
+                  momMinAcc_ = 1.8 -> 0.,   momMaxAcc_ = 200. -> 180.
+                  qzRefInd_ = 1.458 -> 1.6
+                  mcanWind_[0] = 5 -> 2,   nMore_ = 0 -> 3
+                  mcaScan_ = 100 -> 60,   xuScan_ = 100. -> 60.
+                  momMinProc_ = 1.8 -> 0.,   momMaxProc_ = 200. -> 180.
+                  likeType_ = "CHISQ" -> "ALL",   backgrType_ = "02" -> "05"
+
+CsRCExeKeys.cc : defaults modified
+                 doCheckLike_ = true -> false
+
+CsRCDetectors.h : std::vector<int> nCatPMT_, nCatAPV_ and methods   added
+CsRCDetectors.cc : nCatPMT_, nCatAPV_ clear, def. and copy
+      setCathode() : if(... nCatPMT_.push_back( kCat ); ... else {
+                     nCatAPV_.push_back( kCat );   added
+
+CsRCEventPads.c :
+      checkPPads() : 5 lines del. -> for( int kc=0; kc<int(... 3+1 lines added
+                     if( ic ==  3 )... -> if( ic == dets->nCat... 4 lines mod.
+
+CsRCPartPhotons.h : method doPMTOptCorr() definition changed
+CsRCPartPhotons.cc :
+      getPartPhotons() : modif to ref. to doPMTOptCorr()
+      doPMTOptCorr() : modif. and additions to method
+
+CsRCEventRings.cc :
+      singlePhotonPMT() : if( iCaPa == 3 )... -> if( iCaPa == dets->nCatPMT()[
+                          ... 4 lines modif.
+      checkPhotonAngle() : 5 lines del. -> for( int kc=0; kc<int(..
+                           3+1 lines   added - 2 times
+                           if(  kCat ==  3 ) -> if(  kCat == dets->nCatPMT(...
+
+CsRCLikeAll05.cc :
+      normSignal() : histo's 1614, 1615 changed to 1624, 1625
+      normBackgr() : bool exeInt form 'false' to 'true'
+      likeSignal() : if( pPhot->isPMT() ) if( hist.hRC1574...   added
+                     if( pPhot->isAPV() )   added
+                     histo's 1616, 1617 changed to 1626, 1627
+      likeBackgr() : if( pPhot->isPMT() )   added
+                     if( pPhot->isAPV() ) if( hist.hRC1579...   added
+
+CsRCHistos.h : histo's 1574, 1579   added
+               histo's 1614-1617 changed to 1624-1627
+               std::vector<CsHist2D*> vRC2100, vRC2110   added
+CsRCHistos.cc : booking of histo's 1574, 1579   added
+                histo's 1614-1617 changed to 1624-1627
+                booking of histo's 2101-4, 2111-4   added
+
+
+
+
+
+
+RICHONE : version 4.13
+----------------------
+
+Commit    061218    from Acid
+
+CsRICH1Detector.cc :
+      readCalibration() : prints modif.
+
+CsRCExeKeys.h : bool CorrPMTOpt_ and method def.
+CsRCExeKeys.cc : CorrPMTOpt_ : def., reading opt.s and prints   added
+
+CsRCRecConst.cc :
+      CFRefIndVS() : prints modif.
+
+CsRCEventPads.cc:
+      setMyPads() : if( cath->isPMT() ) lPads_.back()->setPMTpars();   added
+      setMCRecPads() : if( cath->isPMT() ) lPads_.back()->setPMTpars();  added
+      setDataPads() : if( cath->isPMT() ) lPads_.back()->setPMTpars();   added
+                      lPads_.back()->setPHPack(... moved up inside if !
+                      if( !flagPad ) lPads_.back()... moved up inside if !
+
+CsRCPad.h : PMTnum_, PMTcha_ and methods   added
+            method setPMTpars()   added
+CsRCPad.cc : PMTnum_, PMTcha_ def.s, copy and prints   added
+      setPMTpars() : method   added
+
+CsRCPartPhotons.h : method doPMTOptCorr(...   added
+CsRCPartPhotons.cc :
+      getPartPhotons() : bool CorrPMTOpt = key->CorrPMTOpt();   added
+                         mathod doPMTOptCorr(... refernced (9 lines)
+      getLikeAll() : if( cons->backgrType() == "02" ) likeAll = new ...
+                     back to call for every entry to method
+                     static int kEventC = -1;... (11 lines) added for "05"
+                     delete likeAll; modif to
+                       if( !(cons->backgrType() == "05") ) delete likeAll;
+                     likeAll->setPPartPhot( this );   killed!
+      doPMTOptCorr() : method started to being implemented
+
+CsRCLikeAll05.cc :
+      normSignal() : pipe intercept calc., 4 lines deleted->10 added
+                      filling of histo's 1614-15 (8 lines)   added
+      likeSignal() : pipe intercept calc., 4 lines deleted->10 added
+                      filling of histo's 1616-17 (8 lines)   added
+
+CsRCHistos.h : histo's 1614-1617   added
+CsRCHistos.cc : booking of histo's 1614-1617   added
+
+
+
+
+
+
+RICHONE : version 4.12
+----------------------
+Commit    061209    from Acid
+
+CsRCCluster.cc : print modified
+
+CsRCEventPartPhotons.cc :
+      getEventPartPhotons() : filling of histo 1121 (5 lines)   added
+      setBackgrType() : if( evclus->lClusters().size() == 0 ) return; added !!
+      partAllIdent() : nPhoRing->nPhotons x 4
+                       if( nPhotons == 0 ) bSele = false;   added
+
+CsRCPartPhotons.cc :
+      getPartPhotons() : filling of histo 1131 (6 lines)   added
+      getLikeAll() : double theIpow = 0.; and 
+                     if( lPhotons.size() > 0 ) theIpow = lPh...   added
+                     nPhoRing  changed to  nPhotons   3 times
+                     if( nPhotons == 0 ) bSele = false;   added
+                     filling of histo 1571 (10 lines)   added
+                     //prints...   added
+                     -> static CsRCLikeAll* likeAll = NULL;
+                     if( cons->backgrType() == "02" ) likeAll = new ...
+                     (14 lines) moved to first call
+                     likeAll->setPPartPhot( this );   added
+                     ->//^^delete likeAll;
+      nPhoExpct() : filling of histo 1572 and 1573 (10 lines)   added
+
+CsRCLikeAll05.h  : inline void setPPartPhot( CsRCPartPhotons* pp )...   added
+
+CsRCLikeAll05.cc :
+      normSignal() : CsRCHistos& hist = ... (5 lines) moved up
+                     filling of histo 1577 (5 lines)   added
+                     fracUsePhiSet_ = true;   moved down
+      normBackgr() : long double backInt/S -> static long d... !!!
+                     CsRCHistos& hist = ... (5 lines) moved up
+                     filling of histo 1578 (5 lines)   added
+      likeSignal() : filling of histo 1575 (5 lines)   added
+                     int level = ... (3 lines) moved up
+                     if( kFrac < 0 ) kFrac = 0;   added
+                     double diffPhi = ... and 2 x if('s   added
+                     / Drad   killed !
+                     else if( kDetClu == 1 ) -> else {...
+      likeBackgr() : else { backgr = backWgtMin;... 8 lines   added
+                     CsRCHistos& hist = ... (5 lines) moved up
+                     filling of histo 1576 (5 lines)   added
+
+CsRCEventRings.cc :
+      getEventRings() : setTime(); ref.   added
+
+CsRCRing.h : double mTime_, bool mTimeSet_ def. and methods
+CsRCRing.cc : mTime_, bool mTimeSet_ def. 
+      getTime() : method   upgraded
+
+CsRCEventAnalysis.cc :
+      setProbsToTrack() : prints modif.
+
+CsRCHistos.h : histo's   1121 and 1131   added
+               histo's   1571-73, 1575-1578   added
+CsRCHistos.cc : comment //std::vector<CsHist1D*> vRC8140(0-1)   added
+                booking of histo's   1121 and 1131   added
+                booking of histo's   1571-73 1575-1578   added
+
+
+
+
+
+
+RICHONE : version 4.11bis
+-------------------------
+Commit    061130    from Acid
+
+CsRCEventPads.cc :
+      checkPMTPPad() : offset--> -1681.;
+      checkAPVPad() : static bool doCuts = false, def. x 2, if( doCuts.. added
+
+CsRCRing.h : method double getTime();   added
+CsRCRing.cc : #include "CsTrack.h"   added
+      getTime() : method   added
+
+
+
+
+
+
+RICHONE : version 4.11
+----------------------
+Commit    061130    from Acid
+
+CsRCRecConst.cc : default PHmipCut_ --> 2000000.;
+                  cleaning
+
+CsRCExeKeys.cc : cleaning
+
+CsRCDetectors.cc : cleaning
+
+CsRCCathode.cc : cleaning
+
+CsRCEventParticles.cc : cleaning
+      setDataParticle() : if( vHelix.size() == 0 ) continue;   added   !!!
+
+CsRCEventPads.h : #include "CsHist.h"   added
+                  methods checkPMTPPad, checkAPVPad   added
+                  PH -> double in setThreshold(... and killHalo(...
+CsRCEventPads.cc : if( key->UsePadThresh() ) {...}   added
+      setMyPads() : buffv and related eliminated
+                    float PHPadw -> double ... --> //^
+                    double PHPack = fbuff[0]; and 12 lines   added
+                    if( cath->isAPV() ) {... (decoding)   10 lines added
+                    if( !cath->isAPV()  &&  !cath->isPMT() ) {...}   added
+                    if( !checkAPVPad(... 4 lines   added
+                    if( !checkPMTPPad(...  5 lines   added
+                    cleaning
+      setMCRecPads() : CsRCCathode* cath = dets->ptrToCat( cathode );   added
+                       if( !cath->isAPV()  &&  !cath->isPMT() ) {...}   added
+                       lPads_.back()->setPHPack( PHPack );   added
+                       double PHPack = PH;   added
+                       fPH back to PH
+                       if( !checkAPVPad(... 4 lines   added
+                       if( !checkPMTPPad(...  4 lines   added
+                       cleaning
+      setDataPads() : bool flagPad = true;   added
+                      if( !checkAPVPad( PH, mod ) )... and relat.   added
+                      PH   = Time;   added
+                      PHPack   defined x 3
+                      A2, A0, A1, mod, lim2, lim01 and related   def.
+                      if( !checkPMTPPad( Time ) )... and relat.   added
+                      if( !cath->isAPV()  &&  !cath->isPMT() ) {   added
+                      histo booking changed and moved to methods
+                      histo filling moved to methods
+                      lPads_.back()->setPHPack( PHPack );   added
+                      if( !flagPad ) lPads_.back()->setFlag( false );   added
+      checkPMTPPad() : method   added
+      checkAPVPad() : method   added
+      checkPPads() : //^if( !(*ip)->flag() ) continue;  added pro-mem. x 2
+      setThreshold(...) : PH -> double
+      killHalo(...) : PH -> double
+
+CsRCPad.h : float PH/PMTTime -> double ... def. and methods
+            float PH -> double ... in CsRCPad(... x 2
+            double PHPack_ and methods   added
+CsRCPad.cc : float PH -> double ... in CsRCPad(... x 2
+             double PHPack_ and methods   added
+
+CsRCEventClusters.cc : cleaning
+      getClusFromPads() : if( !(*ip)->flag() ) continue;   added
+      getClusFromPads(...) : if( !(*ip)->flag() ) continue;   added
+      doClustering() : if( !(*ip)->flag() ) continue;   added 2 times
+                       PHCluw /= float(nPadClu);   corrected !!!
+
+CsRCEventPartPhotons.cc : cleaning
+
+CsRCPartPhotons.cc : cleaning
+      sigmaPhot7() : //--- defaults ( run 51908, 2006 )... 5 lines   added
+ 
+CsRCPhoton.cc : cleaning
+       sigmaPhot6APV() : new defaults
+
+CsRCLikeAll05.cc : cleaning
+
+CsRCEventRings.cc : cleaning
+      checkNoise() : if( !(*ip)->flag() ) continue;   added
+
+CsRCRing.cc : cleaning
+       getRingPk() : if( (*ih)->isPMT() ) PHw = 1.;   added
+       getRingMaxLike() : if( (*ih)->isPMT() ) PHw = 1.;   added
+       peakCountSearch() : if( (*ih)->isPMT() ) PHw = 1.;   added
+       sigmaRing4() : new defaults
+
+CsRCEventAnalysis.cc : cleaning
+
+CsRCEventDisplay.cc : local changes
+
+CsRichOne.cc :
+      writeMyFile(): if( !(*ip)->flag() ) continue; --> //^... !!!
+                     if( !(*id)->flag() ) continue; --> //^... !!!
+                     --> pht[kPad] = (*id)->PHPack();   !!!
+
+CsRCHistos.cc : //std::vector<CsHist1D*> vRC8130(0-3)...   added
+
+CsRCnTup.cc :
+      fillOutNtuple() : cleaning
+
+
+
+
+
+RICHONE : version 4.10
+----------------------
+Commit    061121    from Acid
+
+CsRICH1UpGrade.cc :
+      DecodeChipDigit() : double time = p->GetTimeDecoded();
+                          //^int32 time = p->GetTime();
+
+CsRCMirrors.cc :
+      printEleAll() : line  << ",  --- pos = " << (*ie)->vpos()   added
+
+CsRCCathode.cc :
+      plotGeo() : if( !CsRCHistos::Ref().bookHis()  ||  ...   added
+                  and KILLED!
+
+CsRCEventPads.cc :
+      setMCRecPads() : tests->// and cout.s->//
+      setDataPads() : static std::vector<CsHist1D*> vRC8120;   added
+                      conditional booking of 8121, 8122, 8123, 8124
+                      (34 lines)   added
+                      filling of ... (7 + 6 lines)   added
+                      int nData = ...   added 2 times
+                      double A0,1,2 = ...   added for APV
+                      PH = A2*10000. + A0*100. + A1;   added for APV
+                      PH   = data[1];  Time = data[1];   set for PMT
+                      xh = Time + 1780.;
+
+CsRCEventRings.cc : 
+      checkPhotonAngle() : if( !CsRCHistos::Ref().bookHis()  ||  ...   added
+
+CsRCEventAnalysis.cc :
+      checkLikeDistr() : if( !CsRCHistos::Ref().bookHis()  ||  ...   added
+
+CsRCEventDisplay.cc : local modif.s
+
+CsRCHistos.cc : //- booking in CsRCEventPads::setDataPads() ...   added
+
+
+
+
+
+
+RICHONE : version 4.09
+----------------------
+Commit    061113    from Acid
+
+CsRCDetectors.cc :
+      ptrToCat() : mes( elFatal, str ); --> ->mes( elError, str );
+
+CsRichOne.h : endMyFile_ def. and methods   added
+CsRichOne.cc : endMyFile_ def. and copy   added
+      doRichOne() : some changes in ev. skipping...
+                    if( endMyFile_ ) continue;   added
+      readMyEvent() : dumpd = true;
+                      some setprecision(...)   added
+      physAppend() : if( key->myFileType() < 3 ) return; -->
+                     if( !(key->myFileType() >= 3) ) return;
+
+CsRCEventParticles.cc :
+      setMyParticle() : int iret = 0;   modif.
+                        CsRichOne::Instance()->setEndMyFile( false );   added
+                        int nPartEv = 0;   added
+                        if( CsRichOne::Instance()->endMyFile() ) {.. (6 lines)
+                        else {   added
+                        while( nPartEv > 30 ) {... (9 lines)   added
+      setDataParticle() : if( vHelix.size() > 1 ) {   added 2+1 times
+                          to process RICHONE from DTS's
+
+CsRCEventPads.cc : #include "../evmc/CsMCRICH1Hit.h"
+                   #include "../geom/CsRICH1UpGrade.h"   added for MC
+      getEventPads() : if( !set...) return false; (4 times)   added
+                       and if logics changed   (???)
+      setMCRecPads() : //--- Test MC : 061025 (21 lines)   added
+      setMyPads() : buffv[20000] and related (5 lines)   added and ->// !
+                    if( nPadEv > 5000 ) {... (7 lines)   added
+                    if( cath == NULL ) {... (12 lines)   added
+
+CsRCEventClusters.cc : #include "CsMCHit.h", #include "CsMCDigit.h"   added
+      getClusFromPads() : //------- test 20061110 (18 lines)  added and killed
+      
+
+CsRCEventPartPhotons.cc :
+      moniCFRefInd() : if( key->MCarloEvent() ) {
+                       if( part->iPartT() != 8  &&  ... ) return;   added
+
+CsRCPartPhotons.cc :
+      getLikeAll() : if( isnan... ->//
+      checkLikeReso() : if( fabs( phiMass - 1.020) > 0.012 ) return; ->//
+      nPhotExpct() : if( isnan... ->//
+
+CsRCEventRings.cc :
+      getEventRings() : singlePhotonPMT(); set ON
+      singlePhoton() : xPade, yPade   moved up
+                       if( CsRichOne::Instance()->UpRICHJob() ) {...
+                       and histos 3681-86, 3691-96 (20 lines)   added
+                       if( CsRichOne::Instance()->UpRICHJob() ) {...
+                       and histos 3687-88, 3697-98 (23 lines)   added
+
+CsRCRing.h, .cc : methods ringAPVonly, ringPMTonly   added
+                  #include "CsRCDetectors.h"   added
+
+CsRCHistos.h, .cc : histos vRC3680, vRC3690, hRC3687-88, hRC3697-98   added
+                    level -> 0
+
+
+
+
+
+
+RICHONE : version 4.08
+----------------------
+Commit    061013    from Acid
+
+[base/inithbook() : memory = 10000000->15000000]  NO!
+
+CsRCEventPads.cc :
+      setMyPads() : prov. cathode swap for APV commented OUT!
+
+CsRCEventPartPhotons.cc :
+      partAllIdent() : bool isFirst = true;
+                       if( isFirst ) (*ipf)->setLikeFirst( true );
+	               isFirst = false;
+                       (*ipf)->setLikeFirst( false );   added
+                       (*ipf)->setLikeONLY( true ); / ...false );    added
+
+CsRCPartPhotons.h : bool likeONLY_, likeFirst_  and methods    added
+CsRCPartPhotons.cc : likeONLY_, likeFirst_  def.   added
+      getLikeAll() : //^if( isnan(... (...) and //^if( fabs(... (2)   elim.
+                     if( !(*ih)->flag() ) continue;   added
+      getQsquare() : if( !(*ih)->flag() ) continue;   added
+      nPhotExpct() : protection against /0 added (2 times 1+6-2 lines)
+                     double rTheIpo = theIpo/1000. * focLen;
+                     many changes and corrections...!
+                     histo's 1505, 1506, 1507, 1508   added
+      getCorrMom() : corrMom = 1.;    corrected!
+
+CsRCPhoton.h, .cc :  likeFirst_  and methods    added
+                     def. and copy of some var.s   added
+
+CsRCLikeAll05.cc :
+      likeSignal() : double signal -> signal !!!
+      likeBackgr() : backWgtMin set to 0.00001
+
+CsRCHistos.h, .cc :  histo's 1505, 1506, 1507, 1508   added
+
+
+
+
+
+
+RICHONE : version 4.07
+----------------------
+Commit    060908    from Acid
+
+CsRCEventPads.cc :
+      setMyPads() : //----- swap cathode number according to Sergei
+                    22 lines   added   PROVISIONAL!
+                    if( !setThreshold( iCatw,... -> //^
+      setDataPads() : PH = data[0]; for APV   added
+                      Time = data[0]; for PMT   changed
+
+CsRCEventParticles.cc : 
+      partFilter() : if( !flag ) return  flag;   added 3 times (correction)
+
+CsRCEventPartPhotons.cc :
+      partPhoSelection() : check MAPMT-APV boundary (30 lines)   added
+      partAllIdent() : ... (*ipf)->setPartProb( kPro,  0.);   added (useless)
+                       //----- process selected part-photons (corrected)
+      moniCFRefInd() : hist.vRC1600[ic] ... (2 lines)   added
+
+CsRCPartPhotons.cc : 
+     getLikeAll() : //^if( isnan(... (...) and //^if( fabs(... (2)   added
+
+CsRCPhoton.cc :
+      thetaUVtoVS() : formulae protected for /0.
+      thetaVStoVU() : formulae protected for /0.
+      sigmaPhot6APV() : from dummy to true
+      sigmaPhot6PMT() : from dummy to true
+
+CsRCLikeAll05.h : phoBack_[500]; float -> double, 500 -> 1000
+CsRCLikeAll05.cc :
+      normSignal() : kEvent/kEventC control (4 lines)   added/mod
+                     if( nTotl == 0 ) nTotl = 1;
+                     if( nTot == 0 ) nTot = 1;
+      likeSignal() : if( kFrac > 35 ) kFrac = 35;   added
+                     kEvent/kEventC control (4 lines)   added/mod
+                     if( sigPhot > 0.) {...   added
+                     if( rOnDet . 0. ) ...   added
+                     if((yc - yPade) > 0.) ...   added (2 times)
+                     if( xx == 0.) continue;
+                     if( nTot == 0 ) nTot = 1
+      likeBackgr() : many changes to avoid nan's and large values (?) !!!
+                     check buffer -> 1000
+
+CsRCRing.cc :
+      getDetEFit() : if( nPoint < 7 ) exeFitE = false;   added
+
+CsRCEventDisplay.cc :
+      doEveDisplay() : ring pad pattern out (provisional?)
+                       //^vRC4300[kH4300]->Fill( xh...
+
+CsRCHistos.h, .cc : vRC1600   added
+
+CsRCnTup.h : float likeEl[nRmax]... (6 var's)   added
+CsRCnTup.cc :
+      fillOutNtuple() : likeEl... (6)   added (2 places)
+                        Photon.the[kPhot] = ... (5 lines)   added !!!
+
+CsRichOne.cc :
+      doRichOne() : if( skipMyEvent_ ) kPrintRichRec = 0;   added
+                    if( kPrintRichRec == 1 ) ... (5 lines)   moved down
+
+
+
+
+
+
+RICHONE : version 4.06
+----------------------
+Commit    060830    from Acid
+
+CsRCRecConst.h : inline void setCFRefIndVS( ...   added
+
+CsRCExeKeys.cc :
+      fillMyFileList() : int numbt = ...   added
+                         for( int knu1=numb1; knu1<=numbt; ...   modif
+
+CsRCCathode.cc : if( TBname[1] == sM  ||  TBname[1] == sP ) isPMT_ = true;
+                 added instead
+
+CsRCEventParticles.cc :
+      setRunIndex() : bool twoind = ...,
+                      if( vflo.size() == 3 ) twoind = true;
+                      vRunIndexVS.push_back( vflo[2] );
+                      if( twoind ) cons->setCFRefIndVS( ...
+                      added
+
+CsRCPartPhotons.cc :
+       getPartPhotons() : //^theCluR *= 1.008;   added and killed...
+
+CsRCEventRings.cc :
+      singlePhoton() : thePhow = (*ih)->the0()  in histo 3559
+	               if( part->mom() < momLimit ) {   added
+                       cleaning
+
+CsRCEventAnalysis.cc :
+      MCMonitor() : //... (*ir)->pPartPhot()->lPhotons();
+      dataMonitor() : ...getDetEFit... (3 lines) set out ->//^ crash!!!
+
+      
+
+
+
+
+
+RICHONE : version 4.05
+----------------------
+Commit    060824    from Acid
+
+CsRCExeKeys.h, .cc : nSkipMyEvs_ read and def (3+1 lines) and method added
+
+CsRCDetectors.h, .cc : CsRCCathode* ptrToCat() moved to CsRCDetectors.cc
+                       and prints   added
+      setLocalGeo() : zEntrWind_, zExitWind_ redefined ...vDet0In...
+
+CsRCCathode.cc :
+      xcePPadWC() : corrected error (2 lines) xcePPadPMT_[iPPad]...
+
+CsRCPhotonDet.h, .cc : vDet0In_ def., method, set, prints, ...
+
+CsRCEventParticles.cc :
+      setMyParticle() : if( ...->skipMyEvent() ) added
+      setDataParticle() : corrected for reading DST's (Vinicio)
+
+CsRCEventPads.cc :
+      setMyPads() : if( ...->skipMyEvent() ) added (2 times)
+                    if( !setThreshold( cathode --> //^
+
+CsRCPad.cc : PH_ = 0.; --> //^   (2 times)!
+
+CsRCEventClusters.cc :
+      getClusFromPads(k) : x/yc-->x/yc0
+                           x/yc redefined with xcePPadWC (3 lines)
+                           histo 1022   added
+
+CsRCRing.cc :
+      getDetRFit() : param[0] = the_ * 3.20; (was 3.36)
+
+CsRCEventAnalysis.cc :
+      MCMonitor() : histo 3632 -->  theMC - <the0>
+                    18 lines provisionally added
+      dataMonitor() : bool exeFits = true;   fits activated
+      setProbsToTrack() : prints refined
+
+CsRichOne.h :
+      skipMyEvent() : method   added
+      readMyEvent() : method   added
+CsRichOne.cc :
+      doRichOne() : if( !evpads->getEventPads() ... + 5 lines   deleted
+                    int nPadEv = 0; + 3 lines   added
+                    nMySkip def from options and prints (6 lines)   added
+                    skipping of myFile evs moved up, WORKING, but 
+                    UNEFFECTIVE for corrupted events!
+                    skipMyEvent_ def ... and method
+      readMyEvent() : method   added
+
+CsRCHistos.h : histo 1022   added
+CsRCHistos.cc : histo.s 3700... and 3710... from 48 to npo = 100...
+                histo 1022   added
+                histo.s 3631/32 --> new binning
+
+CsRCLikeAll05.cc :
+      likeBackgr() : BUFFER Overflow!...   only once (3 lines added)
+
+
+CsRCEventDisplay.cc :
+      doEveDisplay() : various provisional changes (//^) for pixel 12x12
+
+
+
+
+
+RICHONE : version 4.04
+----------------------
+Commit    060813    from Acid
+
+CsRCEventPads.cc :
+      setMyPads() : if( PHPadw < cathodeThre[i...   killed   PROVISIONAL!
+      setDataPads() : if( PHPadw < cathodeThre[i...   killed   PROVISIONAL!
+
+CsRCEventClusters.cc :
+      getClusFromPads() : killed obsolete PMT code ->good one
+      getClusFromPads(j) : killed obsolete PMT code ->good one
+
+
+
+
+
+
+RICHONE : version 4.03ter
+-------------------------
+Commit    060812    from Acid
+
+CsRCEventClusters.h : method checkPMTClus()   added
+
+CsRCEventClusters.cc :
+      getEventClusters() : checkPMTClus()   refer.
+      checkClusters() : corrections and additions
+      checkPMTClus() : method   added
+
+CsRCHistos.cc : cleaning in //calls
+
+
+
+
+
+
+RICHONE : version 4.03bis
+-------------------------
+Commit    060811    from Acid
+
+CsRCEventPads.h, .cc : method swapPMTChs()   added
+                       fixes for swapping taken away
+
+
+
+
+
+
+RICHONE : version 4.03
+----------------------
+Commit    060811    from Acid
+
+geom/CsRICH1Detector.cc : //^std::cout's... x 3
+
+geom/CsRICH1UpGrade.cc : #include "DaqDataDecoding/ChipF1.h"   added
+      CsRICH1UpGrade() : //^sprintf(name,"RP01P0%d",ic);
+                         //^sprintf(name,"RP01P%d",ic); to be activated
+                         //^std::cout's... x 3   added
+                         else... const CS::ChipF1::Digit *... 19 lines added
+
+CsRCEventPads.h : method checkPPads()   added
+
+CsRCEventPads.cc : method checkPPads()   added
+      getEventPads() : if( lPads_.size() == 0 ) return  false;   added
+                       checkPPads() instant.
+      setDataPads() : decoding part rearranged + swappings
+
+CsRCHistos.h, .cc : vrc1500 (for checkPPads)   added
+
+
+
+
+
+
+RICHONE : version 4.02
+----------------------
+Commit    060731    from Acid
+
+CsRCEventPads.cc :
+      setDataPads() : 
+
+CsRCHistos.h, .cc : histo's 1514, 15, 16, 17, 18, 19   added
+                    cleaning
+                    some level = 0 set
+
+CsRCEventPartPhotons.cc :
+      moniCFRefInd() : hist.hRC1556->Fill( 0.000205, 0.5, ...
+                       hist.hRC1557->Fill( 0.000205, 0.5, ...
+                       9 lines added
+
+CsRCPartPhotons.h, .cc : method getRelMaxima from bool to int
+      getRelMaxima() : various modifications; tRet, fRet eliminated
+                                              nDim, dump, ...
+      getThetaLikeMax() : various modifications
+                          getRelMaxima() activated
+
+CsRCPhoton.h, .cc : sigmaPhot6APV(), sigmaPhot6PMT()   added
+
+CsRCLikeAll05.cc :
+      normSignal() : histo's 1514, 15   added
+      normBackgr() : histo's 1518, 19   added
+      likeSignal() : histo's 1516, 17   added
+
+
+
+
+
+
+RICHONE : version 4.01
+----------------------
+Commit    060629   from Acid
+
+CsRCEventPads.cc :
+      setDataPads() : if( cath->isAPV() ) {...}   killed
+                      int ix = rich->...   ix = rich->... and y
+
+
+
+
+
+
+RICHONE : version 4.00 PMT
+----------------------------
+Commit    060612   from Acid
+
+see CommitLogPMT
+
+
+
+
+
+
+RICHONE : version 3.12
+----------------------
+Commit    060524   from Acid
+
+CsRCEventParticles.cc :
+      setDataParticle() : if( CsInit::Instance()->getDataType() == "dst" )
+                          {... 4 lines   added
+                          if( vHelix.size() > 1 ) {... 2 lines   added
+
+
+
+
+
+
+RICHONE : version 3.11
+----------------------
+Commit    060510   from Acid
+
+CsRCEventParticles.cc :
+      setMyParticle() : if( !key->MCarloEvent() ) {   added
+
+CsRCEventPartPhotons.cc :
+      partAllIdent() : if( checkLk ) (*ipf)->che.... ???
+                       ref. to getLikeProfile()   added ???
+                       ref. to getThetaLikeMax()   exchanged ???
+
+CsRCPartPhotons.h : nLikePro_, theLikeProMn_, theLikeProMx_, likeProSet_
+                    theLikePro_[...], pLikePro_[...]   added and methods
+                    pLikeMax_   added and method
+      checkLikeReso() : many modif.
+      getLikeProb() : method   added
+      getRelMaxima() : method   added
+      getLikeProfile() : method   added
+      getThetaLikeMax() : new method,   added
+      getThetaLikeMaxO() : old method,   renamed
+CsRCPartPhotons.cc : nLikePro_, ... added in copy and clear
+      checkLikeReso() : many modif.
+      getLikeProb() : method   added
+      getRelMaxima() : method   added
+      getLikeProfile() : method   added
+      getThetaLikeMax() : new method,   added
+      getThetaLikeMaxO() : old method,   renamed
+
+CsRCEventRings.cc :
+      partChiSqIdent() : if( checkChi ) (*ir)->checkChiReso();   added
+
+CsRCRing.h, .cc :
+      checkChiReso() : method   added
+
+CsRichOne.h, .cc : methods stopMyFileJob() and setStopMyFileJob()   added
+
+CsRCGauPolFit.cc : convTolSet_   added ...
+      getConvTol() : method   added
+
+CsRCHistos.cc : comments for ref. to new histo.s   added
+
+
+
+
+
+
+RICHONE : version 3.10
+----------------------
+Commit    060508   from Acid
+
+CsGeom.cc : else if( opt == "rich1" ) {   plus 8 lines with
+            _rich1->setMCCFRefInd( index );      added
+
+CsRICH1Detector.h, .cc : #include "../rich/CsRCRecConst.h"   added
+      setMCCFRefInd() : method   added
+
+CsRCRecConst.h : MCCFRefInd_ and MCCFRefIndSet_   added
+                 CFRefInd_ and rel.   from float to double
+      setMCCFRefInd() and MCCFRefInd() methods   added
+CsRCRecConst.cc : MCCFRefInd_ and MCCFRefIndSet_   added
+                  CFRefInd, index and rel.   from float to double
+      CFRefInd() : if( key->MCarloEvent() ) { plus 3 lines   added
+                   prints   added
+
+
+
+
+
+
+RICHONE : version 3.09
+----------------------
+Commit    060327   from Acid
+
+CsRCEventParticles.cc :
+      setDataParticle() : mom. fit code commented-out
+
+CsRCEventPartPhotons.cc :
+      partAllIdent() : (*ipf)->checkLikeReso();   added
+
+CsRCPartPhotons.h, cc :
+    checkLikeReso() : method and related #include   added
+
+CsRCLikeAll03.cc : modifications for test
+
+CsRCGauPolFit.cc : minor settings changed
+
+CsRCHistos.cc : level set to '0' for histo 1525 "y- vs x-clu"
+                for background map
+
+CsRCEventAnalysis.cc : 
+      checkLikeDistr() : prov. nLike = 4 eliminated!
+
+CsRCEventDisplay.cc : ref. to sideDisplay() commented-out for caution
+      sideDisplay() : many additions not tested
+
+
+
+
+
+
+RICHONE : version 3.08
+----------------------
+Commit    060213   from Acid
+
+CsRCCluster.h : method getBackWgt() moved to getBackWgtX()
+                method getBackWgt() (map type 1 new)   added
+CsRCCluster.cc : method getBackWgt() moved to getBackWgtX()
+                 method getBackWgt() (map type 1 new)   added
+
+CsRCEventRings.h : method checkPhotonAngle()   added
+CsRCEventRings.cc : ref. to and method checkPhotonAngle()   added
+
+CsRCEventAnalysis.h : method checkLikeDistr()   added
+CsRCEventAnalysis.cc : ref. to and method checkLikeDistr()   added
+
+CsRCHistos.cc : record of histo.s vRC3300, vRC3400, 05, 10, 20, 30
+                and vRC3450, 60, 70, 80, 90   added
+
+CsRCEventDisplay.cc :
+      sideDisplay() : modif for top display   added ??? (but not used!)
+                      NOT COMMITTED!
+
+
+
+
+
+RICHONE : version 3.07   TESTs of tracking
+----------------------
+Commit   DONE      from Acid
+
+CsRCTrackMomFit.h, cc   added for TEST!
+
+
+
+
+
+
+RICHONE : version 3.06   TESTs of tracking
+----------------------
+Commit    NOT COMMITTED   from Acid
+
+GNUmakefile : CsRCTrackMomFit.$(SRC_EXT) \   added
+
+CsRCTrackMomFit.h, cc   added for TEST!
+
+CsRCEventParticles.cc : #include "TMtx.h"               added
+                        #include "CsRCTrackMomFit.h"    added
+      setDataParticle() : interface for tracking TESTS   added
+                          //%%%%----- ... > 46 lines added ... //%%%%-----
+
+
+
+
+
+
+RICHONE : version 3.06
+----------------------
+Commit    050823   from Acid
+
+CsRCCluster.cc :
+      getBackWgt() : std::string err = "Ba...   added
+                     mess.append( err );   added
+
+CsRCLikeAll05.cc :
+      normSignal() : vDcPhotWw = vDcPhotWw.unit();   modified!
+      likeSignal() : vDcPhotWw = vDcPhotWw.unit();   modified!
+
+
+
+
+
+
+
+RICHONE : version 3.05
+----------------------
+Commit    050620   from Lxplus
+
+CsRCCluster.cc :
+      getBackWgt() : warning prints and CsErrLog::Instance()->mes( elFatal,
+                     added
+                     } else { ...   added
+
+
+
+
+
+
+
+RICHONE : version 3.04
+----------------------
+Commit    050615   from Lxplus
+
+CsRCEventPartPhotons.h, cc :
+      getEventPartPhotons() : ref to moniCFRefInd()   added
+      moniCFRefInd() : method added
+
+CsRCEventRings.cc :
+      singlePhoton() : static float momLimit  = 50.;   modif
+
+CsRCEventAnalysis.cc :
+      PIDMonitor() : if( RING ) ...BMDisplay( ring );   added
+      moniCFRefInf() : static float momLimit  = 50.;   modif
+                       if( !( momPart < momLimit ) )   modif
+
+CsRCHistos.h, cc : histo 1559 (def and booking)   added
+                   new binning for histo 3059
+
+CsRCRecConst.cc :
+      CFRefInd() : iindex -> .... from Andrea
+      
+pkopt/rich1.2003.opt.050411 : n-1Limits   changed
+
+
+
+
+
+
+RICHONE : version 3.03
+----------------------
+Commit    050411   from Acid
+
+CsRCEventPartPhotons.cc :
+      partAllIdent() : probaChi[kPaTy] = 10000000.;
+                       nProb > 16 --> nProb > 15   2 times
+
+CsRCEventRings.cc :
+      partChiSqIdent() : nProb > 16 --> nProb > 15   1 times
+      partRingIdent() : nProb > 16 --> nProb > 15   1 times
+
+CsRCEventAnalysis.cc :
+      setProbsToTrack() : prints... -> //
+                          nProb > 16 --> nProb > 15   6 times
+
+
+
+
+
+
+RICHONE : version 3.02
+----------------------
+Commit    050407   from Acid
+
+CsRCEventPartPhotons.cc :
+      partPhoSelection() : int nPhotMinRing = cons->nPhotMinRing();   added
+                           if( int(lPhotons.size()) < ... ) bSele = false;
+                           added   !!!
+                           list<CsRCPhoton*> lPhotons = ...   moved up
+
+CsRCEventAnalysis:.cc :
+      setProbsToTrack() : if( nProb > 16 ) { ... }  17 lines   added
+
+CsRichOne.cc :
+      getPartProbs() : for( int k=0; k<nProb; k++ ) partProbs[k] = partPro[k]
+                       added   /   9 lines deleted
+
+
+
+
+
+
+RICHONE : version 3.01 MAP
+--------------------------
+Commit    050331   from Acid
+
+CsRCRecConst.h, cc : outBufferSize_ def. and method   added
+CsRCRecConst.cc : outBufferSize_  print and setting CSTRACK_RICHDATASIZE;
+                  added
+                  cout << setprecision( x )...   added
+                  prints of cathN0   added
+                  read BKGMAP cleaned and prints added
+
+CsRCExeKeys.h : inline float ... -> inline bool ...   corrected 3 times
+                bool thetaLikeMaxTrue_; and method   added
+CsRCExeKeys.h, cc : thetaLikeMaxTrue_ def., read opt., prints   added
+
+CsRCEventParticles.cc : 
+      partAnalysis() : bool DataEvent = key->DataEvent();   added
+                       checks for 'correlated' background (48 lines)   added
+                       exeTest   set to false
+
+CsRCEventPartPhotons : #include "CsRCDetectors.h", "CsRCCathode.h"   added
+      checkSignal() : 'Correlated' background tests (79 lines)   added
+                       exeTest   set to ?
+                       15 -> int khCs = lCathodes.size() - 1;   added
+      partAllIdent() : int nProb = cons->outBufferSize();   added
+                       if( nProb > 16 ) { setPartProb[...qSquare[
+                       5 lines   added
+                       if( nProb > 16 ) { setPartProb[...probaLK[
+                       7 lines   added
+
+CsRCPartPhotons.h : #include "CsRCRecConst.h"   added
+                    int nProb = ...   added
+                    for( int j=0; j<15;... -> ...j<nProb;...
+                    double partProbs_[15]; -> [50];              !!!
+CsRCPartPhotons.cc : #include "CsRCLikeAllMap.h"   re-added
+      copy constructor : 15 -> int nProb = cons->outBufferSize(); and rel.
+      clearPartPhotons() : idem
+      getLikeAll() : sumSig and sumBkg def., calc. and cout   added and // 
+      getLikeAllMap() : re-implemented (provisional)
+      getThetaLikeMax() : tTrue = key->thetaLikeMaxTrue(); &rel.   added
+                          and modifications...
+                          if( !tTreu ) {...}   3 times   added
+
+CsRCLikeAll05.cc : ... vv tests -> //   and   -> false
+
+CsRCEventRings.cc :
+      singlePhoton() : test APV - 050220... (41 lines)   added
+                       exeTest   set to false
+                       filling of vRC3565 and *hRC3569 (8+8 lines)   added
+                       provisional?
+                       tests for 'correlated background' (59 lines)   added
+                       exeTest   set to false
+      partChiSqIdent() : int nProb = cons->outBufferSize();   added
+                         if( nProb > 16 ) { ... 5 lines   added
+      partRingAllIdent() : int nProb = cons->outBufferSize();   added
+                           if( nProb > 16 ) { ... 7 lines   added
+
+CsRCRing.h : #include "CsRCRecConst.h"   added
+             int nProb = ...   added
+             for( int j=0; j<15;... -> ...j<nProb;...
+             double partProbs_[15]; -> [50];             !!!
+CsRCRing.cc : 
+      CsRCRing() : 15 -> int nProb = cons->outBufferSize();
+      copy constructor : idem
+
+CsRCEventAnalysis :
+     setProbsToTrack() : static const int nProb = cons->outBufferSize(); added
+                         double pMinus1[nProb];   and   pZero[nProb];   added
+                         pZero (3 lines)   added / pMinus   killed
+                         15 -> nProb 2 times
+                         if( nProb > 16 ) { partProbs[...qSquare[
+                         2 times 5 lines   added
+                         if( nProb > 16 ) { partProbs[...probaLK[
+                         2 times 7 lines   added
+                         15 -> nProb 5//+1 times
+                         partProbs dump (15 lines)   added
+
+CsRCHistos.h, cc : vRC3565 and *hRC3569   for APV tests &...  added
+                   hRC3563                for 'correlated' backg   added
+
+CsRichOne.cc :
+      getPartProbs() : static const int nProb = cons->outBufferSize();  subst
+      checkOutput() : static const int nProb = cons->outBufferSize();   subst
+      getPartProbs() : static const int nProb = cons->outBufferSize();  added
+                       <15 -> <nProb
+
+CsRCnTup.cc : 'multi-line string literals'   eliminated!!!
+      fillOutNtuple() : static const int nProb = cons->outBufferSize(); subst
+                        double partProbs0[nProb]; without 'static'
+
+
+
+
+
+
+RICHONE : version 3.00 MAP
+--------------------------
+Commit   050211    from Acid
+
+CsRCParticle.cc :
+      print() : cout << setprecision( 5 );  back to ( 2 );   added
+
+CsRCEventPartPhotons.cc :  #include "CsRichOne.h"   added
+      partAllIdent() : long double likeMax = -1.; --> 0.;
+                       long double likeMw = -1.; --> 0.;
+                       probaLK[kPaTy] = -1.; --> 0.;
+                       long double pLike = -1.; --> 0.;
+                       if( pLike >= 0. ) probaLK[kPaTy] = pLike; --> NO if(
+                       if( pLike >= 0. ) { deriv. }   --> != 0. )
+                       long double pLikeD = -1.; --> 0.;
+                       long double pLikeBk = -1.; --> 0.;
+                       if( pLikeBk > 1. ) pLikeBk = 1.;   killed //
+                       if( (*ipf)->thetaLikeSet() ) theReco = theRecoLkR; add
+      setBackgrType() : CsOpt* opt = CsOpt::Instance(); string sflo = "   ";
+                        else if( cons->backgrType() == "BKGMAP" ) {...
+                        18 lines added }
+      getBackgrParam04() : std::cout << setprecision( 7 );  and back to ( 2 )
+
+CsRCPartPhotons.h : long double getLikeAllMap( const double, int& );   added
+                    fracUse_, method and setting   added 
+CsRCPartPhotons.cc : #include "CsRCLikeAllMap.h"   added
+                     #include "CsRichOne.h"   added
+                     #include "CsStopwatch.h"   added
+                     fracUse_ copy and clear...
+      getLikelihood() : if( cons->backgrType() == "BKGMAP" ) 
+                          like = getLikeAllMap( theIpo, nPhotons );
+                          else like = getLikeAll( theIpo, nPhotons );
+                        //- getLikeAll timing : blocks (13+11 lines)   added
+      getLikeAll() : print (firstCall) Type   added
+                     cleaning
+      getLikeAllMap() : method added
+      getThetaLikeMax() : modified!   ("04" and goto's...)
+
+CsRCLikeAll05.cc :
+      normSignal() : bool... moved   print (firstCall) added
+      CsRCPartPhotons* papho = const_cast<CsRCPartPhotons*>(pPartPhot_);
+      papho->setFracUse( fracUse );   added
+      normBackgr() : bool... moved   print (firstCall) added
+      likeSignal() : bool... moved   print (firstCall) added
+
+CsRCLikeAllMap.h, cc : class added
+
+CsRCEventAnalysis.c  :
+      print() : if( probp <= 0. ) --> if( probp != 0. )   7 times
+                if( prob >= 0. ) --> if( prob < 10000000. ) 3   times
+                std::cout << setprecision( x );  added 4 times
+      setProbsToTrack() : if( partProbs[k] < 0. ) partProbs[k] = 0.
+                            killed for like
+                          if( fabs( partProbs[k] ) > 10000. )
+                            partProbs[k] = 0.   killed for like deriv.
+                          if( partProbs[k] > 200. ) 
+                            partProbs[k] = 200.;    killed for nPhotons
+
+CsRCRecConst.h : cathN0_, backgrmap_ def. and methods   added
+CsRCRecConst.cc : cathN0_[k] defaults, read option and setting   added
+                  else if( sflo == "BKGMAP" ) {...
+                    backgrmap_ def., reading and setting   added
+
+CsRichOne.cc : std::cout << setprecision( 3 ); --> ( 2 );
+
+AND
+
+RICHONE : version 2.22
+-------------------------
+Commit   050211    from Acid
+
+CsRCEventPartPhotons.cc :
+      partAllIdent() : pLikeD = (*ipf)->getLikelihood(   adjusted
+                       if( !cons->likeONLY() ) {...}   --> taken out (bkg)
+                       (*ipf)->setThetaLike( theRecoLkR );   moved inside
+                       if( !key->doCheckLike()...   added
+                       if(  key->doThetaLikeMax()  &&...   added 
+                       cons->likeONLY() --> key->likeONLY()   4 times
+
+CsRCPartPhotons.cc :
+      CsRCPartPhotons() : clearPartPhotons()   added
+
+CsRCEventRings.cc :
+      partRingIdent() : if( !cons->likeONLY() ) {...}   --> taken out (bkg)
+                        (*ir)->setThetaLike( theRecoLkR );   moved inside
+                        if( !key->doCheckLike()...   added
+                        if(  key->doThetaLikeMax()  &&...   added 
+                        cons->likeONLY() --> key->likeONLY()   6 times
+      ringSelection() : double zHelix0 /1 = 0.;   added
+
+CsRCRecConst.h, cc :
+      inline void setBackgrType( std::string str ) { backgrType_ = str; };
+      likeONLY_ def., method and settings moved to CsRCExeKeys
+
+CsRCExeKeys.h : likeONLY_ def., method and settings   added
+                doCheckLike_, doThetaLikeMax_ and methods   added
+CsRCExeKeys.cc : doCheckLike_, doThetaLikeMax_ read opts and prints   added
+
+
+
+
+
+RICHONE : version 2.21
+-------------------------
+Commit   041201    from Acid
+
+
+CsRCMirrors.cc :
+      vImpMir() : protection on Delta   added
+
+CsRCCluster.cc : #include <fstream>, #include <iomanip>
+                 #include <unistd.h>, #include <fcntl.h>   added
+      getBackWgt() : reading of "vec74" instead of histogram file
+
+CsRCEventPartPhotons.cc :
+      partAllIdent() : if( !cons->likeONLY() )...  taken out for Like backgr.
+
+CsRCPartPhotons.cc :
+      getLikeAll() : if( ...Type() == "05" ) likeRatio = true;   taken OUT
+                     if( ... "05" ) pLike *= exp( -normS * power ) * likeNorm;
+                     ADDED
+                     if ( !likeRatio ) pLike *= 10.;   taken OUT
+
+CsRCLikeAll05.h : splitPatt_ and fracUse_ and methods   added
+                  cleaning
+CsRCLikeAll05.cc : extensive changes and additions!
+
+CsRCHistos.cc : CsHistograms::SetCurrentPath("/RICH");  NO  if( bookHis ) ...
+                histo 3559   moved down
+                histo 3559   level = -1;
+                } else {
+               cout << "RICHONE, CsRCHistos() : NO histograms booked" << endl;
+               cout << "--------------------------------------------" << endl;
+               cout << "nHist = " << kHisBk << endl      added
+
+CsRCEventAnalysis.cc :
+      fitGCFRefInd() : if( binTot < 1000000. )   changed
+
+CsRCnTup.h : void CsRCnTupNm()   added
+CsRCnTup.cc : cleaning;
+              CsRCnTupNm() referenced
+      CsRCnTupNm() : method added
+
+CsRichOne.cc : double pindex --> int pindex / set precision(...   added
+      end() : int pindex and ...   added
+              cout << "RICHONE end of job :" << endl;   moved
+              cout << "RICHONE end of processing :" << endl;   edded
+
+
+
+
+
+RICHONE : version 2.20
+-------------------------
+Commit  041125     from Acid
+
+CsRCRecConst.h, cc : likeONLY_, method, definition and prints added
+
+CsRCExeKeys.h, cc : NoRingSplitting --> UseSplitRings (2 + 2 lines)
+                    string NO = "NO";   added
+                    SearchForRings (2 + 2 lines)   added
+
+CsRCEventPartPhotons.cc : 
+      getEventPartPhotons() : else if( cons->ringDefMode() == "MAXLIKE" )
+                                                     partAllIdent();   added
+      partAllIdent() : warning on like tests (likeONLY) added (7 lines)
+                       if( ...cons->likeONLY() ) ... added 4 times
+                       double qSqua = (*ipf)->getQsquare(...   added
+                       double probaChi[31];    probaChi[kPaTy] = -1.;  added
+                       probaChi[kPaTy] = qSqua;   added
+                       (*ipf)->setProbaChiAll( &probaChi[0] );   added
+                       (*ipf)->setPartProb( ..,  probaChi[..] )... times 4
+                       cout's modified and added
+
+CsRCPartPhotons.h, cc : probaChiAll_ and method and set... and def and copy
+                        added (3 + 2 lines)
+      getThetaLikeMax() : many modifications!
+      checkLikelihood() : ->acknoMethod(...   added
+      checkLikeRatios() : method added
+      getLikeAll() : checkLikeRatios() referenced   and   commented!!!
+                     if( likeRatio  &&  theIpo > 0. ) {... output likeBk
+                         substituted!   (compatibily  ???)
+                     logLike and logLikeBk introduced (label 041109) 12 lines
+      getPartPhotons() : NoRingSplitting --> UseSplitRings (2 lines)
+      getQsquare() : method added
+
+CsRCLikeAll05.cc : set   bool doHist = false;   (CPU?)
+
+CsRCEventRings.cc : 
+      partRingIdent() : warning on like tests (likeONLY) added (7 lines)
+                        if( ...cons->likeONLY() ) ... added 6 times
+
+CsRCRing.cc :
+      getRingMaxLike() : if( thetaLike <= 0. ) { ... 4 lines added
+                         --> prints --> commented-out
+      getThetaLikeMax() : many modifications!
+
+CsRCEventAnalysis.cc :
+      setProbsToTrack() : partProbs content list : added
+                          if( cons->likeType() == "ALL"  &&  !RING ) {...
+                          8 lines added }
+
+CsRCnTup.cc :
+      fillOutNtuple() : largely modified : loop on rings --> on part-photons
+
+CsRichOne.cc :
+      doRichOne() : ...mes( elFatal, str ) --> exit(0) (-> no bus error ???)
+                    warning printed
+                    probably useless - HBOOK is anyway closed!
+                    if( key->SearchForRings() ) {...   added
+                    //if( nRingEv > 0 ) -->  ana->doEveAnalysis() only
+                    //if( nRingEv > 0 ) --> CsRCnTup::...->fillOutput() only
+
+
+
+
+
+
+RICHONE : version 2.19
+-------------------------
+Commit  040930     from Acid
+
+CsRCCluster.cc :
+      getBackWgt() : 71->73 times 2, 8->16, some //...
+
+CsRCEventPartPhotons.cc :
+      checkSignal() : selection for test added and commented, 6+2 lines
+
+CsRCPartPhotons.h : vySplitLLim_ and method added
+                    sigmaPhoRec(), sigmaPhot5(), 7(), 8(), getCorrMom()
+                    getCorrFactor() -> const
+CsRCPartPhotons.cc : vySplitLLim_ copy, clear, ... added
+      getPartPhotons() : test on full ring added and commented (11 lines)
+                         comments added
+      getSplitLimits() : ...lMirrNom... corrections for vC0 and RR added
+                         3+3 lines
+                         vySplitLLim_.push_back( vySplitLLimit[0] and[1] added
+                         //prints...
+      sigmaPhoRec() : -> const
+      sigmaPhot5() : -> const
+      sigmaPhot7() : -> const
+      sigmaPhot8() : -> const
+      getCorrMom(() : -> const
+      getCorrFactor() : -> const
+      getThetaLikeMax() : double theLiMax = 60.; added and commented for test
+      getLikeAll() : double thePhot, double sigPhot commented
+                     double signW = likeAll->likeSignal( (*ih), theIpo );
+                     std::cout ... added and commented 5 lines
+
+CsRCPhoton.h : sigmaPhoPid(), sigmaPhot6() -> const
+CsRCPhoton.cc : 
+      sigmaPhoPid() : -> const 
+      sigmaPhot6() : -> const
+
+CsRCLikeAll.h : virtual double likeSignal( const CsRCPhoton*, ...
+                virtual double likeBackgr( const CsRCPhoton*, ...
+CsRCLikeAll02, 03, 04, 05.h : double likeSignal( const CsRCPhoton*, ...
+                              double likeBackgr( const CsRCPhoton*, ...
+CsRCLikeAll.cc : double CsRCLikeAll::likeSignal( const CsRCPhoton* pPhot,...
+                 double CsRCLikeAll::likeBackgr( const CsRCPhoton* pPhot,...
+CsRCLikeAll02, 03, 04.cc : 
+                   double CsRCLikeAll::likeSignal( const CsRCPhoton* pPhot,...
+                   double CsRCLikeAll::likeBackgr( const CsRCPhoton* pPhot,...
+      likeSignal() : double thePhot = pPhot->the();
+                     double sigPhot = pPhot->sigmaPhoPid( pPartPhot_ );
+CsRCLikeAll05.cc : double CsRCLikeAll::likeSignal( const CsRCPhoton* pPhot,...
+                   double CsRCLikeAll::likeBackgr( const CsRCPhoton* pPhot,...
+      likeSignal() : double thePhot = pPhot->the();
+                     double sigPhot = pPhot->sigmaPhoPid( pPartPhot_ );
+                     signal fully redefined...
+                     ref to histo 1510 added   (2+19 lines added)
+      likeBackgr() : backgr fully redefined...
+                     ref to histo 1510 added   (15 lines added)
+
+CsRCEventRings.cc :
+      getEventRings() : if( cons->ringDefMode() == "MAXLIKE" ) {
+                        ring->getRingMaxLike( kRing, (*ipf) );
+	                } else {   added   (7 - 2 lines)
+
+CsRCRing.h, cc : method getRingMaxLike( ...   added
+      getRingPk() : if( peak... ) kcanmx = kCanMx; commented (3 lines) !
+                    elError message added  (3 times) !
+                    protection if( kcanmx < 0 )   added (5 lines)
+                    if( firstCall... and   key->acknoMethod(   added
+
+CsRCEventDisplay.cc : vySplitLLim added in hist 4900   +13 lines added
+                      nData = 22; !
+                      yPaDetW = part->vPade()[0].x/y()   <-> 
+                                      vPade()[kDetPart].x/y(); (4 lines) (?)
+
+CsRCRecConst.h, cc : ringDefMode_ and method, reading and printing added
+
+CsRCHistos.h, cc : histo 1510 added
+
+CsRichOne.cc :
+      doRichOne() : cout << "refr. index = " << ... 2 - 1 lines added
+
+
+
+
+
+
+RICHONE : version 2.18
+-------------------------
+Commit  040622     from Acid
+
+CsRCRecConst.cc :
+      CFRefInd() : if( readMyFile ) return  index;   moved up
+
+CsRCEventParticles.cc :
+      CsRCEventParticles() : myFile_ = 0;   myFileRun_ = 0;   added
+      copy constr. : myFileRun_ = evparts.myFileRun_;   added
+      = oper. : myFileRun_ = evparts.myFileRun_;   added
+      setMyParticle() : if( myFileRun_ == 0 ) { ... }   added
+      setRunIndex() : myFileRun_ = 0;   added
+
+CsRCLikeAll04.cc :
+      likeBackgr() : prints of par commented-out
+
+CsRichOne.cc :
+      writeMyFile() : if( ... writeapp_( ...   7 lines added
+      extern "C" { ... writeapp_   moved from physSelec() to writeMyFile()
+
+
+
+
+
+
+
+event/CsEvent.cc :
+------------------
+      _reconstructionSchema001() : // CsRichOne (write g-file) appendix
+                                   CsRichOne::Instance()->physSelec();
+                                   added
+
+tests/rich1/main.cc :  CsRichOne::Instance()->physSelec();   deleted!
+---------------------
+
+
+
+
+
+
+
+RICHONE : version 2.17
+-------------------------
+Commit  040610     from Acid
+
+GNUmakefile : CsRCLikeAll04.cc   addded
+
+CsRCExeKeys.h, cc : physSelection_, method, reading and printing   added
+
+CsRCEventParticles.cc : 
+      setDataParticle() : hist 1210 changed in 1220
+
+CsRCCluster.cc :
+      getBackWgt() : histo 1530 filling moved to likeBackgr()
+
+CsRCPartPhotons.cc : #include "CsRCLikeAll04.h" added
+      getLikeAll() : if( cons->backgrType() == "04" ) likeAll = new ... added
+                     cleaning     //prints
+
+CsRCLikeAll02.cc :
+      likeBackgr() : filling of hist 1530 and 1540  added
+
+CsRCLikeAll04.h, cc : class   added
+
+CsRCLikeAll05.cc :
+      likeBackgr() : filling of hist 1530 and 1540  added
+                     backgr = backWgt * thePhot;   ???
+
+CsRCRing.cc :
+      getDetRFit() : CsRCExeKeys::Instance()->acknoMethod( "....
+
+CsRCLikeRing02.cc :
+      likeBackgr() : filling of hist 1530 and 1540  added
+
+CsRCLikeRing04.cc :
+      likeBackgr() : bkParD[kq] = par[kk];   BUG corrected !
+                     filling of hist 1530 and 1540  added
+
+CsRCLikeRing05.cc :
+      likeBackgr() : filling of hist 1530 and 1540  added
+
+CsRCHistos.h : cleaned, h. 1540 added
+CsRCHistos.cc : h. 1540 added
+CsRCHistos.h, cc : hist 1210 changed to 1220
+                   after HBOOK misterious troubles ???
+                   -----------------------------------
+
+CsRCnTup.cc : 
+      fillOutNtuple() : new kMuPart logics ... many changes and additions
+
+CsRichOne.cc : #include "CsRichOneDisplay.h"   added
+               CsRichOneDisplay::Instance()->doRichOneDisplay();   added
+
+      physSelec() : protection   if( key->readMyFile() ) return;   added
+                    protection   if( !key->physSelection() ) return;   added
+                    int nRP = ...   7 lines   added
+                    if( evGood == 0 ) evGood -= nRP;   added
+                    new kMuPart logics ...
+
+
+
+
+
+
+
+RICHONE : version 2.16
+-------------------------
+Commit  040609     from Lxplus
+
+CsRCEventParticles.cc : 
+      setDataParticle() : hist 1210 (tkMeanTime) added
+
+CsRCHistos.h, cc : hist 1210 added
+
+
+
+
+
+
+
+RICHONE : version 2.15
+-------------------------
+Commit  040526     from Acid
+
+main.cc : CsRichOne::Instance()->physSelec();   added
+
+GNUmakefile : writeapp.F   addded
+
+CsRichOne.h : int evGood_; ...  5 lines   added
+              inline  int evGood() ...   4 lines   added
+              void physSelec();   void physAppend();   added
+CsRichOne.cc : #include "CsVertex.h"   #include "CsParticle.h"   added
+               if( readMyFile ) physAppend();   added
+      copy constr. : evGood_ = rich.evGood_; ...   4 lines   added    
+      physSelec() : method   added
+      physAppend() : method   added
+
+CsRCnTup.h : float Index;   added   in block   Header
+             struct { ... } Phys   (7 lines) added
+CsRCnTup.cc : #include "CsRichOne.h"  #include "CsRCEventParticles.h"   add
+              else if( i == 3  &&  (*Is) == "Phys" ) block_[i] = true;   add
+              hbname( ntupNum, "Header  ", ... , Index:R*4");   modif
+              if( block_[3] ) hbname( ntupNum, "Phys", (...   added
+              Header.Index  = CsRCRecConst::Instance()->CFRefInd();   added
+              if( block_[3] ) { ... } 45 lines   added
+              cleaning
+
+writeapp.F : method added
+
+
+
+
+
+
+
+RICHONE : version 2.14
+-------------------------
+Commit  040518     from Acid
+
+GNUmakefile : CsRCLikeAll05.cc   CsRCLikeRing05.cc   addded
+
+CsRCCluster.cc :
+      getBackWgt() : reading of background map file (12 lines) added
+
+CsRCEventPartPhotons.cc : #include "CsRCEventClusters.h" added
+      setBackgrType() : else if( cons->backgrType() == "05" ) { ...
+                        (15 lines) added
+
+CsRCPartPhotons.cc : #include "CsRCLikeAll05.h"   added
+      getLikeAll() : if( cons->backgrType() == "05" ) likeAll = new ... added
+                     if( cons->backgrType() == "05" ) likeRatio = true; added
+                     //double backW = likeAll->likeBackgr( thePhot, ... ->
+                     double backW = likeAll->likeBackgr( (*ih), theIpo );
+      getThetaLikeMax() : protection added ! (->nan)
+                          theMax = 0.;
+                          double den = (likePs - 2.* likeCt + likeMs); ...
+                          (1 + 4 lines)
+
+CsRCLikeAll.h : class CsRCPhoton   added
+                virtual double likeBackgr( CsRCPhoton*, const double ); added
+                -> //virtual double likeBackgr( const double, const double );
+CsRCLikeAll.cc : //double CsRCLikeAll::likeBackgr( const double thePhot, ->
+                 double CsRCLikeAll::likeBackgr( CsRCPhoton* pPhot, ...
+
+CsRCLikeAll02.h : class CsRCPhoton   added
+                  double likeBackgr( CsRCPhoton*, ... ); added
+                  -> //double likeBackgr( const double, const double );
+                  cleaning of //...
+CsRCLikeAll02.cc : #include "CsRCCluster.h"   #include "CsRCPhoton.h"  added
+                   double CsRCLikeAll02::likeBackgr( CsRCPhoton* pPhot, added
+                   -> //double CsRCLikeAll02::likeBackgr( const double thePhot
+                   double thePhot = pPhot->the(); added
+
+CsRCLikeAll03.h : class CsRCPhoton   added
+                  double likeBackgr( CsRCPhoton*, ... ); added
+                  -> //double likeBackgr( const double, const double );
+CsRCLikeAll03.cc : #include "CsRCCluster.h"   #include "CsRCPhoton.h"  added
+                   double CsRCLikeAll03::likeBackgr( CsRCPhoton* pPhot, added
+                   -> //double CsRCLikeAll03::likeBackgr( const double thePhot
+                   double thePhot = pPhot->the(); added
+
+CsRCLikeAll05.h, cc : class added
+
+CsRCRing.cc : #include "CsRCLikeRing05.h"   added
+      getLikeRing() : if( cons->backgrType() == "05" ) likeRing = new ... add
+                      if( cons->backgrType() == "05" ) likeRatio = true;  add
+                      //double backW = likeRing->likeBackgr( thePhot, ... ->
+                      double backW = likeRing->likeBackgr( (*ih), theIpo );
+      getThetaLikeMax() : protection added ! (->nan)
+                          theMax = 0.;
+                          double den = (likePs - 2.* likeCt + likeMs); ...
+                          (1 + 4 lines)
+
+CsRCLikeRing.h : class CsRCPhoton   added
+                 virtual double likeBackgr( CsRCPhoton*, const double ); added
+                 -> //virtual double likeBackgr( const double, const double );
+CsRCLikeRing.cc : -> //double CsRCLikeRing::likeBackgr( const double thePhot,
+                  double CsRCLikeRing::likeBackgr( CsRCPhoton* pPhot, ... add
+
+CsRCLikeRing02.h : class CsRCPhoton   added
+                   double likeBackgr( CsRCPhoton*, ... ); added
+                   -> //double likeBackgr( const double, const double );
+                   cleaning of //...
+CsRCLikeRing02.cc : #include "CsRCCluster.h"   #include "CsRCPhoton.h"  added
+                   double CsRCLikeRing02::likeBackgr( CsRCPhoton* pPhot, added
+                   -> //double CsRCLikeRing02::likeBackgr( const double the..
+                   double thePhot = pPhot->the(); added
+
+CsRCLikeRing03.h : class CsRCPhoton   added
+                   double likeBackgr( CsRCPhoton*, ... ); added
+                   -> //double likeBackgr( const double, const double );
+                   cleaning of //...
+CsRCLikeRing03.cc : #include "CsRCCluster.h"   #include "CsRCPhoton.h"  added
+                   double CsRCLikeRing03::likeBackgr( CsRCPhoton* pPhot, added
+                   -> //double CsRCLikeRing03::likeBackgr( const double the..
+                   double thePhot = pPhot->the(); added
+
+CsRCLikeRing04.h : class CsRCPhoton   added
+                   double likeBackgr( CsRCPhoton*, ... ); added
+                   -> //double likeBackgr( const double, const double );
+CsRCLikeRing04.cc : #include "CsRCCluster.h"   #include "CsRCPhoton.h"  added
+                   double CsRCLikeRing04::likeBackgr( CsRCPhoton* pPhot, added
+                   -> //double CsRCLikeRing04::likeBackgr( const double the..
+                   double thePhot = pPhot->the(); added
+
+CsRCLikeRing05.h, cc : class added
+
+CsRCRecConst.cc : else if( sflo == "05" ) backgrType_ = "05";   added
+
+CsRCEventAnalysis.cc : 
+      PIDMonitor() : ref. to setProbsToTrack() moved to doEveAnalysis()
+      doEveAnalysis() : ref. to setProbsToTrack() moved IN
+
+CsRCnTup.cc :
+      fillOutNtuple() : Header.Ev  = CsRCRecConst::Instance()->CFRefInd();
+                        -> //Header.Ev  = CsEvent::Instance()->getEventNumb...
+
+
+
+
+
+
+
+RICHONE : version 2.13
+-------------------------
+Commit  040511     from Acid
+
+CsRCUty.cc : 
+      rotfbcc() : phi = patg( llo, mmo ); ===>  patg( mmo, llo );   !!!
+
+CsRCExeKeys.cc :
+      fillMyFileList() : modified --> a and b
+
+CsRCRecConst.cc :
+      CFRefInd() : prints for new run index added ( 1 + 19 lines )
+
+CsRCCluster.h, cc : method  getBackWgt()  added  and  3 #include
+
+CsRCHistos.h, cc : histo 1530 (from CsRCCluster::getBackWgt) added
+
+CsRCEventPads.cc : "RICHONE... moved by one to " RICHONE...
+
+CsRCEventParticles.cc : sparse "RICHONE... moved by one to " RICHONE...
+      setRunIndex() : modified printing for more digits
+      setMyParticle() : decoding of ioExWd --> CFRefInd added
+                        9 lines + 1 #include - provisional ?
+
+CsRCPartPhotons.cc : 
+      getLikeAll() : bool likeRatio = ...  2 lines  added
+                     long double pLike = -1.;  added
+                     if( (*ih)->ptToClu()->getBackWgt( ... 7 lines  added
+                     nd  KILLED !
+                     if( pLikeBk > 0. ) ...  17 lines  added
+                     if ( !likeRatio ) pLike *= 10.;  added
+      getThetaLikeMax() : if( like... < 0. ) return  false;  times 6  added
+
+CsRCRing.cc :
+      getLikeRing() : if( (*ih)->ptToClu()->getBackWgt( ... 6 lines  added
+                      and  KILLED !
+                      pLikeBk /= likeNorm;  put instead   !!!
+      getThetaLikeMax() : if( like... < 0. ) return  false;  times 6  added
+
+CsRCEventAnalysis.cc : 
+      fitGCFRefInd() : xCha[jBin] = XMin + kBin * dX - dX/2.;
+
+CsRCChiSqFit.cc :
+      CsRCChiSqFit() : if( nPoint <= 0 ) {...       times 3   !!!
+      getCovMax() : if( !flagFit_ ) return;         times 4   !!!
+                    protection against error <= 0.  times 4   !!!
+                    avoid use of Er.inverse()       times 4   !!!
+                    protection against det == 0.    times 1   !!!
+  
+CsRCCircleFit.cc :
+      doChiFit() : if( !flagFit_ ) return  false;   added
+
+CsRCEllipseFit.cc :
+      doChiFit() : if( !flagFit_ ) return  false;   added
+
+CsRCGauPolFit.cc :
+      doChiFit() : if( !flagFit_ ) return  false;   added
+
+CsRichOne.cc :
+      writeMyFile() : if( nPartW > 0 ) ioExWd[0] += iindex*1000;
+                      and related added ( 6 lines ) - provisional ?
+
+CsRCnTup.cc : if( cons->likeType() == "RING" ) {...  1 + 11 lines  added
+
+writebuff.F : printing refurbished
+
+
+
+
+
+
+
+
+RICHONE : version 2.12
+-------------------------
+Commit  040422     from Acid
+
+CsRCEventAnalysis.cc : 
+      dataMonitor() : bool exeFits = false;  -> segmentation violation
+                                         in HepMatrix::dfinv_matrix ()
+                                         in HepMatrix::invert ()
+                                         in CsRCChiSqFit::getCovMax ()
+                                         in CsRCCircleFit::CsRCCircleFit ()
+                                         in CsRCRing::getDetRFit ()
+                                         from Albert Lehmann
+
+
+
+
+
+
+
+RICHONE : version 2.11
+-------------------------
+Commit  040419     from Lxplus
+
+CsRCEventParticles.cc : 
+      setDataParticle() : //-- mean time
+                          double tkMeanTime = (*it)->getMeanTime();
+                          and //cout.s  added
+
+CsRCEventAnalysis.cc :
+      fitGCFRefInd() : test histo commented out !!!
+ 
+CsRichOne.cc :
+      end() : thresholds protected against bad n-1 fit
+
+
+
+
+
+
+
+RICHONE : version 2.10
+-------------------------
+Commit  040413     from Acid
+
+CsRCExeKeys.h, cc : 
+      EventROOTDisplay_ (Andrea) and method and reading/printing added
+
+CsRCRecConst.h, cc : 
+      nPhoAliMir_, nSigAliMir_ and methods and reading/printing added
+
+CsRCPartPhotons.cc : 
+      getPartPhotons() : if( kDetClu != kDetPart ) {
+                           if( fabs( yw ) < fabs( vySplitLLimit[kDetClu] ) ...
+                         added
+                         ddPaDet  def. added
+                         if( ddPaDet < 300.) {
+                           if( !(kDetClu == kDetPart) ) ... added
+
+CsRCMirrors.h, cc : hRC7450, hRC7451, hRC7650, hRC7651, hRC7850   added
+                    vRC7100, vRC7300, vRC7500, vRC7700   added
+                    vRC1980, vRC3980  ->  hRC1980, hRC3980
+                    #include "CsRCCluster.h" added
+      doAliMirrDet() : implemented
+      fitAliMirrDet() : added but NOT implemented
+
+CsRCRing.cc : 
+      getDetRFit() : nPhoAliMir(), nSigAliMir()  reference added
+                     if( (*ih)->kDetClu() != kDetPart ) continue; added
+                     if( abs( kRingLoc_ ) != 1 ) exeFit = false; killed
+
+CsRCEventAnalysis.cc :
+      dataMonitor() : exeFits  and  if( exeFits ... added
+                      ->doAliMirrPhi();   added
+                      //doAliMirrors(), //doAliMirrAll()   comm-out
+      doMirrDetFit() : v.histo 2700, booking and filling, added
+
+CsRCHistos.cc : comments updated
+
+CsRichOne :
+      doRichOne() : bool EventROOTDisp = ... added
+                    reference to
+                    //if( AliMirror ) mirr->CsRCMirrors::fitAliMirrors();
+                    //if( AliMirror ) mirr->CsRCMirrors::fitAliMirrAll();
+
+
+
+
+
+
+
+RICHONE : version 2.09
+-------------------------
+Commit  040328     from Acid
+
+CsRCExeKeys.h, cc : NoRingSplitting_ and method and read opt added
+                    print of "List of the g-files requested :" added
+
+CsRCPad.h, cc : MCTime_, MCTime(), setMCTime() and
+                defaults in constructors added
+
+CsRCEventPads.cc : extaction and setting of padMCTime to CsRCPad added
+
+CsRCParticle.h, cc : MCmTime_, MCmTime(), setMCmTime() and
+                     defaults in constructors added
+
+CsRCEventParticles.cc :
+      setMCRecParticle() : setting of trkTime to CsRCParticle added
+
+CsRCPartPhotons.h, cc : 
+      getPartPhotons() : if( !key->NoRingSplitting() ) {
+                    if( !(kDetClu == part->kDetPart()) ) bProClu = false; 
+                                                        } added
+ *                       vPoPhotWw += vCorPoPhoW()[kDetClu]; commented out
+                         -------------------------------------------------
+ *                  if( fabs( yw ) < fabs( vySplitLLimit[kDetClu] )    out
+                    ------------------------------------------------------
+      sigmaPhot8() : method added
+RICHONE   sigmaPhoPatt  ... : added in rich1.options.2003.myfile.cc
+
+      sigmaPhoRec() : modified for test and protection (>0) added (1000000)
+
+CsRCPhoton.cc : 
+      sigmaPhoPid() : modified and protection (>0) added (1000000)
+
+CsRCRing.h, cc :
+      getRingPk() : ref. to getVarMcan() and getVarNMore() added
+                    filling of hist 1708 added
+      peakCountSearch() : ref. to getVarMcan() added
+      peakScan() : ref. to getVarMcan() added (WARNING...papho)
+      sigmaRing() : modified and protection (>0) added (1000000)
+      getVarMcan() : method added
+      getVarNMore() : method added
+      print() : prints of vPade added
+
+CsRCEventDisplay.cc : extensive revision, bugs corrected
+
+
+
+
+
+
+RICHONE : version 2.08ter
+-------------------------
+Commit  040227     from Acid
+
+CsRCEventRings.cc : updated and fill of hist 3597 restored (->BUG!)
+
+CsRCHistos.h, cc : histo 1708 added
+                   missing  hRC3597 = NULL; added (->BUG!)
+
+
+
+
+
+
+RICHONE : version 2.08bis
+-------------------------
+Commit  040217     from Acid
+
+CsRCEventRings.cc : BUG still there??? more protections added (?)
+
+
+
+
+
+
+RICHONE : version 2.08
+-------------------------
+Commit  040202     from Acid
+
+CsRCEventRings.cc : n-1 as 1/(beta*cos) - 1 in hist 3559
+                    if( khP >= 0 ) {...3590 added        BUG found by V.F.!
+
+
+
+
+
+
+RICHONE : version 2.07
+-------------------------
+Commit  040116     from Acid
+
+GNUmakefile : CsRCGauPolFit.$(SRC_EXT) added
+
+CsRCExeKeys.cc : //cout << myFileChunks ...
+
+CsRCHistos.cc : hist 1655 ->10x10 chan.s
+                vector hist 3590 (1->6) added
+                hist 3597 added
+                hist 1630 added
+                comments
+
+CsRCEventParticles.cc : temp. modif. to partSelect()
+
+CsRCEventRings.cc : 
+      singlePhoton() : filling of vhist 3590 added
+                       filling of hist 3597 added
+      partChiSqIdent() : filling of hist 1630 added
+
+CsRCRing.cc :
+      checkLikelihood() : if( kHH < kHHMx ) { ... and related
+                          if( kHHt < kHHtMx ) added and related
+
+CsRCLikeRing03.cc :
+      normSignal() : implemnted for test
+      normBackgr() : implemnted for test
+      likeSignal() : implemnted for test
+      likeBackgr() : implemnted for test
+
+CsRCEventAnalysis.h, cc : MC PID table modified -> hist 1655
+      fitGCFRefInd() : method added
+
+CsRCGauPolFit.h, cc : class (method) added
+
+CsRichOne.cc :
+      end() : reference to fitGCFRefInd() instead of fitCFRefInd()
+
+
+
+
+
+
+RICHONE : version 2.06bis
+-------------------------
+Commit  031102     from Acid
+
+CsRCExeKeys.cc : ->//cout.s and //exit(1)
+
+
+
+
+
+
+RICHONE : version 2.06
+----------------------
+Commit  031031     from Acid
+
+GNUmakefile : CsRCLikeRing04 added
+
+CsRCRecConst.h, cc : else if( sflo == "04" ) backgrType_ = "04"; added
+                     likeRatio_, method, reading, prints added
+
+CsRCExeKeys.h, cc : defaults and read nRobs
+                    fillMyFileList ->( int, int )(h) -> X 2 (cc)
+
+CsRCEventPartPhotons.cc :
+      setBackgrType() : cout's modified and added  X 3
+                        CsErrLog::Instance()->mes( elError, mess ); added  X 2
+                        CsErrLog::Instance()->mes( elFatal, mess ); set  X 1
+                        else if( cons->backgrType() == "04" ) { ... added
+      getBackgrParam04() : added
+      partAllIdent() : if( pLike > 1. ) pLike = 1.; ->////
+
+CsRCPartPhotons.cc :
+      getLikeAll() : CsErrLog::Instance()->mes( elFatal, mess ); added
+
+CsRCEventRings.cc :
+      partRingIdent() : if( backType == "04" ) 
+                        likeRing = new CsRCLikeRing04( (*ir) ); added
+                        if( pLike > 1. ) pLike = 1.; ->////
+      getLikeRing() : if( cons->backgrType() == "04" ) 
+                      likeRing = new CsRCLikeRing04( this ); added
+
+CsRCRing.cc : 
+      getLikeRing() : CsErrLog::Instance()->mes( elFatal, mess ); added
+                      protections added in if( nPhoRing > 0 ) {...
+                      bool likeRatio = ... and related added
+                      if( likeRatio ... and related added
+      peakLikeSearch() : if( backType == "04" ) 
+                         likeRing = new CsRCLikeRing04( this ); added
+
+CsRCLikeRing04.h, cc : added
+
+CsRCEventAnalysis.cc :
+      setProbsToTrack() : cout's changed and ->//
+                          PIDset = true; added  X 2
+                          if( PIDset ) { ...  track->setRich1Probs ... added
+                          if( partProbs[k] > 1. ) {... ->//// X 3 
+
+
+
+
+
+
+RICHONE : version 2.05
+----------------------
+Commit  031013     from Acid
+
+rich1.options.2003.myfile.cc : cathPadThre...
+
+geom/CsRICH1Detector.h, cc : method borasMultiarrayOK() added
+
+CsRCExeKeys.h : method setUsePadThresh(...) added
+
+CsRCRecConst.h, cc : cathPadThre_ and method added
+                     default, reading and printing
+
+CsRCMirrors.h, cc : pMirrElePa_ and method added
+      doSelMirrors() : pMirrElePa_ defined
+
+CsRCEventPads.cc : if( !(rich->borasMultiarrayOK()) ) ... added
+      setThreshold() : if( !(rich->borasMultiarrayOK()) ) ... added
+                       key->setUsePadThresh( false ); times 2 added
+                       *cathPadThre... changed
+
+CsRCEventParticles.cc :
+      partFilter() : selection of a list of mirror elements for
+                     processing added
+
+CsRCEventPartPhotons.cc :
+      partPhoSelection() : selection on PD's added and killed
+
+CsRCPartPhotons.cc :
+      getPartPhotons() : pMirrElePa printing added and ->//
+                         added getCluAngle(...) without mirror corrections
+                         added histo 1101 for test
+                         added histo 3510
+
+CsRCEventAnalysis.cc : prints for test of RICH output added and ->//
+
+CsRCHistos.h, cc : histo 3510 added
+
+
+
+
+
+
+RICHONE : version 2.04
+----------------------
+Commit 030904     from Acid
+
+.../src/pkopt/rich1.2003.opt     NEW !
+
+
+CsRCExeKeys.h, cc : UsePadThresh_, reading, printing and method added
+                    KillHaloPads_, KillHaloClus printing added
+
+CsRCRecConst.h, cc : maxCluSize_, reads and methods added
+                     reading of option "UsePadThresh" added for if(...
+
+CsRCEventPads.h, cc : method setThreshold added (times 2 DATA)
+                      bAccp and
+                      method setThreshold and killHaloPads added (times 2 MC)
+                      cosmetics
+      getEventPads() : reference to setThreshold added
+
+
+CsRCEventClusters.h, cc : method checkClusters() added
+      doClustering() : reference to checkClusters() added
+                       maxCluSize introduced (modifications as
+                       from doClustringX(), deleted and saved in rich1)
+      getClusFromPads() : hist hRC1001 and related added
+
+CsRCEventParticles.cc : myFileRun_ added and method
+      setRunIndex() : myFileRun_ defined
+      partAnalysis() : modified  and  WARNING added
+
+CsRCParticle.cc : //- MC: myfile tracks (type 1 = NEW or >1)
+                  //nPhoCer_ = 0;   //thetaCer_ = 0.;
+
+CsRCEventRings.cc :
+      partChiSqIdent() : ref. to checkChiSquare(...) added
+      partRingIdent() : ref. to checkLikeVsIndex(...) added
+
+CsRCRing.h, cc : references to methods added
+      checkChiSquare() : added
+      checkLikeVsIndex() : added
+      checkLikelihood() : akno message added...
+      peakCountSearchTEST() : modified!
+
+CsRCEventAnalysis.cc :
+      PIDMonitor() : hist 1670... kTab>9 ...
+
+CsRCHistos.cc : hist vector 1670 from 12 to 10 positions
+                comments on hist 3080, 3120 and 3160 added
+
+
+
+
+
+RICHONE : version 2.03
+----------------------
+Commit 03/08/08      from Acid
+
+CsRCEventParticles.cc :
+      setMCRecParticle() : if( vHelix.size() >= 2 ) 
+                              zHelix1 = vHelix[vHelix.size()-1].getZ();
+      setMCDataParticle() : if( vHelix.size() >= 2 ) 
+                               zHelix1 = vHelix[vHelix.size()-1].getZ();
+
+CsRCEventRings.cc : //if( pLike > 1. ) std::cout<< pLike << std::endl; times 2
+                    [cout's]
+
+CsRCPartPhotons.cc : int nIter = 5;       (l696)   and [cout's]
+
+CsRCPhoton.h : inline  void setThe( const double the ) { the_ = the; } added
+
+CsRCRing.h : bool peakCountSearchTEST( const CsRCPartPhotons*, int& ); added
+             bool peakCountSearchVB( const CsRCPartPhotons*, int& ); added
+             bool peakCountSearchMC( const CsRCPartPhotons*, int& ); added
+             std::list<CsRCPhoton*> lDoublePhotons_; added
+
+CsRCRing.cc : methods added
+      peakCountSearchTEST()
+      peakCountSearchVB()
+      peakCountSearchMC()
+      getRingPk() : reference to new methods
+                    code to double photons added and commented out
+
+      peakCountSearch() : bug from V.Frolov corrected
+                          //memset( ...
+                          int mcanmx = nScanMx - mcan;
+                          tests added
+
+      getRingBf() : same bug corrected
+      getRing3S() : float nSigma = 3.; and related added
+      histCntRatio() : same bug corrected
+      peakScan() : same bug corrected
+                   mcaScan in hist 6000 binning
+                   the_ instead of theMax in hist 6000
+
+      getLikeRing() : long double pLikeBk added and related
+                      (to compute the Like ratios: proposal...)
+                      NOT activated
+
+
+
+
+
+RICHONE : version 2.02
+----------------------
+Commit 03/05/06      from Acid
+after update of Benigno gcc... changes (version 2.01)
+--------------------------------------
+
+CsRCEventRings.cc : Like deriv. comp. modified (pLikeP and pLikeM)
+                    deriv2LK[...] added
+                    tests for output deriv2...
+
+CsRCRing.h : inline  double partProb( const int k ) added
+
+CsRCnTup.h, .cc : block 'Like' added ! ---> ntup3
+                  reading of options corrected (= corrected the options)
+
+CsRCEventAnalysis.cc : bReco defined
+                       Like histo's, if( bReco...  commented out
+      setProbsToTrack() : papho->setPartProbs() added
+                          ring->setPartProbs() added
+
+CsRCEventParticles.cc :
+      setMCRecParticle() : if( vHelix.size() >= 2 ) ... corrected!
+                            trkTime ... and related, added
+                            helix extrapolation to 0 (Vadim cut) ... added
+                            and cleaning
+
+CsRCPartPhotons.cc : corrected coDc = sqrt(...
+
+
+
+
+
+
+RICHONE : version 2.00
+----------------------
+Commit 03/03/28      from Acid
+
+CsRCEventParticles.cc :
+      setMCRecParticle() : modified for STRAW point
+                           no test on nPhoCer
+      setMParticle() : no test on nPhoCer
+      setDataParticle() : modified for STRAW point
+      exitWindow() : modified
+      openMyFile() : modified (skip not existing files)
+      initMyFile() : modified (skip not existing files)
+                     rfio_close  added
+      setRunIndex() : modified (calibrations)
+
+CsRCExeKeys.h, cc : method fillMyFileList added and referenced 
+
+CsRCChiSqFit.h, cc : modified: bool flags and polishing
+CsRCCircleFit.h, cc : modified: bool flags and polishing
+CsRCEllipseFit.h, cc : added
+
+CsRichOne.cc : setFullPrintOn( level )
+
+ALL THE BIG RISHUFFLING !!!
+---------------------------
+
+CsRCCluster.h : setFlag(...) added
+
+CsRCPartPhotons.cc :  if( key->KillHalo() ) commented-out
+      getPartPhotons(...) : if( !(*icl)->flag() ) continue; added
+      sigmaPhot5() : ErrLog...
+      sigmaPhot7() : ErrLog...
+
+CsRCPhoton.cc : 
+      sigmaPhot6() : ErrLog...
+
+CsRCEventClusters.h, cc : 
+      killHaloClus() : method added and referenced
+
+CsRCRing.h, cc :
+      sigmaRing4() : ErrLog...
+      ringGaussProb() : method added
+      getNPhotExpected() : method added
+      getNPhotCorrected() : method added
+      peakMassSearch() : modified; sel. keys added
+      peakLikeSearch() : method added; sel. keys added
+
+CsRCExeKeys.h, cc : KillHaloPads_ and KillHaloClus_, read Opt and methods
+                    polishing
+
+CsRCEventPads.cc : key->KillHaloPads() x 2
+
+CsRCHistos.cc : histo 1655 modif
+
+CsRCEventAnalysis.cc : MC section modif
+
+
+
+
+
+RICHONE : version 1.32
+----------------------
+Commit 03/....      from Acid
+
+CsRCEventAnalysis.h, cc :
+      dataMonitor() : -->  for( int kPaTy=2; kPaTy<=14; kPaTy+=3 ) 
+
+
+
+
+
+RICHONE : version 1.31bis
+-------------------------
+Commit 03/01/30      from Acid
+
+CsRCEventAnalysis.h, cc :
+       partIdent() : protection if( kProbMx >= 0 ) added (line 2228)
+
+
+
+
+
+RICHONE : version 1.31
+----------------------
+Commit 03/01/28      from Acid
+
+CsRCDetectors.cc : corr.s to rotMatrix prov. added and killed
+
+CsRCMirrors.h, cc : vC0nom_, RRnom_ & related methods, def.s added
+      setMirrNom() : const added
+                     read Opt moved to CsRCMirrorNom.cc
+
+CsRCMirrorNom.h, cc : vC0nom_, RRnom_ & related methods, def.s added
+                      const added and cleaning
+                      read Opt moved in and modified
+                      calculation of new mirror centre added
+                      prints added
+
+CsRCMirrorElem.h, cc : const added and cleaning
+                       corr.s to vCorPoPa0_, corPaRR_, vCorPoPho0_, corPhoRR_
+                       prints added
+
+CsRCPhotonDet.cc : reads x, y, z corr.s and prints added ===> rich1.opt
+
+CsRCParticle.cc :
+      print() corrected!
+
+CsRCPartPhotons.cc : working prints added and killed
+      getPartPhotons() :  if( kDetClu == part->kDetPart() ) added
+      doPartToMWR() : if( kMir == part->kDetPart() ) added
+                      prints (killed)
+
+CsRCRing.h, cc : method histPeakSearch() added
+                 with vector<CsHist1D*> vRC6300
+
+CsRCHistos.h, cc : histo.s vRC1590( 1591-1595) added
+                   histo.s vRC1634 added
+                   histo.s 3045, 3046 new binning
+                   histos vRC3720(8) and vRC3730(8) added
+
+CsRCEventAnalysis.h, cc : class CsHist & CsRCCircleFit  added
+      doMirrDetFit() : method added
+                       protected for no or bad fit added
+      getDetRFit() : modified ( vHist and CsRCCircleFit obj )
+                     protected for no or bad fit added
+      dataMonitor() : call to histos vRC3720(8) and vRC3730(8) added
+      partIdent() : histo 1634 added
+                    histo.s vRC1590( 1591-1595 ) added
+                    ref. to getDetRFit() modified
+                    extensive cleaning
+
+CsRCChiSqFit.h, cc : null constructor added
+                     method setFlag() added
+
+CsRCCircleFit.h, cc : null constructor added
+
+
+
+
+
+RICHONE : version 1.30
+----------------------
+Commit 02/12/16      from Acid
+
+CsRCEventAnalysis.h, cc : kPaTy=2... not everywhere !
+      partIdent() : polishing
+                    kTyLL = 2... added
+                    kPaTy=kTyLL... not everywhere !
+                    (kTyMin-kTyLL)/3 + 0.5... not everywhere !
+                    histo 1664 from 1 to 2 dim
+                    histo 1691 new meaning
+                    histo.s vRC1680[0-4] added
+      getQsquare() : theReco out, theReco = ring->the();
+      singlePhoton() : check on ring flag added!
+                       polishing
+      checkSignal() : check on ring flag
+                      histo 3533 added
+      getLikeMix() : -> OBSOLETE
+      getLikeAll1() : -> OBSOLETE
+      getLikeRing1() : -> OBSOLETE
+      getThetaLikeBM() : -> OBSOLETE
+      getThetaLikeRing() : -> OBSOLETE
+      getThetaLikeAll(*) : -> OBSOLETE
+      getThetaLikeAll(*, *) : -> OBSOLETE
+      recoCut(), sigmaRing...() : const  added
+      sigmaRing4() : rebuilt for data
+      sigmaPho...() : const  added
+                      histo.s 1701-3 added
+      sigmaRing() : histo 1705 added
+      sigmaPhot5() : upgrade and polishing
+      sigmaPhot6() : upgrade and polishing
+      sigmaPhot7() : added
+      likeBackFrac...() : const  added, but -> OBSOLETE !
+      corrRingBack1 & 2() : -> OBSOLETE
+      likeBackFrac1 & 2() : -> OBSOLETE
+      offTheRing...() : const  added
+      getCorrMom() : method added
+      sigmaPhoPid(*) -> sigmaPhoPid(*,*)  everywhere !
+      sigmaPhoRec(beta) -> sigmaPhoRec(mom)  everywhere !
+      betaReco & coorBeta  killed everywhere (?)
+      getDetRFit() : test on kRingLoc added
+      partPhoSelection() : ddPaDet = part->ddPaDet()[kDetPart];
+      ringSelection() : ddPaDet = part->ddPaDet()[kDetPart];
+      checkSignal() : ddPaDet = part->ddPaDet()[kDetPart];
+
+CsRCParticle.h, cc : ddPaDet_, meth. ddPaDet() and setDdPaDet() added,
+                     in constructors and prints
+
+CsRCPartPhotons.cc : ddPaDet calculation and set added, with ralated
+                     and check filling
+
+CsRCHistos.h, cc : histo 1665, new binning
+                   histo 1664 from 1 to 2 dim
+                   histo 3533 added
+                   histo.s 1701-5 added
+                   histo.s vRC1680[0-4] added
+
+CsRichOne.cc : computes and prints mom thresholds
+
+
+
+
+
+RICHONE : version 1.29
+----------------------
+Commit 02/12/02      from Acid
+
+CsRCEventParticles.h, cc : entrance window limits adjusted
+                           method setGeoCorrections() added, and instance
+                           method setRunIndex() added, and instance
+
+CsRCEventAnalysis.h, cc : flagPartPhoSel_ added in .h and .cc
+      getLikeAll3() : method added and related
+      doEveAnalysis() : partPhoSelection() invoked
+      partPhoSelection() : method added
+      checkSignal() : LOOP over PART-PHOTONS and calls to histos added
+      singlePhoton() : polishing
+                       hRC3559 added (raw n-1), read from Opt momLimit
+      getDetRFit() : method added and invoked
+      getRingness() : method added and invoked
+      getLikeAll() : else if and WORNING for Backgr. type
+      getLikeRing() : else if and WORNING for Backgr. type
+      getLikelihood() : else if and WORNING for Likelihood type
+      getThetaLikeMax() : coarse search added and modif.s
+      checkLikelihood() : kPaTy=2...
+      print() : partProbs prints modif. and added
+
+CsRCHistos.h, cc : vRC3535( 3536, 3537, 3538, 3539 ) added
+                   3544 added in vRC3540 and corr. to titles
+                   vRC3545( 3546, 3547, 3548, 3549 ) added
+                   all set at level 0
+                   vRC3710( 3711, 3712, 3713, 3714, 3715 ) added
+                   vRC3710( 3716, 3717 ) added
+                   hRC3047 added
+                   hRC3559 added
+                   modif. binning in hRC1669 (like's)
+                   hRC3501 added (path l.)
+                   reminder to vRC6000, vRC6200 added
+
+CsRCRecConst.h, cc : method setCFRefrInd() added
+                     else if and errorLog added for Cherenkov angle
+                     else if and errorLog added for Likelihood type
+                     else if and errorLog added for Background parametrization
+                     else if and errorLog added for Display mode
+                     peakSrcMode_ and method added and reading from Opt
+
+CsRCExeKeys.h, cc : PartPhoSelect_, method, opt reading and prints added
+
+CsRCRing.h, cc : ...'Scan' to 'Search'
+                 method peakMassSearch() added, and instance
+                 method peakCountSearch() added, and instance (std method!)
+                 if, else if and errorLog added for peakSrcMode
+      peakScan() : theIpo[5], but not the rest...(kPaTy=8)
+      rejectWrongPeak() : kPaTy=2...
+      peakChiSearch() : kPaTy=2...
+
+CsRCPartPhotons.cc :
+      getPartPhotons() : histo hRC3501 added (path l.)
+
+
+
+
+RICHONE : version 1.28
+----------------------
+Commit 02/11/05
+
+CsRCEventAnalysis.cc :
+      [partIdent() : //if( partProbs[k-3] <= 0. )  partProbs[k] = 0.]
+
+CsRCHistos.cc : 'centralized' booking and level added
+                level 0 histos defined
+
+CsRCEventParticles.cc :
+      setDataParticle() : entrance window test --> +/- 2000
+                          zHelix1 smoothed as from Sergei
+
+
+
+
+RICHONE : version 1.27
+----------------------
+Commit 02/11/04
+
+CsRCEventAnalysis.cc :
+      partIdent() : partProbs[12] --> [15]   !!!
+                    dLike/dn added --> to partProbs[4-6]
+      print() : prints partProbs updated
+
+CsRCRing.h, cc : partProbs[12] --> [15] in .h and .cc   !!!
+
+CsRichOne.cc :  
+      getPartProbs() : partProbs[12] --> [15]   Data   !!!
+      getPartProbs() : partProbs[12] --> [15]   MC   !!!
+
+in ...coral/src/tests/rich1
+CoralUser.cc : partProbs[12] --> [15]   !!!
+
+
+
+
+
+RICHONE : version 1.26
+----------------------
+Commit 02/11/01    from Acid
+
+CsRCEventParticles.cc :
+      partFilter() : test om momMinAcc() added
+
+CsRCEventAnalysis.cc :
+      recoCut() :       recoCut = 1.1; !!!
+
+CsRCRing.cc :
+      peakChiScan() : PH added
+
+
+
+
+RICHONE : version 1.25
+----------------------
+Commit 02/10/24
+
+in .../coral/src/geom/
+CsRICH1Detector.h, cc : method readCalibration() added
+                        3 '_' added to rich1 TBName for readCalibration
+
+
+
+
+
+RICHONE : version 1.24
+----------------------
+Commit 02/10/18
+
+CsRCEventPads.cc :
+       killHalo() : ackno added
+
+CsRCRing.cc :
+      peakChiScan() : heavily modified (not yet used!)
+
+CsRCEventAnalysis.cc : protection against partProbs out of range added
+      getThetaRFit() : default from 1000000. to 0.
+                       test < xuScan added
+
+CsRCRecConst.h, cc : offset changed (sigBfCut_)
+                     #include "CsGeom.h", "CsRICH1Detector.h" and
+                     "CsRCDetectors.h" added
+                     method CFRefInd() and cathodeThre() changed in .h and
+                     added in .cc
+                     
+
+
+
+RICHONE : version 1.23
+----------------------
+Commit 02/10/07
+
+CsRCRecConst.h, cc : thetaType_ read Opt, method and prints added
+
+CsRCEventAnalysis.cc :
+      MCMonitor() : selection on thetaType added ...
+      dataMonitor() : selection on thetaType added ...
+      partIdent() : selection on thetaType added ...
+                    pLike0 --> pLikeMx
+      getTheta...() : acnoMethod() added
+      moniCFRefInf() : betaIpo added in formula
+                       nPhoLimit read from Opt
+
+
+
+
+RICHONE : version 1.22
+----------------------
+Commit 02/10/03
+
+CsRCEventAnalysis.h, cc : method checkSignal() added
+                          filling of histo 3059: selection added
+                                                 new formula
+                          method getQsquare() added ...
+                          partProbs[10] --> [12]   !!!
+                          partProbs[4-6], [7], [10-11] added
+                          setRich1Probs() moved down
+      getLikelihood() : corrected ("CHISQ")
+      print() : prints partProbs added
+
+CsRCHistos.h, cc : vRC3540[1-3] added (checkSignal)
+                   histo 1633 added
+
+CsRCRing.h, cc : method peakChiScan() added (?)
+      peakScan() : check of booking and level added for vRC6000, vRD6100
+                 partProbs[10] --> [12] in .h and .cc   !!!
+
+CsRichOne.cc :
+      getPartProbs() : partProbs[10] --> [12]   Data   !!!
+      getPartProbs() : partProbs[10] --> [12]   MC   !!!
+
+
+
+
+RICHONE : version 1.21
+----------------------
+Commit 02/09/30
+
+CsRCEventAnalysis.cc : no chiCut and probCut
+
+
+
+
+RICHONE : version 1.20
+----------------------
+Commit 02/09/30
+
+CsRCEventAnalysis.h, cc : key->acknoMethod() added ...
+                          backgrType() added ...
+      ringSelection() : ddPaDet def and test added
+      getThetaLike() -> getThetaLikeRing()
+      getThetaLikeMax() : method added and called
+      getCorrRingBack() : method added and called
+      getLikeRing() : cons->backgrType() selection added
+      getLikeRing1() : key->acknoMethod() added 
+      getLikeRing2() : modified (2 -> 2X -> 2) and ...
+                       key->acknoMethod() added
+                       dBindTheta from histo
+                       getRingBackground()
+      getLikeAll() : cons->backgrType() selection added
+      getLikeAll1() : key->acknoMethod() added 
+      getLikeAll2() : modified (dBindTheta* ...)
+                      dBindTheta from histo
+                      getRingBackground()
+      getRingBackground() : method added
+      getCorrRingBack() : modified (interface)
+      corrRingBack1() : method added
+      corrRingBack2() : method added
+      getPartConfLevel() : def. deleted
+
+CsRCRecConst.h, cc : backgrType_ read Opt, method and prints added
+
+CsRCRing.h, cc : flagBack_, ringBack_ added and methods, def.s ...
+
+CsRichOne.cc : static int nEvStartPrint = 1000000000;
+
+
+
+
+RICHONE : version 1.19
+----------------------
+Commit 02/09/23
+
+CsRCEventAnalysis.cc : 
+      ringSelection() : nPhotMinRing, momMaxProc added in checks
+      partIdent() : modified filling of histo.s 1640,1,2,3
+                    momentum resolution histo.s moved from MC to Data
+                    likeType() -->getLikeRing(), getLikeAll(), ... kFigMe
+                    pLike0 = (max) ... set out
+                    histo 1661 1d --> 2d; recCut out
+                    theRecoLk. LKA = getTh... out
+                    checkLikelihood(..., dummy, ...)
+                    probCut added, chiCut moved
+                    modified filling of histo.s 1661 and ...
+                    modified filling of histo.s 1664
+                    doubled filling of histo.s 1693
+                    cleaned filling of histo.s 1655[]
+      getLikelihood() : likeType() introduced
+      getLikeRing() : --> getLikeRing1()
+      getLikeRing2() : added, to run 20330 data
+      getLikeAll() : --> getLikeAll1()
+      getLikeAll2() : added, to run 20330 data
+      likeBackFrac2() : (cleaned)
+      corrBeta() : = sigPhoRec / 0.8;
+      fitCFRefInf() : modified (central average)
+      getThetaRFit() : kPhot-- --> kPhot
+      checkLikelihood() : correction in filling (for mom, ...)
+
+CsRCEventParticles.cc :
+      partFilter() : modified for data (mom. selection on momMaxAcc)
+
+CsRCExeKeys.h, cc : "useClusterPH", moved
+                    "rejWrongPeak", added; prints
+
+CsRCHistos.cc : modif. limits for histo 1583,4
+                modif. limits for histo 1641,2,3
+                histo.s 1656,7,8 moved from MC to Data
+                histo 1661 1d --> 2d
+                modif. limits for histo 1661, 1669
+
+CsRCRecConst.h, cc : momMaxAcc_, momMaxProc_ and methods added and prints
+                     likeType_ and method added and print
+
+CsRCRing.h, cc :
+      getRingPk() : modified; calls added
+      getRingBf, getRingWa, getRing3S() : modified, cleaned
+      histCntRatio() () :  modified, cleaned
+      peakScan() : method added
+      rejectWrongPeak() : method added
+
+CsRichOne.cc :
+      end() : printing of refr.index modified
+
+CsRCChiSqFit.cc : printKey_ = 1 added times 2
+
+
+
+
+RICHONE : version 1.19
+----------------------
+Commit 02/09/09
+
+CsRCEventAnalysis.cc : 
+      ringSelection() : (updated)
+
+CsRCRing.cc : 
+      getRingPk() : nScanMx (=60) and elsewhere
+                    kCan >= 0
+      getRingBf() : nScanMx (=60), cleaning
+      histCntRatio() : upgrades
+
+CsRCEventDisplay.cc : nRingUse added
+                      kRing++; moved   4 times
+
+
+
+
+RICHONE : version 1.18
+----------------------
+Commit 02/09/09
+
+CsRCEventParticles.cc :
+      setDataParticle() : use of smoothed helix added
+
+
+
+
+RICHONE : version 1.17
+----------------------
+Commit 02/09/05
+
+CsRCEventRings.cc : singlePhoton( (*ipf), ring ); commented out
+                    bool DoCluCo = key->DoCluCo(); cancelled
+
+CsRCHistos.h, cc : histo.s 1640, 1641, 1642, 1643 added
+                   histo 3059 "n-1"  added
+                   added members bookHis_, levelBk_
+                   added methods bookHis(), levelBk()
+                   approx level selection
+                   histo 1584 "peak"  added
+                   histo 3502 "phi vs phi"added
+
+CsRCPhotonDet.cc : 
+      CsRCPhotonDet() : det. corrections in rich1.options
+
+CsRCEventAnalysis.h, cc :
+      doEveAnalysis() : singlePhoton(); added
+      ringSelection() : updated
+      singlePhoton() : method added
+      getThetaRFit() : thetaFit = oCirclev.para()[0];  corrected
+      partIdent() : double theRecoFt = getThetaRFit( (*ir) ); 
+                    theReco = theRecoFt;
+                    histo.s 1640, 1641, 1642, 1643 added
+                    double theRecoR = ... & related
+      sigmaPhot5() : corrected & updated param.s
+     (sigmaPhot6() : updated param.s)
+      moniCFRefInf() : method added
+      fitCFRefInf() : method added
+      hitDisplay() : histo (5000...) booking under conditions
+      BMDisplay() : histo (5000...) booking under conditions
+      checkLikelihood() : histo (3070, 3080...) booking under conditions
+                          set histo to RICH dir
+      cluStructure() : (PHpad = 0.) float padPHmx = -1.;   
+
+CsRCEventPads.cc : (PHpad = 0.) PHPadw < cathodeThre[iCatw]     2 times
+                   upgraded killHalo (with CsOpt)
+
+CsRCEventClusters.cc : (PHpad = 0.) PHPad[kPad] = pad->PH() + 1.;
+                                    PHCluw -= float(nPadClu);
+                                    wh = PHPad[kPoins] - 1.;
+
+CsRCPartPhotons.cc :
+      getPartPhotons() : histo 3502 added
+
+CsRCMirrors :
+      doAliMirrors() : corrected nTitle for vRC3800     2 times
+      setMirrNom() : mirror corrections in rich1.options
+
+CsRCExeKeys.h, cc : DoCluCo --> UseCluPH  everywhere
+
+CsRCRing.cc : (PHpad = 0.) if( !DoCluCo ) PHw = (*ih)->PH() + 1.    4 times
+              DoCluCo --> UseCluPH  everywhere
+      histCntRatio() : histo 1584 "peak"  added
+
+CsRCnTup.cc : (PHpad = 0.) double pPHmx = -1.;  
+
+CsRichOne.cc :
+      end() : call to method fitCFRefInf() added
+
+f-digits.F : defaults=0 for padtable and no more stop
+
+
+
+
+RICHONE : version 1.16
+----------------------
+Commit 02/08/02
+
+CsRCEventPads.h, cc : bool getEventPads()
+                      if( iCatw >= nCathode ) return false; * 3...
+CsRichOne.cc : if( !evpads->getEventPads() ) {...
+      writeMyFile() : protection for NPAEV and MAXPAD
+
+
+
+
+RICHONE : version 1.15
+----------------------
+Commit 02/07/16
+
+CsRCEventAnalysis.cc : 
+      checkLikelihood() : int nIpo = 320 -> 321 (bug!)
+                          histo call protections added
+
+
+
+RICHONE : version 1.14
+----------------------
+Commit 02/06/26
+
+CsRCMirrors.cc : (nothing)
+
+CsRCPartPhotons.h, cc : 
+      getPartPhotons() : theCluP added and polishing
+                         histos hRC3503 and hRC3504 added
+                         theCluB and theCluM  killed!
+      doSelCathodes() : sort 'useful' cath.: modified code(v.4), from v.2
+                        getSplitCondition() added
+
+CsRCHistos.h, .cc : histos hRC3503 and hRC3504 added
+
+CsRCExeKeys.cc : default printFrequency_ = 10000000; printFrequency_ not 0
+
+
+
+RICHONE : version 1.13
+----------------------
+Commit 02/06/21
+
+in .../src/geom
+CsRICH1Detector.cc : getMCDigits(): various defaults added
+                     elFatal to elError for RICH1 MC constants init.
+
+
+
+RICHONE : version 1.12
+----------------------
+Commit 02/06/21
+
+CsRCEventClusters.cc : ordering of pads by ascending ix and iy added 
+
+CsRCEventPads.h, cc : killHalo (provisional) and its control added
+                      polishing
+
+CsRCExeKeys.cc : killHalo control added
+
+CsRichOne.cc : (nothing)
+
+CsRCHistos.h, .cc : histo hRC3509 added
+
+CsRCMirrorElem.cc : prov. prints killed
+
+CsRCPartPhotons.cc : histo hRC3509 added
+                     killHalo control added
+
+
+
+RICHONE : version 1.11
+----------------------
+Commit 02/05/27
+
+CsRCEventPads.cc : cathode -> 15-cathode
+
+CsRichOne.cc : (nothing)
+
+
+
+RICHONE : version 1.10
+----------------------
+Commit 02/05/12
+
+CsRCHistos.h, .cc : histo vector vRC3570 (hN3571 to hN3574) added
+                    histo vector vRC3580 (hN3581 to hN3584) added
+                    histo hRC3553 (ringSelection) added
+                    histo hRC3555, hRC3556 (rawSignal) added
+                    histo hRC3557, hRC3558 (ringSignal) added
+                    histo hRC3507 (doAliMirrors) added
+                    correction for DataEvent ...
+
+CsRCnTup.cc : protections added (kRing, kPhot ...)
+
+CsRCEventPartPhotons.cc : 
+      rawSignal() : modification and cleanup
+
+CsRCEventRings.h, .cc :
+      ringSignal() : added
+      ringSignal(ring) : added
+
+CsRCMirrors.cc : mirror elem name in title added
+                 corrected errFit[...
+
+CsRCEventAnalysis.cc :
+      ringSelection() : modified
+                        instance to ringSignal added
+
+CsRCEventParticles.cc : 
+      partFilter() : modified (but useless)
+
+CsRCExeKeys.cc : setting of some defaults  and  cleaning
+
+CsRCRecConst.cc : modif. of one default
+
+CsRichOne.cc : process myfile scrambled corrected
+
+CsRCEventDisplay.cc : nHistoMax = 25;
+
+
+
+RICHONE : version 1.09
+----------------------
+Commit 02/04/09
+
+CsRCHistos.cc : level and bool bk added... in progress
+                modify rich1.options!
+
+
+
+
+RICHONE : version 1.08
+----------------------
+Commit 02/04/09
+
+CsRCMirrorElem.cc : gets mirror elem angle corrections
+
+CsRCMirrors.cc : prints for checking
+
+CsRCParticle.h : polishing
+
+CsRCnTup.cc :  prints for checking
+
+CsRCEventPartPhotons.cc : nothing
+
+
+
+
+RICHONE : version 1.07
+----------------------
+Commit 02/03/22
+
+CsRCEventPads.cc : #include <shift.h>
+                   rfio_read for myFile
+
+CsRCEventParticles.cc : #include <shift.h>
+      setMyParticle(): rfio_read for myFile
+                       myFileType() >= 1
+                       myFileType() >= 2 and related (zHelix...) added
+                       myFileType() >= 1
+                       setQualityPars( zHelix...) added
+      setMCRecParticle(): nclus = ... chiSq = ... added
+                       setQualityPars( zHelix...) added
+      setDataParticle(): setQualityPars( zHelix...) added
+                        cleanup
+
+CsRCExeKeys.cc : myFileType() >= 1
+
+CsRCParticle.cc : zHelix... added (Constructors...)
+                  cleanup
+CsRCParticle.h : zHelix... added 
+                 inline zHelix0()... added
+                 inline setQualityPars(... added
+
+CsRCnTup.cc : zHelix... and related from part->...
+
+CsRichOne.cc : kMyWrEvent_ = 0;
+      extern writebuff_ modified
+      writeMyFile(): zHelix... and related added
+      closeMyFile() added
+      closewrtfile_() added
+
+CsRichOne.h : closeMyFile() added
+
+writebuff.F :  zHelix... and related added
+      closewrtfile added
+
+
+
+RICHONE : version 1.06
+----------------------
+Commit 02/03/11
+
+CsRichOne.cc, writebuff.F : string length in call to writebuff...
+CsRCEventParticles.cc, .h : #include <shift.h>
+                            const_cast<... fileName & related in
+                            initMyFile and openMyFile
+                            rfio_open in openMyFile
+
+
+RICHONE : version 1.05
+----------------------
+Commit 02/03/05
+
+CsRCnTup.cc : break  added in _case CsHistograms::ROOT:_
+
+
+
+
+RICHONE : version 1.04
+----------------------
+Commit 02/01/11
+
+CsRCEventParticles.cc :
+      setMCRecParticle() : protection on mctrak pt added
+                           check Helix // MC67 added
+CsRCParticle.cc : 
+      CsRCParticle() (Data) : defaults (iTrack_, ...) added
+
+CsRCEventAnalysis.cc : 
+      MCMonitor() : check iPartT > 30 added 
+      partIdent() : check iPartT >< 30 added 
+      checkLikelihood() : check iPartT > 30 added 
+
+
+
+
+RICHONE : version 1.03
+----------------------
+Commit 02/01/10
+
+CsRichOne.cc :
+      doRichOne() : padScrambled() added
+      polishing
+
+CsRCExeKeys.cc /.h :
+      padScrambled_ added in Opt
+
+
+
+
+RICHONE : version 1.02
+----------------------
+Commit 01/12/19
+
+CsRCEventAnalysis.cc : 
+     ringSelection() : H.extrapolation and cut at PT   (011212)
+
+CsRCEventParticles.cc :
+     setDataParticle() : H.extrapolation and cut at PT   (011212)
+                         hist 1200 added
+CsRCHistos.cc /.h : 
+                  : hist 1200 added   (011212)
+
+
+
+
+RICHONE : version 1.01
+----------------------
+Commit 01/12/11
+
+CsRCEventAnalysis.cc : 
+     polishing
+     Constructor and Copy Constructor revis. (011204)
+     ringSelection() : temp. modif. to selection (011203)
+CsRCEventAnalysis.h  :
+     inline functions added (011204)
+
+CsRCEventClusters.cc : 
+      polishing
+      Copy Constructor revis. (011204)
+      doClustering() : temp. modif. for test (011203)
+
+CsRCEventDisplay.cc :
+      doEveDisplay() : good rings scan for data display added (011203)
+
+CsRichOne.cc :
+      Copy Constructor revis. (011206)
+      'SCRABMLED' Pad processing revised     !!!  (011207)
+
+CsRCRing.h :
+      Copy Constructor -> public (011206)
+      //operator=(... (011206)
+
+CsRCPhotonDet.cc : 
+      Copy Constructor and Operator= revis. (011206)
+
+CsRCPhoton.cc : 
+      Constructor and Copy Constructor revis. (011206)
+
+CsRCParticle.cc :
+      polishing
+      Constructor and Copy Constructor revis. (011206)
+
+CsRCPad.cc :
+      polishing
+      Copy Constructor revis. (011206)
+
+CsRCMirrorNom.cc, h :
+      polishing
+      cleaned //vPoPaMir0...
+      Copy Constructor revis. (011206)
+
+CsRCMirrorElem.cc :
+      polishing
+      Copy Constructor revis. (011206)
+
+CsRCEventParticles.cc :
+      polishing
+      Copy Constructor and Operator= revis. (011206)
+
+CsRCEventPartPhotons.cc :
+      polishing
+      Copy Constructor revis. (011206)
+
+CsRCEventPads.cc :
+      polishing
+      Copy Constructor revis. (011206)
+      some methods added ('SCRAMBLED' Pad processing)
+CsRCEventPads.h :
+      some methods added ('SCRAMBLED' Pad processing)
+
+CsRCDetectors.cc :
+      polishing
+      Copy Constructor revis. (011206)
+
+CsRCCluster.cc :
+      polishing
+      Copy Constructor revis. (011206)
+
+CsRCCathode.cc :
+      polishing
+      Copy Constructor and Operator= revis. (011206)
+CsRCCathode.h :
+      Copy Constructor and Operator= -> public (011206)

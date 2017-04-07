@@ -1,0 +1,856 @@
+version 0 unencrypted
+
+schema *
+0
+1000001 1000000
+{
+  class ooContObj_ooRef
+  UNKNOWN
+  1000000 1000000
+  1 0 1 0 1 0 0
+  {
+    Oid
+    private ooRef(ooContObj) _vs
+    1048581
+    1 0 0
+  }
+
+}
+
+schema HepODBMS
+16
+20 8
+{
+  class HepODBMSNamedSchema
+  basic
+  1048577 1048577
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+  class opiRef<ooContObj >_ooVArray
+  UNKNOWN
+  1048578 1048578
+  1 0 1 0 1 0 0
+  {
+    VArrayOid
+    private ooVArray(ooRef(ooContObj)) _vs
+    1002
+    1 0 0
+  }
+
+  class HepClusteringContainer_HepRefVArray
+  UNKNOWN
+  1048579 1048579
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public opiRef<ooContObj >_ooVArray
+    1048578
+    1 0 0 0
+  }
+
+  class HepContainerGroup
+  basic
+  1048580 1048580
+  1 0 2 0 2 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+
+    Embedded
+    private HepClusteringContainer_HepRefVArray cont
+    1048579
+    2 1 0 0
+  }
+
+  class ooContObj
+  UNKNOWN
+  1048581 1048581
+  1 0 0 0 0 0 0
+  {  }
+
+  class HepDBGroup
+  basic
+  1048582 1048582
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+  class HepDBGroupDummy1
+  basic
+  1048583 1048583
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+  class HepDBGroupDummy2
+  basic
+  1048584 1048584
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+  class NamedNode
+  basic
+  1048585 1048585
+  1 0 4 0 4 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+
+    UniAssoc
+    private ooHandle(NamedNode) parent --> 
+    470810625
+    1048577 1048585
+    0 0 1 3 1
+    2 1 0
+
+    UniAssoc
+    private ooHandle(NamedNode) child[] --> 
+    1276116994
+    1048578 1048585
+    4 0 1 0 1
+    3 2 0
+
+    UniAssoc
+    private ooHandle(ooObj) obj --> 
+    470810627
+    1048579 1001
+    0 0 1 3 1
+    4 3 0
+  }
+
+  class FieldTabElem
+  UNKNOWN
+  1048586 1048586
+  1 0 3 0 3 0 0
+  {
+    Basic
+    private int8 name[64]
+    1 0 0 0
+
+    Basic
+    private int32 type
+    2 1 0 0
+
+    Basic
+    private int32 ofs
+    3 2 0 0
+  }
+
+  class HepExplorableDescr
+  basic
+  1048587 1048587
+  1 0 3 0 3 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+
+    VArrayStruct
+    private ooVArray(FieldTabElem) ftab
+    1048586
+    2 1 0
+
+    UniAssoc
+    public ooHandle(HepContainerGroup) contGroup --> 
+    470810628
+    1048580 1048580
+    0 0 1 0 1
+    3 2 0
+  }
+
+  class HepExplorableTagsDescr
+  basic
+  1048588 1048588
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public HepExplorableDescr
+    1048587
+    1 0 0 0
+  }
+
+  class HepGenericTag
+  basic
+  1048589 1048589
+  1 0 7 0 7 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+
+    VArrayBasic
+    public ooVArray(float32) floats
+    2 1 0
+
+    VArrayBasic
+    public ooVArray(float64) doubles
+    3 2 0
+
+    VArrayBasic
+    public ooVArray(int32) longs
+    4 3 0
+
+    VArrayBasic
+    public ooVArray(int16) shorts
+    5 4 0
+
+    VArrayBasic
+    public ooVArray(int8) chars
+    6 5 0
+
+    UniAssoc
+    public ooHandle(ooObj) event --> 
+    470810629
+    1048581 1001
+    0 0 1 0 1
+    7 6 0
+  }
+
+  class HepExplorableGenericTagsDescr
+  basic
+  1048590 1048590
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public HepExplorableDescr
+    1048587
+    1 0 0 0
+  }
+
+  class HepEventTag
+  basic
+  1048591 1048591
+  1 0 2 0 2 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+
+    BiAssoc
+    public ooHandle(HepEvent) event <-> eventTag
+    3020947462
+    1048582 1048592
+    2 0
+    0 0 1 3 1
+    2 1 0
+  }
+
+  class HepEvent
+  basic
+  1048592 1048592
+  1 0 2 1 2 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+
+    BiAssoc
+    public ooHandle(HepEventTag) eventTag <-> event
+    2014314502
+    1048582 1048591
+    2 1
+    4 0 1 3 1
+    2 1 0
+  }
+
+  class HepEventCollection
+  UNKNOWN
+  1048593 1048593
+  1 1 0 0 0 0 0
+  {  }
+
+  class HepPersistentEventCollection
+  basic
+  1048594 1048594
+  1 0 4 0 4 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+
+    Embedded
+    : public HepEventCollection
+    1048593
+    2 1 0 0
+
+    UniAssoc
+    public ooHandle(HepEventTag) tag[] --> 
+    202375175
+    1048583 1048591
+    0 0 1 0 1
+    3 2 0
+
+    Basic
+    public * cur
+    4 3 0 0
+  }
+
+  class HepMapNode
+  basic
+  1048595 1048595
+  1 0 6 0 6 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+
+    Embedded
+    protected ooVString typeName
+    5005
+    2 1 0 0
+
+    Basic
+    protected uint32 typeNumber
+    3 2 0 0
+
+    Embedded
+    protected ooVString comment
+    5005
+    4 3 0 0
+
+    Embedded
+    protected ooVString creationTime
+    5005
+    5 4 0 0
+
+    Oid
+    private ooRef(ooObj) child
+    1001
+    6 5 0
+  }
+
+}
+
+schema HistOO
+17
+2 1
+{
+  class HistOONamedSchema
+  basic
+  1114113 1114113
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema HepHisto
+18
+2 1
+{
+  class HepHistoNamedSchema
+  basic
+  1179649 1179649
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema CLHEP
+19
+2 1
+{
+  class CLHEPNamedSchema
+  basic
+  1245185 1245185
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema HepExplorer
+20
+2 1
+{
+  class HepExplorerNamedSchema
+  basic
+  1310721 1310721
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema HepInventor
+21
+2 1
+{
+  class HepInventorNamedSchema
+  basic
+  1376257 1376257
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema HepVis
+22
+2 1
+{
+  class HepVisNamedSchema
+  basic
+  1441793 1441793
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema HepMeta
+23
+2 1
+{
+  class HepMetaNamedSchema
+  basic
+  1507329 1507329
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema Geant4
+24
+2 1
+{
+  class Geant4NamedSchema
+  basic
+  1572865 1572865
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema Minuitxx
+25
+2 1
+{
+  class MinuitxxNamedSchema
+  basic
+  1638401 1638401
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema HepCalibration
+26
+2 1
+{
+  class HepMisc0NamedSchema
+  basic
+  1703937 1703937
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema HepMisc1
+27
+13 3
+{
+  class HepMisc1NamedSchema
+  basic
+  1769473 1769473
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+  class PCondFolderGeneral
+  basic
+  1769474 1769474
+  1 0 5 0 5 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+
+    Embedded
+    private ooVString name
+    5005
+    2 1 0 0
+
+    Embedded
+    private ooVString fullName
+    5005
+    3 2 0 0
+
+    Embedded
+    private ooVString attributes
+    5005
+    4 3 0 0
+
+    Embedded
+    private ooVString description
+    5005
+    5 4 0 0
+  }
+
+  class PCondObjData
+  basic
+  1769475 1769475
+  1 0 2 0 2 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+
+    VArrayBasic
+    private ooVArray(int8) data
+    2 1 0
+  }
+
+  class PCondFolderData
+  basic
+  1769476 1769476
+  1 0 5 0 5 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+
+    Oid
+    private ooRef(ooTreeSet) completeCollectionR
+    1769477
+    2 1 0
+
+    Oid
+    private ooRef(ooTreeSet) HEADCollectionR
+    1769477
+    3 2 0
+
+    Oid
+    private ooRef(ooContObj) intervalContR
+    1769478
+    4 3 0
+
+    Oid
+    private ooRef(ooContObj) dataContR
+    1769478
+    5 4 0
+  }
+
+  class ooTreeSet
+  UNKNOWN
+  1769477 1769477
+  1 0 0 0 0 0 0
+  {  }
+
+  class ooContObj
+  UNKNOWN
+  1769478 1769478
+  1 0 0 0 0 0 0
+  {  }
+
+  class PCondFolder
+  basic
+  1769479 1769479
+  1 0 3 0 3 0 0
+  {
+    Embedded
+    : public PCondFolderGeneral
+    1769474
+    1 0 0 0
+
+    BiAssoc
+    private ooHandle(PCondFolderSet) parentFolderSet <-> folders[]
+    337313793
+    1769473 1769480
+    4 0
+    0 0 1 0 1
+    2 1 0
+
+    Oid
+    private ooRef(PCondFolderData) toCondFolderData
+    1769476
+    3 2 0
+  }
+
+  class PCondFolderSet
+  basic
+  1769480 1769480
+  1 0 4 1 4 0 0
+  {
+    Embedded
+    : public PCondFolderGeneral
+    1769474
+    1 0 0 0
+
+    BiAssoc
+    private ooHandle(PCondFolderSet) parentFolderSet <-> folderSets[]
+    337313794
+    1769474 1769480
+    3 0
+    0 0 1 0 1
+    2 1 0
+
+    BiAssoc
+    private ooHandle(PCondFolderSet) folderSets[] <-> parentFolderSet
+    672858114
+    1769474 1769480
+    2 1
+    0 0 1 0 1
+    3 2 0
+
+    BiAssoc
+    private ooHandle(PCondFolder) folders[] <-> parentFolderSet
+    672858113
+    1769473 1769479
+    2 1
+    0 0 1 0 1
+    4 3 0
+  }
+
+  class PCondObjInterval
+  basic
+  1769481 1769481
+  1 0 7 0 7 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+
+    Basic
+    private int64 since
+    2 1 0 0
+
+    Basic
+    private int64 till
+    3 2 0 0
+
+    Basic
+    private int64 insertionTime
+    4 3 0 0
+
+    Embedded
+    private ooVString description
+    5005
+    5 4 0 0
+
+    Oid
+    private ooRef(PCondObjData) objData
+    1769475
+    6 5 0
+
+    Basic
+    private uint32 layer
+    7 6 0 0
+  }
+
+  class ooCompare
+  basic
+  1769482 1769482
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+  class CompInterval
+  basic
+  1769483 1769483
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooCompare
+    1769482
+    1 0 0 0
+  }
+
+  class PCondTag
+  basic
+  1769484 1769484
+  1 0 4 0 4 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+
+    Embedded
+    private ooVString name
+    5005
+    2 1 0 0
+
+    Embedded
+    private ooVString attributes
+    5005
+    3 2 0 0
+
+    Embedded
+    private ooVString comment
+    5005
+    4 3 0 0
+  }
+
+}
+
+schema HepMisc2
+28
+2 1
+{
+  class HepMisc2NamedSchema
+  basic
+  1835009 1835009
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema HepMisc3
+29
+2 1
+{
+  class HepMisc3NamedSchema
+  basic
+  1900545 1900545
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema HepMisc4
+30
+2 1
+{
+  class HepMisc4NamedSchema
+  basic
+  1966081 1966081
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema HepMisc5
+31
+2 1
+{
+  class HepMisc5NamedSchema
+  basic
+  2031617 2031617
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}
+
+schema HepMisc6
+32
+2 1
+{
+  class HepMisc6NamedSchema
+  basic
+  2097153 2097153
+  1 0 1 0 1 0 0
+  {
+    Embedded
+    : public ooObj
+    1001
+    1 0 0 0
+  }
+
+}

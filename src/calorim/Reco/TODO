@@ -1,0 +1,219 @@
+Printout functions for data, hypothesis, particle, cluster what else ?
+Debug printout flags as calorimeter members.
+
+What does it mean?:  X = proexali, + = sdelali, - = ne sdelali
+
+  Sat Jun 17 16:49:33 CEST 2000
+  For Zvyagin
+  Task to ask
+-  1. Porushil class Event nado-by ih otdeljat' kachestvenee.
++  2. Particle ID ?
++  3. Class ECAL1 ECAL2 ... ne poluchilos', poprobovat' esche?
+   4. GOTO ROOT in analysiz.
+-  5. Risovalka ? luche-by sam - pouchit'sja in ROOT(&GTX).
+X  6. dokumentacija
++  7. Prosmotret' TODO
++  8. DataBase
+  MNE
+X  9. mnogo printov. DATA EVENT LED EXPECT GAMMA ...
+- 10. idea grid
+X 11. Calorimeter.h: warning: 1 trigraph(s) encountered
++ 12. Razdacha data po calorimetram: dodelat' kak nado.
+  13. sdelat' hfm1 hfm2 v ROOTe
+
+ Thu Mar 29 21:53:54 CEST 2001
+   1. GUI est' risovalki NET                   (AZ?)
+   2. Ubrat' histograms iz Calorimeter.h       (AZ)
+   3. Reconstruction HCAL cluster -> Particle
+   4. Reconstruction with Hint_Particles
+   5. Xi^2 i probability - dodelat'
+   6. Coral + Real data (mapping, calibration...)
+   7. GUI LED,PED,DATA,CALIB(stat,mean,sigma) (AZ???)
+   8. Turbo reconstruction - for on-line
+   9. Reconstruction results -> Interface v Coral
+  10. GUI + HV u Kuz'mina
+  11. Options - chtoby moghno bylo rabotat'! (Functionality)
+       *  set default particle type
+       *  thresholds for clusters and gamma search
+       *  choosing reconstruction procedure
+       *  otions list and how to use
+  12. Calibrovka v Corale (pi0? ,mjuon? ,electron, hadron)
+  13. Near gamma reconstruction (after 5)
+  14. Angular dependent coordinate function(chtob bylo kruto)
+  
+ Proshlo neskol'ko let.
+ Sat Jun  7 12:49:20 MSD 2008
+ 
+ Koe-chto dlya pamyati:
+ Calorimeter::OneParticleResponse::CalculateExpectedResponseForFMC
+ est' mnogo raboty s profilyami raznoobraznyx livnei.
+ Baza est' tak-chto ne tak vse strashno. Sdelat' udobnye opcii dlya
+ vyzova tex coord funkcii, kotorye nado/xochetsy.
+ Tuda-zhe zavesti fluktuacii livnya.
+ 
+ Izmenit' imya peremennyx v klasse  OneParticleResponse
+ Naprimer: shower_fluctuations_one_particle_response -> shower_fluctuations_
+ Histo dlya Chi_4, Chi_9sub4, Chi_25sub9 i Prob dlya nix-zhe
+ fluktuacii energii zapolnit' v real_one_particle_response_in_cells.second
+ tam poka kakaya-to botva.
+ 
+Posle cleanup Wed Oct  1 2008
+////////////////
+void Calorimeter::ClearArray(void)
+Inicializaciya s kakim-to otfonarnym 0.05/3 ?
+
+double sdelta = options.delta_spars_mode_*0.05/3.;
+real_amplitudes[it].second += sdelta*sdelta;
+
+Mozhet inado eto proveryat'? Mnogo est' raznyx putei zagruzit' dannye. 
+Konechno nado sledit'.
+# warning Calorimeter::InsertData:: Need to check ClearArray may be called twice 
+
+Sam ne znaju kak eto deletsya. Nado dlya nachala opisat' proceduru.
+# warning Calorimeter::InsertData:: procedure of setting real_data energy dispersion to be tuned
+
+Ne stal razbirat'sya kakaya tam chast' specific, kakaya net. Potom.
+# warning " TODO ProcPedestal GAMS specific part should be moved to implementation classes! "
+
+!
+Rech' idet o options.particle_energy_threshold
+Nado konechno vse proveryat' v t.ch i defalty  a to vsyakie nepriyatnosti proisxodyat
+deistvitel'no TODO(CheckOptions) nu i pisat' strogie preduprezhdeniya.
+Gde tol'ko etu proverku stavit'?
+#warning TODO: check is this a good options
+#warning "TODO: options consistency check & Options::Default() function "
+
+!
+Vazhno sdelat' dokumentaciju na to kak opisyvat'
+geometriju kalorimetra.
+
+Tak i ne znaju. No pust' budet. Nado pridumat' kogda ona nado.
+ #warning " Do we need  Calorimeter::Particle::Clear function ? "
+
+Etot warning v zoneoptions.reco_cluster_search_only
+ uzhe ne znaju chto oboznachaet  
+Reconstruction.cc#warning  Seems it is not correct errors setting for particles from clusters
+
+Ne ponyal ya ob chem eto.
+Calorimeter::ApplyGammaEnergyCuts
+#warning  "WARNING!!!TODO options.particle_energy_threshold  to be improved "
+
+
+ Tut ya soglasen kopirovat' etot manyparticles kak-to ne ochen' xorosho.
+Calorimeter::ApplyGammaEnergyCuts
+#warning  "WARNING!!!TODO Would be much better to avoid  coping manyparticles vector ! "
+
+Ne znaju
+void Calorimeter::ReturnResult(void)
+#warning "Calorimeter::ReturnResult() should be improved. Do we need it at all?"
+
+A mozhet uzhe i sdelal? Ne ochen mnogo takix mest.
+void  Calorimeter::SetCalorimeterParticles(const vector<CalorimeterParticle> &particles)
+#warning "TODO Constructor Calorimeter::Particle <-> CalorimeterParticle  "
+
+Odno delo kak tam eto turbo rabotaet, a drugue delo, chto sam kljuch turbo hard-coded
+Voobsche etimi Shower davno pora zanyat'sya. I sovet v warninge pravil'nyi.
+ShowerLednev(  bool turbo = false;
+# warning "!!!!!!!!!!!! TODO improve TURBO VERSION IN ShowerLednev. Link it with Calorimeter flag_fast_online option !!!!"
+
+Soglasen, no ob etom uzhe govorili. Prosto mesto ukazano potochnee gde eti problemy mogut vozniknut'.
+#warning " WARNING in IsNicePeak0:: wrong setting of readout term may cause the problems! Need aditional check!"
+
+Pravil'nyi vopros. Oshibku zadaem ot fonarya. Kakoi smysl fizicheskii etoi oshibki? 
+V principe cell/2 eto kak-to pravil'no.
+Calorimeter::FindGamma0(double CellThreshold)
+#warning Is it correct sigma X,Y,E for one Particle? And what about Particle ID?
+
+Nu ladno eto dlya online. Tak nado znachit ya dumaju.
+CalorimeterHist::Reset
+# warning " CalorimeterHist::Reset We dont reset NOISE histograms "
+
+Rech' idet o testovyx histo. Soglasen , oni nuzhny tol'ko esli nuzhny + dokumentaciya.
+Calorimeter::ReconstructionTest   test_histos_booked
+#warning "WARNING not the best place for booking and filling "
+
+Tam voobsche mutnoe mesto v ReconstructionTest
+#warning "WARNING!! ReconstructionTest:: hardcoded constant in particles linking "
+
+Da tam voobsche vse histo "obsolet"
+ReconstructionTest
+
+Eto mechta Rainera. Mogbyt'
+Calorimeter::CalculateMonitorCalibration
+// #warning " TODO Check FitValue is valid "
+# warning " Calorimeter::ReconstructionTest:: This cut is only for GAMS valid !!! "
+
+!!!
+Eto voobsche bardak esli eto tak!
+Calorimeter::MonteAddConstantFluctuations(void)
+#warning TODO:Monte-Carlo options - Hard coded 100 MeV threshold to randomise Constant term.
+
+!
+Tozhe nado posmotret'
+Calorimeter::MonteAddStochasticFluctuations(void)
+#warning TODO:Monte-Carlo options - Hard coded 5 MeV threshold to randomise photo-electrons light.
+
+
+Eto uzhe bylo. No nado chto-to delat'!
+void Calorimeter::MonteAddReadoutFluctuations(void)
+#warning TODO:Monte-Carlo options - Check ReadOut term.
+
+K sozhaleniju ot razmera yacheiki poka ne zavisit. No uzhe luchshe
+Calorimeter::OneParticleResponse::OneParticleResponse(const Calorimeter::Particle &p,Calorimeter &c,Cell &cell) :                                     
+# warning OneParticleResponse:: Only for gamma in ECAL ExtendList() valid and depends on the cell size!!!    
+
+Ne ponyal.
+Calorimeter::OneParticleResponse::OneParticleResponse(const Calorimeter::Particle &p,Calorimeter &c,
+                                                                    vector<CellDataRaw> &cluster_data) :                                     
+# warning OneParticleResponse:: Could be done directly from cluster    
+Tam zhe
+# warning OneParticleResponse:: Seems too heavy initialisation. Need to be improved.    
+
+Ne bezopasnyi code.
+# warning OneParticleResponse:: !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! cluster_data.size() == 0   
+
+!
+Dlya online ochen' nado!
+# warning " TODO improve  fast_online option in ParticleResponseInCell "
+
+Aga! Ochen' nado. Srochno!
+# warning " TODO improve  muon response in ParticleResponseInCell "
+ # warning " TODO improve  hadron response in ParticleResponseInCell "
+
+NU estestevenno ili net?
+# warning SimpleFit::   Shower leak corrections valid only for gamma!! Need to be improved!
+
+Budem zhivy i do etogo doidet.
+# warning " WARNING !!!!! NOT CLEAR CODE "
+Da eto mysl' SimpleFit dly muonov
+# warning SimpleFit:: Non realistic very BAD SigmaX,Y  setting - to be valid for muons.  
+Aga
+# warning SimpleFit::   Shower leak corrections valid only for gamma!! Need to be improved!
+
+!!!!!!
+eto voobsche bardak!!!
+#warning OneParticleResponse::Fit Parmeters errors not implemented yet
+
+Navernoe. Voobsche nado proveryat', chto chitaem iz fila
+CalorimeterDB.cc Calorimeter::ReadFromDataBase(
+#warning " Default Calibration setting should be implemented in case some chanels are missing "
+
+Ne yasno che nado.
+#warning " implement size check"
+OutputStatInfo
+
+Starajus' tuda ne sovat'sya.
+DataBase::DataBase
+#warning TODO  test that directory exists or was created
+
+Uzhe ne ponimaju o chem eto.
+CalorimeterMatrixSet.cc, CsCalorimeter.cc
+// #warning Amount of cells in configuration file is (Y,X) and NOT (X,Y)
+// #warning Parameter "offset" is not used.
+  
+Need to get rid this
+class ForFileReading
+//  #warning "WRONG GOOD BIT SETTING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
+
+Nado navodit' poryadok s timingom!
+//  #warning " Temporary timing setting any of T1 or T2 and T error setting hard-coded = 5ns "

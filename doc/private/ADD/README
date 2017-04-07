@@ -1,0 +1,40 @@
+#--------------------------------------------------------------------
+# CERN, European Laboratory for Particle Physics
+# 
+# Software Documentation Layout Templates
+# 
+# README (Document Instance) 
+#--------------------------------------------------------------------
+
+The files required for a single document instance are 
+organized under the SoftDoc directory of the main distribution.
+To create a FrameMaker book document, simply start from a 
+copy of this directory. 
+
+For further instructions read the User's Guide, included 
+in the distribution or online at:
+
+  http://framemaker.cern.ch/sdlt/ 
+
+docsys@ptsun00.cern.ch
+
+#--------------------------------------------------------------------
+
+SoftDoc/                    Document subdirectory  
+        README 
+  
+        SoftDoc.bk          FrameMaker book file 
+        frontmatter.fm      FrameMaker files... 
+        SoftDocTOC.fm 
+        SoftDocLOF.fm 
+        SoftDocLOT.fm 
+        SoftDocLOL.fm 
+        chapter.fm 
+        SoftDocLOI.fm 
+        appendix.fm 
+        SoftDocIX.fm 
+        SoftDoc-master.css  Cascading Style Sheet file  
+        imported/           To caontain any imported files  
+        html/               To contain generated HTML 
+
+#--------------------------------------------------------------------

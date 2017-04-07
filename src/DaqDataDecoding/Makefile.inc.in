@@ -1,0 +1,68 @@
+ver_date        = 2007-08-22
+ver             = 6.0
+
+prefix          = @prefix@
+exec_prefix     = @exec_prefix@
+bindir          = @bindir@
+sbindir         = @sbindir@
+libexecdir      = @libexecdir@
+datarootdir     = @datarootdir@
+datadir         = @datadir@
+sysconfdir      = @sysconfdir@
+sharedstatedir  = @sharedstatedir@
+localstatedir   = @localstatedir@
+libdir          = @libdir@
+includedir      = @includedir@
+oldincludedir   = @oldincludedir@
+infodir         = @infodir@
+mandir          = @mandir@
+docdir          = ${prefix}/doc
+
+INSTALL         = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_SCRIPT  = @INSTALL_SCRIPT@
+INSTALL_DATA    = @INSTALL_DATA@
+MKDIRHIER       = mkdir -p
+
+CC              = @CC@
+CXX             = @CXX@
+CXXFLAGS        = @CXXFLAGS@
+LIBS            = @LIBS@
+
+USE_DATE_LIB    = @USE_DATE_LIB@
+DIR_DATE_LIB    = @DIR_DATE_LIB@
+LIB_DATE_LIB    = @LIB_DATE_LIB@
+
+USE_RFIO        = @USE_RFIO@
+DIR_RFIO        = @DIR_RFIO@
+LIB_RFIO        = @LIB_RFIO@
+
+USE_EXPAT       = @USE_EXPAT@
+DIR_EXPAT       = @DIR_EXPAT@
+LIB_EXPAT       = @LIB_EXPAT@
+
+# Library type - static or shared
+LIB_TYPE        = @LIB_TYPE@
+
+LD_OPT = -L$(top_dir)/src
+ifeq "$(LIB_TYPE)" "shared"
+LD_OPT         += -Wl,-rpath,$(top_dir)/src
+libDaqDataDecoding = libDaqDataDecoding.so
+else
+libDaqDataDecoding = libDaqDataDecoding.a
+endif
+
+CXXFLAGS += -fPIC
+
+ifeq "$(USE_RFIO)" "yes"
+  CXXFLAGS += -I/usr/include/shift
+endif
+
+.cc.o:
+		$(CXX) -I. $(CXXFLAGS) -c $*.cc -o $*.o
+
+.c.o:
+		$(CXX) -I. $(CXXFLAGS) -c $*.c  -o $*.o
+
+clean_mask    = *.o *.bck *.bak *~ *.root *.log *.out *.dvi *.aux fort.* *Cint.[ch] *Cint.cxx \
+                *.out *.gprof gdb-transcript core doc html log

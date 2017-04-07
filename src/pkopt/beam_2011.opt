@@ -1,0 +1,124 @@
+// $Id: beam_2011.opt 14069 2015-09-17 20:44:46Z lsilva $
+
+// Overall BEAM reconstruction code
+//0 (old reconstruction), 1 (new reconstruction)
+//note: if you want to use old beam reconstruction set this option in trafdic and use old beam option file (e.g. beam_2004.opt)
+beam		method		1 
+
+// BEAM TELESCOPE reconstruction mode in reconstruction mode 0
+// >0: Traffic is used, =0: standalone beam package is used
+//BeamRecons	useTRAFFIC	1
+
+// Histogramming level
+//0 (no histograms), 1 (basic histograms), 2 (all, debug histograms)
+beam	histogram_level		2
+// Prepare tree for BMS alignment procedure
+beam	prepare_alignment	0
+
+//nominal energy of beam
+   beam              nominal_mom                   200.
+//nominal resolution
+//note: parameter is used to set error of reconstructed momentum, element in covariance matrix
+   beam              nominal_res                   0.005
+//beam charge
+   beam              beam_charge                   1
+
+//time window for bt tracks
+   beam_bt           time_window                   30. 
+
+//usage of BM05 and BM06
+   beam_bms          use_BM05                      1
+   beam_bms          use_BM06                      1
+
+//coral names for bms planes
+   beam_bms          BM01_name                     BM01P1__  
+   beam_bms          BM02_name                     BM02P1__
+   beam_bms          BM03_name                     BM03P1__
+   beam_bms          BM04_name                     BM04P1__
+   beam_bms          BM05_name                     BM05P1__
+   beam_bms          BM06_name                     BM06P1__
+
+//time resolution of bms planes
+   beam_bms          time_resolution_BM01          0.3
+   beam_bms          time_resolution_BM02          0.3
+   beam_bms          time_resolution_BM03          0.3
+   beam_bms          time_resolution_BM04          0.3
+   beam_bms          time_resolution_BM05          0.5 
+   beam_bms          time_resolution_BM06          0.5
+
+//space resolution of bms planes
+   beam_bms          space_resolution_BM01         1.44
+   beam_bms          space_resolution_BM02         1.44
+   beam_bms          space_resolution_BM03         1.44
+   beam_bms          space_resolution_BM04         1.44
+   beam_bms          space_resolution_BM05         0.72
+   beam_bms          space_resolution_BM06         0.36
+
+
+//time window for bms hits w.r.t. any bt track
+//note: option correlated with 'btvsbms_time_mult'
+   beam_bms          time_window                   5.
+//clusterization, two hits are considered as cluster if |dt| < cluster_time_mult*time_resolution_BM0X
+   beam_bms          cluster_time_mult             3.
+//clusterization, two hits are considered as cluster if |dy| < cluster_space_mult*space_resolution_BM0X
+   beam_bms          cluster_space_mult            5.
+
+//deviation of residual distribution (bt_time - bms_cluster_time) for given bms plane 
+
+   beam_bms    	     btvsbms_time_resolution_BM01   0.49
+   beam_bms 	     btvsbms_time_resolution_BM02   0.53
+   beam_bms 	     btvsbms_time_resolution_BM03   0.49
+   beam_bms 	     btvsbms_time_resolution_BM04   0.51
+   beam_bms 	     btvsbms_time_resolution_BM05   0.80
+   beam_bms 	     btvsbms_time_resolution_BM06   0.69
+
+//correction of residual distribution (bt_time - bms_cluster_time) for given bms plane 
+   beam_bms          btvsbms_time_correction_BM01  -0.07
+   beam_bms          btvsbms_time_correction_BM02  -0.09
+   beam_bms          btvsbms_time_correction_BM03  -0.10
+   beam_bms          btvsbms_time_correction_BM04  -0.13
+   beam_bms          btvsbms_time_correction_BM05  -0.57
+   beam_bms          btvsbms_time_correction_BM06  -0.47
+
+//considered are only clusters which pass |bt_time - bms_cluster_time - btvsbms_time_correction_BM0X| < btvsbms_time_mult*btvsbms_time_resolution_BM0X
+   beam_bms          btvsbms_time_mult             3.
+
+//considered momentum window of backtracking 
+   beam_bms          slice_mom                     20.
+//number of spatial slices
+   beam_bms          slice_n                       4
+//overlap between slices, ymin = ymin0 - slice_overlap*space_resolution_BM0X
+   beam_bms          slice_overlap                 3.
+
+//likelihood calculation mode
+//1 (time LH only), 2 (spatial LH only), 3 (both time and spatial LH)
+   beam_bms          lh_calculation_mode           3
+//if new track has more bms planes and its LH > reasonable_lh, new track is better (even is LH of new track is worse) 
+   beam_bms          reasonable_lh                 0.01
+//independent cuts on spatial and time LH
+   beam_bms          s_lh_cut                      0.005
+   beam_bms          t_lh_cut                      0.005
+
+//deviation of residual distribution (y_measured - y_backprop) for given bms plane
+   beam_backprop     space_resolution_BM01         4.59
+   beam_backprop     space_resolution_BM02         3.69
+   beam_backprop     space_resolution_BM03         2.07
+   beam_backprop     space_resolution_BM04         1.83
+   beam_backprop     space_resolution_BM05         4.10
+   beam_backprop     space_resolution_BM06         1.45
+
+//correction of residual distribution (y_measured - y_backprop) for given bms plane
+   beam_backprop     space_correction_BM01         -7.64   
+   beam_backprop     space_correction_BM02         -3.73
+   beam_backprop     space_correction_BM03         3.65
+   beam_backprop     space_correction_BM04         6.50
+   beam_backprop     space_correction_BM05         -3.14
+   beam_backprop     space_correction_BM06         5.96
+
+//ignore coeff given by option file and read via alignment file
+   beam_backprop  ReadFromAligFile  1
+
+//point where y, and dy are measured to calculate momentum
+beam_momrec       mesured_point_U                  -137194.
+beam_momrec       mesured_point_D                  -61282.
+

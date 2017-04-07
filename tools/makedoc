@@ -1,0 +1,82 @@
+#!/bin/sh
+
+#
+# Script for generating doxygen documentation for Coral. The script also
+# store the doc files in delivery area.
+# 1999/xx/xx V0.0 Benigno Gobbo - first release
+# 2000/05/16 V1.0 Benigno Gobbo - get the coral version number from Coral src.
+#
+
+#!/bin/sh
+
+if [ -r ${CORAL}/src/base/CoralRelease.h ]
+then
+  MAJOR=`awk '/CORAL_MAJOR_RELEASE/ {printf "%d", substr($3,2) }' ${CORAL}/src/base/CoralRelease.h`
+  MINOR=`awk '/CORAL_MINOR_RELEASE/ {printf "%d", substr($3,2) }' ${CORAL}/src/base/CoralRelease.h`
+  BUILD=`awk '/CORAL_BUILD/ {printf "%d", substr($3,2) }' ${CORAL}/src/base/CoralRelease.h`
+else
+  echo "No CoralRelease.h file. Exit."
+  exit 1;
+fi
+
+VERSION=${MAJOR}.${MINOR}.${BUILD}
+
+echo "version: ${VERSION}"
+
+if [ -r ${CORAL}/tools/doxygen/coral.doxygen ]
+then
+  sed "s/PROJECT_NUMBER       = [0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*/PROJECT_NUMBER       = $VERSION/" ${CORAL}/tools/doxygen/coral.doxygen > doxycoral.tmp
+  mv doxycoral.tmp ${CORAL}/tools/doxygen/coral.doxygen
+else
+  echo "No coral.doxygen file. Exit."
+  exit 1;
+fi
+
+#
+
+here=`pwd`
+
+echo ">>> Changing directory to $CORAL/tools/doxygen"
+cd $CORAL/tools/doxygen
+
+echo ">>> Making Doxygen"
+doxygen coral.doxygen
+
+#echo ">>> Making PostScript manual"
+#cd ./latex
+#ln -s /usr/local/share/texmf/tex/latex/fancyhdr/fancyhdr.sty fancyheadings.sty
+#gmake 
+#dvips -o coral.ps refman.dvi
+#echo ">>> Making PDF manual"
+##gmake pdf
+##mv refman.pdf coral.pdf
+#ps2pdf coral.ps coral.pdf
+
+echo ">>> Changing directory to /afs/cern.ch/compass/delivery/coral/www/html"
+cd /afs/cern.ch/compass/delivery/coral/www/RefGuide/html
+echo ">>> Deleting all files"
+rm *
+echo ">>> Coping all files from $CORAL/tools/doxygen/html"
+cp $CORAL/tools/doxygen/html/* .
+
+#echo ">>> Changing directory to /afs/cern.ch/compass/delivery/coral/www/pdf"
+#cd /afs/cern.ch/compass/delivery/coral/www/RefGuide/pdf
+#echo ">>> Deleting all files"
+#rm *
+#echo ">>> Coping $CORAL/tools/doxygen/latex/coral.pdf"
+#cp $CORAL/tools/doxygen/latex/coral.pdf coral.pdf
+
+cd $CORAL/tools/doxygen
+if [ -d html ]
+then
+  echo ">>> Removing $CORAL/tools/doxygen/html directory"
+  rm -fR ./html
+fi
+if [ -d latex ]
+then
+  echo ">>> Removing $CORAL/tools/doxygen/latex directory"
+  rm -fR ./latex
+fi
+
+echo ">>> That's all, changing directory to $here"
+cd $here

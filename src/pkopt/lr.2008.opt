@@ -1,0 +1,151 @@
+// $Id: lr.2008.opt 13162 2012-01-09 03:27:12Z ybedfer $
+
+//------------------------------
+//
+//   LR (Left/Right ambiguities) for Drift Detectors in 2008
+//
+//------------------------------
+
+// Originally copied from "../lr.2006.opt,v1.9"
+
+LR	detector association	// Execute detector association requested. Cluster associated delayed until otherwise requested.
+//LR	make histograms		// Book and fill L/R histograms
+
+//--------------------------------------
+//
+// DETECTOR ASSOCIATION TABLE. 
+// FORMAT : TBNAME0 TBNAME1  ASSOCIATION_CUT(mm)  LRPROB_CUT LRMODE
+//
+// LRProbCut is supposed to be in [0,0.5]
+// drift-like clusters for which LRProb < LRProbCut can be removed
+//
+// LRMODE : optional parameter 
+//		nothing - 	Target pointing
+//		0 - 		Target pointing; 
+//		1 - 		Cell overlap (i.e. infinity pointing); 
+// 		other - 	Nothing;
+//-----------------------------
+
+// DRIFT CHAMBERS
+LR associate  DC00X1__   DC00X2__  8.0	  0.5 	1
+LR associate  DC00Y1__   DC00Y2__  8.0    0.5   1
+LR associate  DC00U1__   DC00U2__  8.0    0.5   1
+LR associate  DC00V1__   DC00V2__  8.0    0.5   1
+
+LR associate  DC01X1__   DC01X2__  8.0	  0.5 	1
+LR associate  DC01Y1__   DC01Y2__  8.0    0.5   1
+LR associate  DC01U1__   DC01U2__  8.0    0.5   1
+LR associate  DC01V1__   DC01V2__  8.0    0.5   1
+
+LR associate  DC04X1__   DC04X2__  8.0	  0.5 	1
+LR associate  DC04Y1__   DC04Y2__  8.0    0.5   1
+LR associate  DC04U1__   DC04U2__  8.0    0.5   1
+LR associate  DC04V1__   DC04V2__  8.0    0.5   1
+
+// WD (association cut set a priori = 12, i.e. somewhat larger than pitch. Y.B)
+LR associate  DR01X1__   DR01X2__ 12.0    0.5   0
+LR associate  DR02X1__   DR02X2__ 12.0    0.5   0
+LR associate  DR01Y1__   DR01Y2__ 12.0    0.5   0
+LR associate  DR02Y1__   DR02Y2__ 12.0    0.5   0
+
+// Include also WD used in earlier MC files
+LR associate  WD01X1__   WD01X2__ 12.0    0.5   1
+LR associate  WD02X1__   WD02X2__ 12.0    0.5   1
+LR associate  WD01Y1__   WD01Y2__ 12.0    0.5   1
+LR associate  WD02Y1__   WD02Y2__ 12.0    0.5   1
+
+// DW (association cut set a priori = 45, i.e. somewhat larger than pitch. Y.B)
+LR associate  DW01X1__   DW01X2__ 45.0	  0.5 	0
+LR associate  DW01Y1__   DW01Y2__ 45.0	  0.5 	0
+// - DW02X2 out of order in 2008
+// - DW02Y1 broken in mid-2008:
+// When processing earlier runs, the association has to be booked in the main options file.
+//LR associate  DW02X1__   DW02X2__ 45.0	  0.5 	0
+//LR associate  DW02Y1__   DW02Y2__ 45.0	  0.5 	0
+LR associate  DW03Y1__   DW03Y2__ 45.0	  0.5 	0
+LR associate  DW03V1__   DW03V2__ 45.0	  0.5 	0
+LR associate  DW04Y1__   DW04Y2__ 45.0	  0.5 	0
+LR associate  DW04U1__   DW04U2__ 45.0	  0.5 	0
+LR associate  DW05X1__   DW05X2__ 45.0	  0.5 	0
+LR associate  DW05V1__   DW05V2__ 45.0	  0.5 	0
+LR associate  DW06X1__   DW06X2__ 45.0	  0.5 	0
+LR associate  DW06U1__   DW06U2__ 45.0	  0.5 	0
+
+// 6mm STRAW TUBES
+LR associate  ST02X1ub   ST02X1db  7.0    0.5   1
+LR associate  ST02Y1ub   ST02Y1db  7.0    0.5   1
+LR associate  ST02U1ub   ST02U1db  7.0    0.5   1
+LR associate  ST02X2ub   ST02X2db  7.0    0.5   1
+LR associate  ST02Y2ub   ST02Y2db  7.0    0.5   1
+LR associate  ST02V1ub   ST02V1db  7.0    0.5   1
+LR associate  ST03X1ub   ST03X1db  7.0    0.5   1
+LR associate  ST03Y1ub   ST03Y1db  7.0    0.5   1
+LR associate  ST03U1ub   ST03U1db  7.0    0.5   1
+LR associate  ST03X2ub   ST03X2db  7.0    0.5   1
+LR associate  ST03Y2ub   ST03Y2db  7.0    0.5   1
+LR associate  ST03V1ub   ST03V1db  7.0    0.5   1
+LR associate  ST05X1ub   ST05X1db  7.0    0.5   1
+LR associate  ST05Y2ub   ST05Y2db  7.0    0.5   1
+LR associate  ST05U1ub   ST05U1db  7.0    0.5   1
+
+// 10mm
+LR associate  ST02X1ua   ST02X1da 11.0    0.5   0
+LR associate  ST02Y1ua   ST02Y1da 11.0    0.5   0
+LR associate  ST02U1ua   ST02U1da 11.0    0.5   0
+LR associate  ST02X2ua   ST02X2da 11.0    0.5   0
+LR associate  ST02Y2ua   ST02Y2da 11.0    0.5   0
+LR associate  ST02V1ua   ST02V1da 11.0    0.5   0
+LR associate  ST03X1ua   ST03X1da 11.0    0.5   0
+LR associate  ST03Y1ua   ST03Y1da 11.0    0.5   0
+LR associate  ST03U1ua   ST03U1da 11.0    0.5   0
+LR associate  ST03X2ua   ST03X2da 11.0    0.5   0
+LR associate  ST03Y2ua   ST03Y2da 11.0    0.5   0
+LR associate  ST03V1ua   ST03V1da 11.0    0.5   0
+LR associate  ST05X1ua   ST05X1da 11.0    0.5   0
+LR associate  ST05Y2ua   ST05Y2da 11.0    0.5   0
+LR associate  ST05U1ua   ST05U1da 11.0    0.5   0
+
+LR associate  ST02X1uc   ST02X1dc 11.0    0.5   0
+LR associate  ST02Y1uc   ST02Y1dc 11.0    0.5   0
+LR associate  ST02U1uc   ST02U1dc 11.0    0.5   0
+LR associate  ST02X2uc   ST02X2dc 11.0    0.5   0
+LR associate  ST02Y2uc   ST02Y2dc 11.0    0.5   0
+LR associate  ST02V1uc   ST02V1dc 11.0    0.5   0
+LR associate  ST03X1uc   ST03X1dc 11.0    0.5   0
+LR associate  ST03Y1uc   ST03Y1dc 11.0    0.5   0
+LR associate  ST03U1uc   ST03U1dc 11.0    0.5   0
+LR associate  ST03X2uc   ST03X2dc 11.0    0.5   0
+LR associate  ST03Y2uc   ST03Y2dc 11.0    0.5   0
+LR associate  ST03V1uc   ST03V1dc 11.0    0.5   0
+LR associate  ST05X1uc   ST05X1dc 11.0    0.5   0
+LR associate  ST05Y2uc   ST05Y2dc 11.0    0.5   0
+LR associate  ST05U1uc   ST05U1dc 11.0    0.5   0
+
+//=== DRIFT TUBES ===
+//------  Large parts ----
+LR associate  MB01X1ub   MB01X1db 35.0    0.5   1
+LR associate  MB01Y1ur   MB01Y1dr 35.0    0.5   1
+LR associate  MB01V1ub   MB01V1db 35.0    0.5   1
+
+LR associate  MB02X1ub   MB02X1db 35.0    0.5   1
+LR associate  MB02Y1ur   MB02Y1dr 35.0    0.5   1
+LR associate  MB02V1ub   MB02V1db 35.0    0.5   1
+
+LR associate  MB02X2ub   MB02X2db 35.0    0.5   1
+LR associate  MB02Y2ur   MB02Y2dr 35.0    0.5   1
+LR associate  MB02V2ub   MB02V2db 35.0    0.5   1
+
+//------- Small parts ----------
+LR associate  MB01X1uc   MB01X1dc 35.0    0.5   1
+LR associate  MB01Y1ul   MB01Y1dl 35.0    0.5   1
+LR associate  MB01V1uc   MB01V1dc 35.0    0.5   1
+
+LR associate  MB02X1uc   MB02X1dc 35.0    0.5   1
+LR associate  MB02Y1ul   MB02Y1dl 35.0    0.5   1
+LR associate  MB02V1uc   MB02V1dc 35.0    0.5   1
+
+LR associate  MB02X2uc   MB02X2dc 35.0    0.5   1
+LR associate  MB02Y2ul   MB02Y2dl 35.0    0.5   1
+LR associate  MB02V2uc   MB02V2dc 35.0    0.5   1
+
+// end

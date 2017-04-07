@@ -1,0 +1,365 @@
+//$Id: README,v 1.10 2006/06/16 15:21:48 conrad Exp $
+
+ ================================== 
+ README file for alignment package
+ ==================================
+
+   I- Introduction 
+  II- Compilation 
+ III- Execution 
+  IV- $OS/traf <options_file> 
+   V- $OS/align <options_file> 
+  VI- $OS/updateFromAlign <alignment file> <old det.dat> [<new det.dat>] 
+ VII- $OS/checkTracks [-b] <options_file> 
+VIII- ManyChunk
+  IX- ReloadAll
+   X- ROOT utilities
+  XI- Additional Files 
+ XII- Additional Documentation 
+XIII- DISCLAIMER
+
+
+   I- Introduction 
+      ------------
+
+ The method used to align is based on a one shot minimisation of both
+    - all track's 'local' parameters of a tracks sample
+and - the 'global' alignment parameters.
+ It consists in minimising the sum of the chi2 of all tracks with respect
+to these parameters (local+global).
+ To do the minimisation, a very large matrix is built from the derivatives
+of this sum chi2 with respect to all the parameters. The matrix inversion
+is then performed exactly, by splitting it into smaller matrices. 
+
+ The matrix inversion is performed by the _core_ of the program, viz.
+'millepede.f', which has been obtained from:
+
+  http://www.desy.de/~blobel/wwwmille.html
+
+The core has been modified, adapted and interfaced to coral.
+
+Contact:
+  hpereira@axfr01.physik.uni-freiburg.de
+  Hugo.Denis.Pereira.Da.Costa@cern.ch
+  pereira@hep.saclay.cea.fr
+  hugo.pereira@free.fr
+  
+  (with this I am pretty sure to have the mail from anywhere!)
+
+
+  II- Compilation 
+      -----------
+  
+  >cd coral 
+  >source setup.csh 
+  is needed, as always 
+
+  >cd coral/src/alignment 
+  >make 
+  will build all execs
+
+In more detail:
+
+  >make $OS 
+  >make $OS/traf          
+  builds the coral main exec used to generate alignment tree 
+
+  >make $OS/libalign.so 
+  builds the shared-object library including alignment and checks of the 
+  coral output. It can be loaded by root. 
+
+  >make $OS/align 
+  builds the alignment exec which reads coral output and detector file 
+
+  >make $OS/updateFromAlign
+  builds an utility to read alignment output and update detector file
+  
+  >make $OS/cleanDetFile
+  builds an utility to move dead zone according to det center, has detector
+  centers of X,Y chambers match, check MB consistancy, ...
+  All called macro  are listed in CleanDetFile.cc
+  
+  >make $OS/checkTracks 
+  builds an utility to check coral output in terms of alignment
+  
+  >make $OS/addOffset 
+  builds an utility to add hard coded offsets to GM01/02/03 and MM03 needed
+  when switching from an alignment run to a physics run
+
+  >make $OS/ManyChunks 
+  >make $OS/ReloadAll 
+  builds some utilities to process many chunks together  
+  (I guess everybody has is own)
+
+
+
+ III- Execution 
+      ---------
+
+THREE STEPS to perform the alignment of a given run:
+
+   i) >Linux/traf <options_file> 
+      Runs coral to produce main alignment tree.
+      <options_file> is a standard coral options file with some
+     extra options for handling the production of the alignment tree.
+     Examples:
+       - "traf.FIELDOFF.2002.opt",                    : Calibration runs.
+       - "traf.LONGT.2002.opt", "traf.TRANSV.2002.opt": Physics runs.
+
+  ii) >Linux/align <options_file> 
+      Reads coral output, performs the minimisation.
+      Dumps output to file
+
+ iii) >Linux/updateFromAlign <alignment file> <old det.dat> [<new det.dat>] 
+      Creates new alignment file
+     NOTA.BENE: "updateFromAlign" also performs detector file cleaning (
+	CleanDetFile),  as listed in CleanDetFile.cc
+
+AND THREE more for tuning upstream-scifis/Si's: use options files
+w/ the "HALO" extension.
+
+Each step, and the corresponding options files are described in the following
+sections.
+
+Some of the steps may have to be iterated. 
+
+
+  IV- $OS/traf <options_file> 
+      ----------------------
+
+In the options file few options are needed to monitor coral alignment output:
+
+  main do alignment    
+  when commented, alignment tree is neither booked nor filled
+
+  main magnets off     
+  values are (on|off). the default (no option, or anything) means off it
+  monitors the structure of the tree output. It should better match the type of
+  the run which is being process.  option magnets on works on all runs, but is
+  much slower.
+
+  main require cop
+  when NOT commented, only tracks with momentum (i.e. tracks with bridging) 
+  are kept in the tree. For an alignment run (i.e. main magnets off), this
+  makes no sense (!) and the option is forced to false.
+
+  main chi2 cut <VALUE>
+  when found, only tracks whose chi2/ndf is below <VALUE> are kept in the tree.
+  A negative value means no cut.  
+
+When magnets on is selected, many smoothed helices are required. I used:
+
+  //=== Smoothed helices for extrapolations   
+  TraF	SmoothPos [0]	100.	 
+  TraF  SmoothPos [1]	230. 
+  TraF	SmoothPos [2]	450.	 
+  TraF	SmoothPos [3]	550.	 
+  TraF  SmoothPos [4]	920.	 
+  TraF	SmoothPos [5]	1550.	 
+  TraF	SmoothPos [6]	2030.	 
+  TraF  SmoothPos [7]	2300.	 
+  TraF	SmoothPos [8]	3900.	 
+  TraF	SmoothPos [9]	5000.	
+
+  events refresh rate 100 
+  just writes the number of events processed every 100 events.
+
+Two options files are given here as example: 
+
+  traf.FIELDOFF.2002.opt  with magnets off 
+  traf.LONGT.2002.opt     with magnets on
+
+They are both working for trafdic, although the program itself, works both on
+traffic and trafdic.
+
+In traf.FIELDOFF.2002.opt I modified the zones and the corresponding cuts so
+that there is only one zone for the whole spectrometer. I also excluded MA, MB,
+DW but this is temporary.
+
+In traf.LONGT.2002.opt everything is standard for trafdic, except I also
+excluded MA, MB, DW and added the alignment options.
+
+
+
+
+
+  V- $OS/align <options_file> 
+     -----------------------
+
+The options file has a coral like format. Align reads coral tree output, 
+det.dat file, fix detectors, performs minimisation. 
+Two options files are given here as example: 
+
+  align.FIELDOFF.opt  with magnets off    
+  align.LONGT.opt     with magnets on
+
+All options are explained in the file. 
+
+IMPORTANT: 
+The 'main magnets on|off' option must be the same as the one use in coral
+options file to build the tree otherwise the tree is not recognised.
+
+The 'detector table' must also be the same.
+
+Output is written to file given by 'output file'. Backup is made when the
+file exists.
+  
+  
+  
+  
+  VI- $OS/updateFromAlign <alignment file> <old det.dat> [<new det.dat>] 
+      ------------------------------------------------------------------
+
+Takes alignment output file, update the <old det.dat> with alignment offsets.
+Save to <new det.dat> if specified, otherwise, overwrites <old det.dat>.
+In any case, automatic backup is made when the destination file already exists.
+
+WARNING: some 'cleaning' is performed in the process. It might be dangerous.
+The cleaning performed is described in CleanDetFile.cc. It
+consists in the following
+
+Sorting detectors according to zcm and name
+match X and Y (U and V) planes centre for almost all detector using translation along
+the wires.
+
+match the dead zone center to the detector center, adding offset for PB chambers
+
+check MB consistancy, align the c (small) regions according to the b (large region), and the l regions to the r regions.
+
+Feel free to comment/modify/add any part of/to this macro; 
+Feel responsible for the modifications you make.
+
+
+
+
+
+ VII- $OS/checkTracks [-b] <options_file> 
+      ----------------------------------
+
+Some utility to make partially automatised plots to check the coral output tree
+quality in terms of alignment. 
+
+An options file is given as example:
+  
+  checkTracks.opt
+
+Options are described and commented in the file. 
+To make plots, the list of the tree variables is to be know. It is given in 
+Tracks.h.
+
+Tree variables are:
+
+  unsigned int T_evt;     //!< Event number 
+  unsigned int T_trigMsk; //!< Event trigger mask 
+  unsigned int T_cmlt;    //!< track multiplicity 
+  double   T_chi2;        //!< track chisquare 
+  int      T_ndf;         //!< track number of degree of freedom 
+  double   T_prob;        //!< track chisquare probability 
+  double T_cop;           //!< charge over momentum int
+  T_nDets;                //!< number of fired detectors
+
+  int T_detVect[NPLAN];   //!< list of detectors uniqID contributing to track
+  double T_uVect[NPLAN];  //!< u_cluster, coordinate perp to the wire
+  double T_duVect[NPLAN]; //!< u_cluster - u_track
+  double T_rVect[NPLAN];  //!< u_cluster - u_wire    (drift-like detectors only)
+  double T_tVect[NPLAN];  //!< t_cluster, drift time (drift-like detectors only)
+
+  //!  branches specific to magnets_on_ = false 
+  double T_xLx;           //!< track X
+  double T_yLx;           //!< track Y 
+  double T_zLx;           //!< track Z 
+  double T_txLx;          //!< track dX/dZ 
+  double T_tyLx;          //!< track dY/dZ
+
+  //!  branches specific to magnets_on_ = true 
+  double T_xVect[NPLAN];  //!< track X     
+  double T_yVect[NPLAN];  //!< track Y     
+  double T_zVect[NPLAN];  //!< track Z     
+  double T_txVect[NPLAN]; //!< track dX/dZ 
+  double T_tyVect[NPLAN]; //!< track dY/dZ 
+  double T_dzVect[NPLAN]; //!< zoffset between detector and recorded point
+
+You may add variable to the tree by modifying both Tracks.h and Main.traf.cc
+(InitAlignmentTree and FillAlignmentTree)
+
+IMPORTANT: 
+The 'main magnets on|off' option must be the same as the one use in coral
+options file to build the tree otherwise the tree is not recognised.
+
+The 'detector table' must also be the same.
+
+
+
+VIII- ManyChunk
+      ---------
+
+ManyChunk [-r] <ExecProg> <options_file> [<ChunkID1> <ChunkID2> <...>]"
+  <execProg>     is a coral executable.
+  <options_file> is a coral options file. 
+
+ - Takes the run number from <options_file>. 
+ - Assumes it was recorded in 2002
+ - Looks for chunks,
+    - specified in [<ChunkID1> <ChunkID2>]
+    - or what's in in castor/dump if none is specified. 
+ - Creates a local directory named <run number>
+ - Puts a copy of <options_files> in it, for each chunkID. The chunkID
+  being appended to the filename.
+ - Modifies the data specification in the <options_file> so that it
+  matches chunkID
+ - Appends the chunkID to the ROOT file specified in options file
+ - Generates a script to run exec program on each generated options file
+  on LSF. If option -r is specified, the chunk is reloaded before the
+  job submission
+
+
+  IX- ReloadAll
+      ---------
+
+ReloadAll <runNumber> <year> [Chunk1] [Chunk2]
+Reload all chunks corresponding to runNumber, year and specified chunks.
+All chunks are loaded if none is given
+
+
+   X- ROOT utilities
+      --------------
+using ROOT, 
+ROOT> .L Linux/libAlign.so
+will load all alignment, detector file manipulation and traffic output tree manipulation objects
+DetFileManager object for instance may be use to update detector file by hand, 
+get values from another det.dat file, 
+draw the detectors/dead zones.
+All detectors read in det.dat file are stored in a DetectorInfo object; all dead zones in a DeadZoneInfo object. 
+
+
+
+  XI- Additional Files 
+      ----------------
+
+I added two detector files used for testing:
+
+  detectors.22751   // Alignment run
+  detectors.22754   // physics run
+
+
+
+
+ XII- Additional Documentation 
+      ------------------------
+
+  > doxygen Doxyfile 
+  will generate doxygen documentation for this package in <doc> directory
+
+
+
+
+XIII- DISCLAIMER
+      ----------
+Not everything have been tested yet in this package. Alignment on U, Theta and Pitch
+works fine for both physics run and alignment run. There are still uncertain statements concerning
+alignment on Z. 
+
+Feel free of modifying/adding whatever you want to this package, but,
+Feel responsible for the modifications you make.
+
+Hugo.

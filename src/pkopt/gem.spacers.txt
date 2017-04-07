@@ -1,0 +1,70 @@
+// $Id: gem.spacers.txt,v 1.1 2005/11/14 16:50:17 ybedfer Exp $
+
+//  File used by TraFDic to handle GEMs' spacer hits, i.e. hits below those
+// spacers that are parallel to the read-out strips, and which position is
+// biased.
+//  Contents = Channel#'s of the spacer hits extrema.
+//  This info is supplemented by TraF option entries specifying the interval
+// of channel#'s about these extrema that have to be given a special processing.
+
+// From: Albert Lehmann <Albert.Lehmann@physik.uni-erlangen.de>
+// Date: Mon, 28 Feb 2005 12:57:55 +0200
+// [...] file with the 3 spacer positions of each Gem plane
+// (in channels). Given are actually the bins of the minima and the
+// maxima left and right of the spacer positions.
+
+// $Log: gem.spacers.txt,v $
+// Revision 1.1  2005/11/14 16:50:17  ybedfer
+//  Initial revision.
+//
+
+// Detector 	1st Minimum 	1st Maximum 	2nd Minimum 	2nd Maximum 	3rd Minimum 	3rd Maximum
+
+ GM01U1 	       185 	       186 	       385 	       386 	       584 	       586 	
+ GM01V1 	       182 	       184 	       382 	       383 	       582 	       584 	
+ GM01Y1 	       184 	       186 	       385 	       386 	       584 	       586 	
+ GM01X1 	       184 	       185 	       383 	       385 	       583 	       584 	
+ GM02U1 	       184 	       186 	       384 	       386 	       584 	       585 	
+ GM02V1 	       184 	       185 	       384 	       385 	       584 	       585 	
+ GM02Y1 	       179 	       181 	       379 	       381 	       579 	       580 	
+ GM02X1 	       187 	       188 	       387 	       388 	       587 	       588 	
+ GM03U1 	       184 	       186 	       384 	       386 	       583 	       586 	
+ GM03V1 	       184 	       186 	       384 	       386 	       584 	       585 	
+ GM03Y1 	       184 	       185 	       384 	       385 	       584 	       585 	
+ GM03X1 	       184 	       186 	       384 	       385 	       584 	       585 	
+ GM04U1 	       183 	       184 	       383 	       385 	       583 	       584 	
+ GM04V1 	       184 	       185 	       383 	       384 	       583 	       585 	
+ GM04Y1 	       182 	       184 	       382 	       384 	       581 	       584 	
+ GM04X1 	       185 	       187 	       385 	       387 	       584 	       587 	
+ GM05U1 	       186 	       187 	       386 	       387 	       585 	       587 	
+ GM05V1 	       183 	       185 	       383 	       384 	       583 	       584 	
+ GM05Y1 	       187 	       188 	       386 	       387 	       586 	       588 	
+ GM05X1 	       184 	       186 	       384 	       385 	       584 	       585 	
+ GM06U1 	       188 	       189 	       388 	       389 	       588 	       589 	
+ GM06V1 	       182 	       183 	       381 	       383 	       581 	       583 	
+ GM06Y1 	       187 	       190 	       387 	       389 	       586 	       590 	
+ GM06X1 	       181 	       184 	       381 	       383 	       581 	       582 	
+ GM07U1 	       186 	       187 	       386 	       387 	       586 	       587 	
+ GM07V1 	       182 	       184 	       382 	       383 	       582 	       583 	
+ GM07Y1 	       184 	       185 	       384 	       386 	       584 	       586 	
+ GM07X1 	       181 	       182 	       380 	       382 	       580 	       581 	
+ GM08U1 	       185 	       186 	       385 	       386 	       584 	       585 	
+ GM08V1 	       182 	       183 	       381 	       382 	       581 	       584 	
+ GM08Y1 	       185 	       186 	       385 	       386 	       584 	       587 	
+ GM08X1 	       184 	       186 	       384 	       385 	       583 	       585 	
+ GM09U1 	       189 	       190 	       388 	       390 	       588 	       590 	
+ GM09V1 	       181 	       183 	       381 	       383 	       581 	       582 	
+ GM09Y1 	       184 	       186 	       384 	       388 	       584 	       585 	
+ GM09X1 	       179 	       180 	       379 	       380 	       578 	       580 	
+ GM10U1 	       182 	       185 	       382 	       384 	       583 	       584 	
+ GM10V1 	       186 	       188 	       386 	       388 	       586 	       587 	
+ GM10Y1 	       186 	       188 	       386 	       388 	       585 	       588 	
+ GM10X1 	       177 	       179 	       377 	       379 	       577 	       579 	
+
+
+// Default values for GM11
+
+ GM11U1 	      1000 	      1000 	      1000 	      1000 	      1000 	      1000 	
+ GM11V1 	      1000 	      1000 	      1000 	      1000 	      1000 	      1000 	
+ GM11Y1 	      1000 	      1000 	      1000 	      1000 	      1000 	      1000 	
+ GM11X1 	      1000 	      1000 	      1000 	      1000 	      1000 	      1000 	

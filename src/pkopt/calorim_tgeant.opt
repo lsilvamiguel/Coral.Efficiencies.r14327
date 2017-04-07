@@ -1,0 +1,133 @@
+// $Id: calorim_mc.2008.opt 13702 2013-04-23 13:30:42Z suhl $
+
+
+//      Possible RecoOptions:
+//      ---------------------
+// Option                               Possible values         Default value
+// ------                               ---------------         -------------
+// DEBUG                                some integer            -1
+// PARTICLE_DEFAULT                     some integer            Particle::GAMMA
+// CALIB                                YES, NO                 NO
+// CALIB_ENERGY                         some float              0
+// ENABLE_TIME_CALIB                    YES, NO                 NO
+// TIME_GATE_CALIB                      some float              5.0
+// CLUSTER_SEARCH                       YES, NO                 NO
+// CLUSTER_SEARCH_ONLY                  YES, NO                 NO
+// USE_HINT_PARTICLES                   YES, NO                 NO
+// FIT                                  SIMPLE, NORMAL          SIMPLE
+// HIST                                 YES, NO                 YES
+// PARTICLE_ENERGY_THRESHOLD            some float              0.3
+// CELL_ENERGY_THRESHOLD                some float              0.1
+// CLUSTER_SEARCH_CELL_ENERGY_THRESHOLD some float              0.02
+// CLUSTER_SEARCH_CELL_AMPL_DEVIATION   some float              2
+// Specific Fortran reconstruction options:
+// FORTRAN_RECONSTRUCTION               YES, NO                 NO
+// FAST_RECONSTRUCTION                  YES, NO                 NO
+// HBOOK                                YES, NO                 NO
+// BAD_CELL_CHECK                       YES, NO                 NO
+// VARIABLE_THRESHOLDS                  YES, NO, READ           NO
+// ECA2_TIME_0                          some float              0.
+// ECA2_TIME_WIDTH                      some float              5.0
+
+EC01P1__ MoreRecoOptions PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1 TOLERANCE_FOR_NEARBY_CELLS=15.0
+EC02P1__ MoreRecoOptions PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1
+HC01P1__ MoreRecoOptions PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1
+HC02P1__ MoreRecoOptions PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1
+
+EC01P1__ MoreRecoOptions HIST=YES
+EC02P1__ MoreRecoOptions HIST=YES
+HC01P1__ MoreRecoOptions HIST=YES
+HC02P1__ MoreRecoOptions HIST=YES
+
+// Kolosov "SIMPLE" reconstruction
+EC01P1__ MoreRecoOptions FIT=SIMPLE
+
+// Kolosov "SIMPLE" reconstruction
+EC02P1__ MoreRecoOptions FIT=SIMPLE
+// Lednev "FORTRAN" reconstruction
+//EC02P1__ MoreRecoOptions RECONSTRUCTION=FORTRAN FAST_RECONSTRUCTION=NO
+// S. Uhl "Combined" reconstruction
+// EC02P1__ MoreRecoOptions RECONSTRUCTION=COMBINED CELL_ENERGY_THRESHOLD=0.2 MIN_SHOWER_DISTANCE=0.7
+// EC02P1__ MoreRecoOptions CORRECT_LONGITUDINAL_LEAKAGE=FALSE USE_RECO_COMBINED_CALIB=TRUE
+
+HC01P1__ MoreRecoOptions FIT=SIMPLE
+HC02P1__ MoreRecoOptions FIT=SIMPLE
+
+
+
+EC01P1__ MC response MCSmeared
+EC02P1__ MC response MCSmeared
+HC01P1__ MC response MCSmeared
+HC02P1__ MC response MCSmeared
+
+// EC01P1__ MC response MCExact
+// EC02P1__ MC response MCExact
+// HC01P1__ MC response MCExact
+// HC02P1__ MC response MCExact
+
+EC01P1__ BookHistograms
+EC02P1__ BookHistograms
+HC01P1__ BookHistograms
+HC02P1__ BookHistograms
+
+
+// set cluster timing according to the time of the most energetic cell in the
+// cluster - as it is done for real data
+EC01P1__ new_style_sadc_timing
+
+
+// the following parameters do only apply to the so called Lednev
+// reconstruction, which is switched on with setting RECONSTRUCTION=FORTRAN
+// in the RecoOptions.
+// the parameters have been extracted from COMGeant SVN rev. 91, using another
+// revision might require to change the parameters
+// parameters are in the same order as in the reconstruction, so:
+// FortranShowerProfA [0-3] (GAMS a1) (GAMS a2) (Shashlyk a1) (Shashlyk a2)
+// FortranShowerProfB [0-3] (GAMS b1) (GAMS b2) (Shashlyk b1) (Shashlyk b2)
+//
+EC02P1__ FortranShowerProfA [0-3]   1.4108  -0.4108 1.7868  -0.7867
+EC02P1__ FortranShowerProfB [0-3]   7.5128  24.8691 9.2912  20.7138
+
+// Define the shower profiles as used in my (suhl) new reconstruction,
+// The parameters have been extracted from COMGeant SVN rev. 405 and the CORAL
+// branch specific to the 2008 slot 4 production, using another revision might
+// require to change the parameters.
+//
+EC02P1__ ShowerProfile Lednev
+EC02P1__ ShowerProfileParams gams       [0-3]   1.0000  -0.0757  5.3128 95.5072
+EC02P1__ ShowerProfileParams rhgams     [0-3]   1.0000  -0.0757  5.3128 95.5072
+EC02P1__ ShowerProfileParams shashlik   [0-5]   1.0000  -0.1421 -0.0810  6.2825 30.4875 42.4935
+
+// parametrization of per cell energy error
+// sigmaE(E) = sqrt(a*a*E + b*b*E*E + c*c)
+//                                               a       b       c
+EC02P1__ ParamEnergyError               [0-2]    0.15    0.015   0.05
+
+// parametrization of time error
+// sigmaT(E) = sqrt(a*a/E + b*b/E*E + c*c)
+//                                               a       b       c
+EC02P1__ ParamTimeError                 [0-2]    0.9055  1.3077  0.5831
+
+// minimal cluster size for certain number of showers
+// for the moment I am copying the behaviour of Anatoli Lednev's reconstruction
+//
+// | cluster size | number of showers allowed |
+// +--------------+---------------------------+
+// |       1      |              1            |
+// |       2      |              2            |
+// |       3      |              3            |
+// |       4      |              4            |
+// |       5      |              4            |
+// |       6      |              5            |
+// |       7      |              5            |
+// |       8      |              6            |
+// |       9      |              6            |
+// |      10      |              6            |
+// |     ...      |              6            |
+EC02P1__ RecoCombined NrAllowedShowers  [0-5]    0   2   3   4   6   8
+
+// Define an additional calibration file for ReconstructionCombined
+// this contains the position corrections and the position-dependent energy
+// corrections (the later being not neccessary with the current COMGeant as
+// the Shashlyk blocks are described without the holes for the fibers)
+EC02P1__ RecoCombined McCalib ${CORAL}/src/pkopt/ecal2-recocombined-mccalib

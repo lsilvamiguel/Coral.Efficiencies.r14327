@@ -1,0 +1,212 @@
+                  =========================
+                  README file for "lattice"
+                  =========================
+================================
+Contents:
+ I)   Intro
+ II)  How to compile a "dico" file from a "detectors.dat"
+ III) Performances
+ IV)  Special options (residuals, detector studies..)
+================================
+
+I) Intro
+----------------------------------
+ "TraFDic" is the track reconstruction software actually used by  coral.
+
+ Historically, "TraFDic" inherits its Pattern recognition, bridging and fitting
+pieces from "TraFFiC".
+
+ It adds to it a dictionary of all possible COMPASS tracks, called "dico", which
+is a look-up table indexed by the track parameters. The dico is used at various
+stages of the reconstruction: PR, bridging.
+
+ "TLattice" is the coral class handling the dico.
+
+ dico is is a very large table (a hundred of MBytes), that has to be read at
+initialisation time from a pre-compiled file.
+
+II) How to compile a "dico" file from a "detectors.dat"
+----------------------------------
+ The executable to compile the dico is "makeDico".
+
+ To build "makeDico" do:
+
+   - cd makeDico
+   - make
+
+ This will generate makeDico/Linux/makeDico
+
+ "makeDico" is driven by coral standard input files:
+   - A "detectors.dat" for the specification of the setup.
+   - A coral options file. 2 examples of the latter are provided:
+    "makeDico.muon.opt" and "makeDico.hadron.opt". Most of the entries there
+    are useless. It's simply that coral requires something to be specified
+    for most options, whether your particular executable makes use of them
+    or not. The only things to care to are:
+   I) Specifying the ``detectors.dat'' one wants to process instead of the
+     default.
+  II) Beam charge, in conformity with the above.
+ III) Magnetic field maps, in conformity with the above.
+
+ In order to make a particular "dico" file:
+      0) cd $CORAL/src/track/trafdic/makeDico
+      i) Edit makeDico-specific options file to meet your needs. Example
+        of such file: "makeDico.muon.opt", "makeDico.hadron.opt". Cf.
+	comments therein for details.
+     ii) Linux/makeDico <options_file>
+        (Some errors "TAlgo::RkutaNoGrad ==> Do not getting closer..."
+        show up @ execution: can be safely ignored)
+
+ Output of "makeDico": "dicofit.out" => Foresee enough disk space to accommodate
+its large size (a hundred of MBytes).
+
+ Rename the output. The file name syntax has to follow strict rules if one wants
+coral to guess what's the file most appropriate for a particular run#. The
+dico's syntax parallels the detectors.dat's.
+   - Longitudinal muon data taking: "dico.<run#>.plus" or "dico.<run#>.minus".
+   - Hadron data taking: "dico.<run#>.hadron".
+   - No rules yet for transversity, or else.
+The <run#> is to be taken for the input detectors.dat (Which in turn has to have
+as a <run#> field the # of the first (in chronological order) run the file
+corresponds to. In the case of longitudinal muon data taking, where "plus" and
+"minus" are intertwined, the overall 1st run is OK.)
+
+ Official directory where to store dicos: "$COMPASS_FILES/geometry/<year>/dico".
+
+Notes:
+ - "dico" is limited in scope, restricted to:
+   - A subset of detectors, cf. "$CORAL/src/track/trafdic/src/Tlattice.cc".
+   - A 5-D sub-domain of all possible tracks.
+ 
+ - For the SM1 field, "makeDico" resorts to a slightly modified map, viz. one
+  where the abrupt variation at the boundary of the iron yoke has been smoothed
+  out to prevent the, non physical, tracks of the dico that travel through the
+  iron from disrupting the interpolation procedure. 
+  i) For the calculated map, an executable for ``smoothing'' compass standard
+    map is provided. 
+ ii) For the measured map, the ``smoothing'' is integrated in "makeDico" through
+    using a specific version of "getFieldSM1" (in "./makeDico/CsField.cc").
+
+ - "makeDico" gets the definition of the 5-D sub-domain from file "dicofit.dat".
+
+ - The sequence of abscissae corresponding to the generation of the dico is
+  stored in the header of the dico file and checked at run time: a warning
+   message is edited when this does not match that of detectors.dat. E.g.:
+   ERROR, on Tue, 19/Jun/2012 14:12:39.849805 (GMT) from: src/TLattice.cc   337
+`Geometry: Dico's (=534.218079) != current (=3169.100100) @ index == 134 FI08Y1  '
+
+
+III) Performances
+----------------------------------
+ As an example here are typical performances achieved on real data:
+(Notes:
+ - pVertex (i.e. primary vertex): not necessarily an interaction, can be the
+  mere association of an incident, non interacting, track w/ its continuation
+  in the spectrometer. Why there are so many in beam triggers.
+ - # of tracks per pVertex = # of all tracks, including beam.)
+
+======================================
+ Run 09W33/78172 (cdr41049-78172.raw)
+======================================
+
+ coral stdoutput (on a subset of the above-mentioned chunk)
+--------------------------------------------------------------------------
+-----------> Traffic End-Of-Job statistics
+Time in Pre-Pattern   =  0.2614  sec/ev
+ ... in Proj          =  0.0235  sec/ev
+ ... in Space         =  0.2251  sec/ev
+ ... Cleaning         =  0.0051  sec/ev
+Time in Bridging      =  0.0800  sec/ev
+Time in Track Fit     =  0.0247  sec/ev
+Time in End-of-Event  =  0.0001  sec/ev
+Total time in TRAFFIC =  0.3661  sec/ev
+
+Total number of TRAFFIC beam  tracks / ev          = 1.2935
+Total number of TRAFFIC event tracks / ev          = 8.2265
+Number of TRAFFIC event tracks with momentum / ev  = 2.8140
+
+--------------------------------------------------------------------------
+0x7 Triggers, i.e. RPD based ones
+--------------------------------------------------------------------------
+      #Tracks per event     %Evts w/  %Evts w/  #Tracks      Excl. 3pi
+    LAS|SAS  LAS  SAS   mu    Beam     pVertex  /pVertex   %Evts  (sigma)
+      2.74  2.36 1.51 0.012   99.6%     88.1%     3.217     2.1%  (5.393)
+chi2: 1.74  1.77 1.21 2.373   0.317
+---------------
+All Triggers 0x7fff
+---------------
+      2.69  2.31 1.50 0.016   98.9%     86.5%     3.193
+chi2: 1.74  1.77 1.20 2.287   0.317
+-------------------
+Beam triggers 0x180
+-------------------
+      1.70  1.37 1.32 0.012   99.5%     60.3%     2.321
+chi2: 1.19  1.25 0.77 2.871   0.309
+
+IV) Special options
+------------------
+  i) Residuals
+  ------------
+    The booking and filling of residuals hinges on 4 TraF options. Their
+   default setting as specified in "$CORAL/src/pkopt/trafdic.????.opt" is
+   so that residuals are all disabled. In order to enable them: set bit 0x10
+   of  "TraF Hist[1]", e.g.:
+	1)  TraF Hist[1]  16	// Monitor, &0x10:Residuals
+    The other 3 options tell which detectors (Hist[16] and Hist[17]) are
+   to be histogrammed and (Hist[18]) which kind of tracks are used. For
+   all, reconstruction zones are specified, as bit patterns. W/ 0x1 = 1st zone,
+   which, usually, corresponds to the zone Target<->SM1, 0x2 = 2nd zone,
+   usually SM1<->SM2, etc... (But remember than zones can be defined
+   otherwise). The difference between Hist[16] and Hist[17] is that the latter
+   fills all detectors lying in the specified zones, whereas the former
+   fills only those that have been turned off (using ad hoc TraF options,
+   either "TraF DetNameOff", or "TraF DetOff[]"). (N.B.: All histograms
+   are booked: a known bug). The zones specified for the tracks (Hist[18])
+   are all simultaneously required (an "AND" whereas Hist[16,17] are "ORs").
+    Example:
+     Hodoscopes HL, HM, HO using ``muon'' tracks:
+	TraF	Hist	[  1 ]	16	// Monitor, &0x10:Residuals
+
+	TraF	Hist	[ 16 ]	0	// Residuals: |Groups of det's  histo'ed
+	TraF	Hist	[ 17 ]	12	// Residuals: |Groups of inactive det's histo'ed
+	TraF	Hist	[ 18 ]	14	// Residuals: &Groups of tracks histo'ed
+	TraF    DetNameOff	VO	VI	HL	HM	HO
+
+    The residuals are stored in 2D histograms, named after TB names.
+    N.B.: In traffic:
+    	- TB names are stripped of their "_" (underscores).
+        - Unit is "cm".
+    Most useful are
+        - "TBname_res0": residual vs. coordinate measured
+        - "TBname_rep0": residual vs. perpendicular coordinate
+
+    I have written a ROOT macro to fit and display these residuals. It's
+   in the directory "/afs/cern.ch/compass/detector/saclay/root" and
+   makes use of other macros defined there => In order to run it:  have
+
+     Unix.*.Root.MacroPath: ./:/afs/cern.ch/compass/detector/saclay/root:$(ROOTSYS)/macros
+     Unix.*.Root.DynamicPath: ./:/afs/cern.ch/compass/detector/saclay/root:$(ROOTSYS)/lib
+
+   in your "$HOME/.rootrc". Macro's name: "PlotResiduals.C", which
+   defines methods:
+     - "InitResiduals()" to be run once at the beginning,
+     - "PlotResidualsvsC(char* generic_hname = "MM01X1  _res",,,bool is_mwpc)"
+      which actually plots the histograms and fits. The option
+      "is_mwpc = true" has the residual distribution fit by a pulse function
+      smeared by a Gauss. This is the default option for hodoscopes. It has
+      to be brought into play for drift-like detectors that will have been
+      processed as MWPCs by coral, such as MBs.
+       N.B.: Have to "cd" to "Traffic/RDmonitor" first where the
+      histograms are stored.
+       It outputs to stdout a summary of the results:
+
+         eD MB 2 -0.00296 -0.00026 -0.00878
+         eD MB 2 -0.00051 -0.00237 0.00144
+
+      with a syntax that can be almost readily fed to a script that
+      updates "detectors.dat": "~ybedfer/coral.utils/eDitDetDat".
+
+  ii) Others...
+  ------------
+	...   histograms for detector studies can be enabled by
+    ``defines'' in "./source/alter/RDMonitor.cc".

@@ -1,0 +1,33 @@
+// $Id: pixelmm.2015.opt 14070 2015-09-20 01:36:58Z lsilva $
+
+// Threshold for hits and clusters amplitudes in units of sigma
+MP	Threshold [0] 5.
+MP	Threshold [1] 7.5
+
+// Time Cuts
+MP TimeCuts [0] -30
+MP TimeCuts [1]  40
+
+// Geometry:
+// - From: Le 06/01/2015 08:03 PM, Damien Neyret: 
+//  ...the following lines should be added, in order to set the good pixel
+//  geometry. In fact I plan to make this geometry the default one...)
+// - From: Le 07/08/2015 02:47 PM, Damien Neyret:
+//  ...MP01MU and MV, for which these lines should not be used for runs before
+//   258425
+//  => MP01MU and MV are also included, given that earlier runs such as
+//   258425 have no ST03UV and are hence completely uninteresting.
+// - "PixelMM_design_version" lines commented out, as they are no more useful
+//   after an update of Coral pixelMM code
+// MP01MX__ PixelMM_design_version 3
+// MP01MY__ PixelMM_design_version 3
+// MP01MU__ PixelMM_design_version 3 
+// MP01MV__ PixelMM_design_version 3 
+// MP02MU__ PixelMM_design_version 3
+// MP02MV__ PixelMM_design_version 3
+// MP02MX__ PixelMM_design_version 3
+// MP02MY__ PixelMM_design_version 3
+// MP03MU__ PixelMM_design_version 3
+// MP03MV__ PixelMM_design_version 3
+// MP03MX__ PixelMM_design_version 3
+// MP03MY__ PixelMM_design_version 3

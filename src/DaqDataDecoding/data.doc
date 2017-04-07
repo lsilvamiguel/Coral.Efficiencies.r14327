@@ -1,0 +1,40 @@
+The data structure is the following:
+
+File:
+  Event
+  Event
+  .....
+  Event
+
+Event:
+  Chip
+  Chip
+  ....
+  Chip
+
+Chip:
+  DataLine
+  DataLine
+  .....
+  DataLine
+
+---------------
+
+File:
+  Event 1:
+    Chip 1:
+      DataLine 1
+      DataLine 2
+      ....
+      DataLine n
+    Chip 2:
+      DataLine 1
+      DataLine 2
+      ....
+      DataLine l
+    ....
+    Chip k
+  Event 2:
+    ....
+  ....
+  Event M

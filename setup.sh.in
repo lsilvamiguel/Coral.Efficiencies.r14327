@@ -1,0 +1,78 @@
+#!/bin/sh
+
+if test "$CORAL" != ""; then
+  echo 'The setup script has been run in this environment already'
+else
+  if test "$CORAL_LOCATION" != ""; then
+  export CORAL=$CORAL_LOCATION
+  else
+  export CORAL=$PWD
+  fi
+
+  export COMPASS_FILES=@DEF_COMPASS_FILES@  
+
+  DIR_ORACLE=@DIR_ORACLE@
+  DIR_CLHEP=@DIR_CLHEP@
+  DIR_ROOT=@DIR_ROOT@
+  DIR_MySQL=@DIR_MySQL@
+  DIR_Qt=@DIR_Qt@
+  DIR_COMPASS_Date=@DIR_COMPASS_Date@
+
+
+  if test -d @GCC_ROOT@/lib64 ; then
+    LD_LIBRARY_PATH=@GCC_ROOT@/lib64:$LD_LIBRARY_PATH
+  fi
+  if test -d @GCC_ROOT@/lib ; then
+    LD_LIBRARY_PATH=@GCC_ROOT@/lib:$LD_LIBRARY_PATH
+  fi
+
+  if test "$DIR_CLHEP" != ""; then
+    LD_LIBRARY_PATH=${DIR_CLHEP}/lib:${LD_LIBRARY_PATH}
+  fi
+
+  if test "$DIR_ROOT" != ""; then
+    LD_LIBRARY_PATH=${DIR_ROOT}/lib:${LD_LIBRARY_PATH}
+    export ROOTSYS=$DIR_ROOT
+    export PATH=$ROOTSYS/bin:$PATH
+  fi
+
+  if test "$DIR_MySQL" != ""; then
+    LD_LIBRARY_PATH=${DIR_MySQL}/lib:${LD_LIBRARY_PATH}
+    export PATH=$DIR_MySQL/bin:$PATH
+  fi
+
+  if test "$DIR_Qt" != ""; then
+    LD_LIBRARY_PATH=${DIR_Qt}/lib:${LD_LIBRARY_PATH}
+    export QTDIR=$DIR_Qt
+    export PATH=$DIR_Qt/bin:$PATH
+  fi
+  
+  if test "$DIR_COMPASS_Date" != ""; then
+    LD_LIBRARY_PATH=${DIR_COMPASS_Date}/monitoring/Linux:${LD_LIBRARY_PATH}
+  fi
+
+  # CORAL libraries
+  LD_LIBRARY_PATH=${CORAL}/lib/Linux:${LD_LIBRARY_PATH}
+  
+  # ORACLE depended environments
+
+  if test "$DIR_ORACLE" != ""; then
+    export ORACLE_HOME=${DIR_ORACLE}
+    export ORA_NLS33=${ORACLE_HOME}/ocommon/nls/admin/data
+    if test ! -e $ORA_NLS33; then
+      export ORA_NLS33=${ORACLE_HOME}/nls/data
+    fi
+    export TNS_ADMIN=/afs/cern.ch/project/oracle/admin
+    # remove or comment next line if you will use "normal" database:
+#    export COMPASS_TESTDB=yes
+
+    # RedHat7 hacks to link and run as if libstdc++-libc6.1-2.so.3 existed
+    BINDIR=`fs sysname | awk '{print substr($4,2,length($4)-2)}'`
+    if test -f $BINDIR/libstdc++-libc6.1-2.so.3; then
+      LD_LIBRARY_PATH=$CORAL/$BINDIR:${LD_LIBRARY_PATH}
+    fi
+      LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${ORACLE_HOME}/lib
+  fi
+
+  export LD_LIBRARY_PATH
+fi

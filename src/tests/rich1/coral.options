@@ -1,0 +1,111 @@
+//
+// coral option file. Benigno 2001/03/16
+//
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+
+//Histogramming
+histograms package HBOOK
+histograms home   /afs/cern.ch/user/s/schiavon/w1/paw/coral.hist
+
+// This is an MC run
+Monte Carlo job
+//Monte Carlo file /afs/cern.ch/compass/scratch/d13/schiavon/halo.01.outpipe.fz
+//Monte Carlo file /afs/cern.ch/compass/scratch/d13/schiavon/lepto.160.full_p-up.6.05.outpipe.fz
+//Monte Carlo file /afs/cern.ch/compass/scratch/d06/COMGeant/100/dstar.full_p-up.outpipe.fz
+//Monte Carlo file /afs/cern.ch/compass/scratch/d13/schiavon/lepto.160.full_p-up.6.03.outpipe.fz
+//Monte Carlo file /afs/cern.ch/compass/delivery/simevt/testntfz61/zebradat.61.fz
+//Monte Carlo file /afs/cern.ch/compass/delivery/simevt/testntfz62/zebradat.62.fz
+//Monte Carlo file /afs/cern.ch/compass/delivery/simevt/testntfz63/zebradat.63.fz
+Monte Carlo file /afs/cern.ch/compass/scratch/d07/schiavon/lepto.full_segm_00.outpipe.fz
+Monte Carlo file /afs/cern.ch/compass/scratch/d07/schiavon/lepto.full_segm_01.outpipe.fz
+Monte Carlo file /afs/cern.ch/compass/scratch/d07/schiavon/lepto.full_segm_02.outpipe.fz
+Monte Carlo file /afs/cern.ch/compass/scratch/d10/schiavon/lepto.full_segm_03.outpipe.fz
+Monte Carlo file /afs/cern.ch/compass/scratch/d10/schiavon/lepto.full_segm_04.outpipe.fz
+Monte Carlo file /afs/cern.ch/compass/scratch/d10/schiavon/lepto.full_segm_05.outpipe.fz
+
+// detector table
+detector table   detectors.dat
+//detector table   detectors.halo.dat
+//detector table /afs/cern.ch/compass/delivery/simevt/testntfz61/detectors.61.dat.nrich
+//detector table /afs/cern.ch/compass/delivery/simevt/testntfz62/detectors.62.dat.nrich
+//detector table /afs/cern.ch/compass/delivery/simevt/testntfz63/detectors.63.dat
+//detector table /afs/cern.ch/user/c/comgeant/public/dzero65_160/detectors.1.dat
+//detector table /afs/cern.ch/compass/delivery/simevt/testntfz66/detectors.66.dat
+
+// Set some limits on number of events
+events to read 18
+//events to skip 135
+
+//
+// reconstruction options 
+//
+
+// SCHEMA
+reconstruction schema 1     // at present only one schema available
+
+// DECODING
+make decoding               // options: <nothing>, MCExact
+//decoding map                /afs/cern.ch/compass/scratch/d01/DB/daq_map.xml
+
+// CLUSTERING
+make clustering      // options: <nothing>, MCExact, MCSmeared, MCQuantized
+include ${CORAL}/src/pkopt/leftright.opt
+
+// BEAM RECONSTRUCTION 
+//make beam reconstruction // set beam reconstruction on
+include ${CORAL}/src/pkopt/beam.opt
+
+// VERTEX RECONSTRUCTION
+//make vertex reconstruction // set vertex reconstruction on
+include ${CORAL}/src/pkopt/vertex.opt
+
+// RICH1
+make rich1 reconstruction  // set rich1 reconstruction on
+include rich1.options
+//include ${CORAL}/src/pkopt/rich1.opt
+
+// CALORIMETERS
+//make calorimeters reconstruction // set calorimeters reconstruction on
+
+// TRACKING
+make tracking               // set tracking on
+track prepattern method traffic
+//track prepattern method recon
+track bridging   method traffic
+track fitting    method traffic
+include ${CORAL}/src/pkopt/traffic.opt
+include ${CORAL}/src/pkopt/recon.opt
+// Overwrite a traffic option
+TraF 	Graph [0]    0
+//TraF    ReMode [0]   2
+
+// define geometrical zones
+define zone 0 3500 before M1
+define zone 3500 17000 between M1 and M2
+define zone 17000 32000 between M2 and Muon Wall
+define zone 32000 99999 after Muon Wall
+
+// Magnetic field maps
+//CsField SOL_field  /afs/cern.ch/user/c/comgeant/public/dzero64_160/smctgt_solenoide.fieldmap
+CsField SOL_field  /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SOL/OXFORD.map.01.data
+CsField SM1m_field_measured /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.172.data
+//CsField SM1m_field /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.01.data
+CsField SM2_field  /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM2/FSM.map.2000.data
+//CsField SM2_field  /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM2/FSM.map.4000.data
+
+// options for the logger
+error logger log level error
+error logger verbosity normal
+error logger store level none
+
+// Material maps
+CsMaterialMap Zone_1 /afs/cern.ch/compass/scratch/d05/comgeant/matmap/material.60x23x22.dat
+CsMaterialMap Zone_2 /afs/cern.ch/compass/scratch/d05/comgeant/matmap/material.30x70x62.dat
+CsMaterialMap Zone_3 /afs/cern.ch/compass/scratch/d05/comgeant/matmap/material.30x92x82.dat
+CsMaterialMap Zone_4 /afs/cern.ch/compass/scratch/d05/comgeant/matmap/material.filter.dat
+CsMaterialMap ELossTarget /afs/cern.ch/compass/scratch/d05/comgeant/matmap/material.target_de.dat
+
+

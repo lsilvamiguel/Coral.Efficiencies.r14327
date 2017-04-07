@@ -1,0 +1,114 @@
+// $Id: trafdic.mc.h2009.primakoff.opt 13185 2012-01-10 09:58:21Z suhl $
+
+// Options file for TraFDic on 2009 MC Primakoff 
+
+// - It's dedicated to pion data.
+// - But a block of options, commented out by default, is supplied for muons,
+//  cf. MUON BLOCK in fine.
+
+// TODO:
+// - Setup files: Check whether GM04 DZ have been enlarged in RD prod, and if
+//  indeed, update the MC detectors.dat
+// - Clarify what triggers and what trigger jitters.
+
+//  For the simulation of a particular mass production, cf. dedicated branch or,
+// if no relevant branch, "$COMPASS_FILES/geometry/mc".
+//  For any other particular application, this file has to be edited or, better,
+// ``included and overwritten''. Cf. the TWiki page:
+// "wwwcompass.cern.ch/twiki/bin/view/DataReconstruction/CoralSoftware#Options_files"
+
+// - Copied from "../trafdic.mc.h2009t50.opt,v12588"
+// - Updated to align w/ "../trafdic.2009.primakoff.opt.c,v12772"
+
+// ***** Use trafdic.mc.h2009.opt as basis
+include ${CORAL}/src/user/trafdic.mc.h2009.opt
+//  All of the following overwrites settings specified in the basis file and in
+// the files therein included.
+
+// ***** Hadron specifics:
+// - Bridging over target:
+Traf	ReMode	[26]	1	// Bridging over target
+// - Enable double bridging
+TraF	ReMode	[18]	15	// Backtrack. &0x1: Zone 1 (&0x2: even w/out P). &0x4: Zone 2, &0x8: Double Bridging
+// - SI: redefine the route width, and/or the uncertainty of the hits
+// (Given the particularly refined, run by run, alignment, available for hadron
+// data, the  2 redefinitions set =0.)
+TraF	dCut	[84]	.00	// SI route enlargement w.r.t. resolution (for when badly aligned)	(TSetup::Init,TEv::PrePattern2,BridgeSegments2)
+TraF	dCut	[85]	.00	// SI position uncertainties correction term (for when badly aligned)	(TEv::ImportClusters)
+// - SI: time cuts, in order to make for the lack of good timing calibrations
+// (Although timing calibrations have been improving, relaxed cuts have been
+// maintained in mass prod's.) 
+TraF	dCut	[77-78]	16 30	// SI time cuts: #sigmas, absolute time (ns).
+
+// ***** Primakoff specifics:
+// - Condition fast fit in Bridging by RICH pipe
+TraF	ReMode	[46]	1	// No fast fit in Bridging for tracks through RICH pipe
+TraF	ReMode	[14]	15	// Quasi-Newton fit: 0xf = in PR and in Bridging
+TraF	dCut	[97]	30.	// Preliminary chi2/Nhits for track candidate bridged w/ FullKF
+TraF	dCut	[ 9]	25.	// Final chi2/Nhits cut for bridged track candidate
+// - Arbitration between 0x3 and 0x6 bridges.
+TraF	dCut	[94]	0	// Disabled
+// - Extend the updating the drift hits w/ event's time to trigger 0x400, which
+//  is no longer a random trigger during the Primakoff data taking. 
+TraF	ReMode	[35]	2047	// (Trigger pattern where) Update drift hits w/ event's (=beam-track's) time before track finding	(TEv::UpdateDrifts)
+TraF	ReMode	[36]	2047	// (Trigger pattern where) Update drift hits w/ event's time in track finding and fittting		(TEv::UpdateDrifts,FitSegments,TracksFit2,RDMonitor,BackTrackZ1,ForeTrack2RICHWall,ForeTrack2Hs)
+TraF	ReMode	[37]	2047	// (Trigger pattern where) Update drift hits w/ event's time in post-vertexing tracks refit		(TEv::TracksRefit)
+// - SI space point cleaning
+TraF	iCut	[36]	4	// Check consistency of SI space points w/ multiplicity >= 4.
+
+// ***** Redefine the TBNAMES of DETECTORS to be EXCLUDED FROM PR: cf.
+// "../trafdic.2009.primakoff.opt"
+TraF	DetNameOff	VO	VI	DW02Y1	DW02X2	HK	HI05	MP	SI02X1
+// => Consequent updating of PR options:
+TraF	iPRpar	[40-47]	3 3 11  2 4 9  3 2	// Take lack of SI02X into account => 2+3/4 SI + 1 FI
+
+// ***** mDST options:
+mDST	select	0	// 0: no selection whatsoever
+
+//		********** SETUP DESCRIPTION **********
+// Cf. http://wwwcompass.cern.ch/twiki/bin/view/DataReconstruction/CoralDetectorsDat#Monte_Carlo_MC_files
+
+// ***** Detectors.dat/dico: official ones
+detector table  	$COMPASS_FILES/geometry/mc/detectors.h2009.Primakoff.dat
+TraF	Dicofit		$COMPASS_FILES/geometry/mc/dico/dico.h2009.Primakoff
+
+// ***** ROOTGeometry
+CsROOTGeometry file	$COMPASS_FILES/geometry/2009/ROOTGeometry/detectors.primakoff.r206.C
+CsROOTGeometry massDefault	.1396	// For muons use .1057 instead
+TraF	ELossStraggling		1
+
+// ***** Trigger jitter: simulation and taking into account
+//			DT0	lowt2	lowt3	lowt1	NIT	VI	VO	BT	aBT	Prim1	Prim2
+Trigger MCJitter	2	0	0	0	0	0	0	0	0	2	2
+Trigger ExtraTimeWidth  3	0	0	0	0	0	0	5	0	5	5
+
+// ***** Beam: specify the beam charge, ID and momentum (Will be X-checked against magnet polarities from the detector table).
+TraF	iCut	[15]	-1	// Beam charge.
+TraF	iCut	[30]	1	// Beam particle ID: 1=hadron (0=muon)
+TraF	dCut	[ 4]	190	// Beam momentum (GeV).
+
+                                                                            
+//			***** EXAMPLE ZEBRA FILES
+Monte Carlo file	/castor/cern.ch/user/g/guskov/Primakoff_t55/zebradat.0.fz	// .0.fz -> .15.fz
+
+// Debugging options
+//TraF	Graph	[0]	0	// coral's graphics switches off automatically under BATCH @ CERN, gridKa and Lyon. This option forces it to do so in any case. 
+//TraF	Print	[ 0]	3	// Event-by-event numbering
+//TraF	Print	[ 3]	2	// Detector list
+//TraF	Print	[ 8]	7	// EoE
+//events to read 60000		// # of events to read
+//events to skip 182
+
+//  ===== MUON BLOCK (uncomment, if needed) =====
+// Muon specifics (mu-ID, BMS resolution simulation, Beam characteristics)
+//mDST hits	HO04
+//make beam reconstruction
+//include ${CORAL}/src/pkopt/beam_2004.opt
+//BeamRecons	useTRAFFIC	1	// >0: Traffic is used, =0: standalone b
+//BeamRecons	AllowMultCand	2                                       
+// Beam charge and momentum have to be specified to the BMS reconstruction 
+//BeamRecons	BmChrg		-1	// Beam charge   specified to the BMS re
+//BeamRecons	BmMoment	190	// Momentum to which beam line is tuned,
+//TraF	ReMode	[25]	1	// != 0 - TraFDic beam reco
+//TraF	iCut	[30]	0	// Beam particle ID: 1=hadron (0=muon)
+//TraF	dCut	[ 5]	1.80e-4	// Beam cop spread (c/GeV). Assigned to d(1/p) by default of BMS simulation.

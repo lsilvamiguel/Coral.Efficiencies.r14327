@@ -1,0 +1,130 @@
+AC_INIT
+
+AC_DEFUN(AC_LHCXX_PACKAGE,
+[
+  AC_SUBST(DIR_$1)
+  AC_SUBST(LIB_$1)
+  AC_ARG_WITH($1,
+  --with-$1=$1 path
+  ,
+    if test "${with_$1}" = ""; then
+    DIR_$1=$2
+    else
+    DIR_$1="${with_$1}"
+    fi
+  ,
+    DIR_$1=$2
+  )
+  AC_CHECK_FILE($DIR_$1,
+  LIB_$1="$3"
+  C_INCLUDES="$C_INCLUDES -I$DIR_$1/include"
+
+  ,
+  AC_ERROR($DIR_$1 is not found)
+  )
+])
+
+AC_PROG_CXX
+AC_PROG_CXXCPP
+
+
+dnl ################### Parameters  ######################
+dnl ######################################################
+DIR_LHCXX=/afs/cern.ch/sw/lhcxx/specific/redhat61/gcc-2.95.2
+Ver_Objectivity=6.1
+Ver_HepODBMS=0.3.2.9
+Ver_ConditionsDB=0.2.1.0
+Ver_HepUtilities=0.5.0.0
+dnl ######################################################
+dnl ######################################################
+
+dnl ##############  Without Objectivity/DB ###############
+dnl ######################################################
+
+AC_SUBST(CDBPROCEDURE)
+
+AC_ARG_ENABLE(lhcxx,--enable-lhcxx,
+if test "${enable_lhcxx}" = "no"; then
+CDBFLAGS=-DNO_OBJY
+fi
+,
+)
+
+if test "${enable_lhcxx}" = "yes" || test "${enable_lhcxx}" = ""; then 
+
+CDBPROCEDURE="fdb db folderset folder"
+
+dnl ########### DEFAULT Directory Path ###################
+dnl ######################################################
+DEFAULT_Objectivity=$DIR_LHCXX/Objectivity/$Ver_Objectivity
+DEFAULT_HepODBMS=$DIR_LHCXX/HepODBMS/$Ver_HepODBMS
+DEFAULT_ConditionsDB=$DIR_LHCXX/ConditionsDB/$Ver_ConditionsDB
+DEFAULT_HepUtilities=$DIR_LHCXX/HepUtilities/$Ver_HepUtilities
+
+AC_LHCXX_PACKAGE(Objectivity,$DEFAULT_Objectivity, -loo -loo_co -looseccl)
+AC_LHCXX_PACKAGE(HepODBMS,$DEFAULT_HepODBMS, -lHepODBMS)
+AC_LHCXX_PACKAGE(ConditionsDB,$DEFAULT_ConditionsDB, -lConditionsDB)
+AC_LHCXX_PACKAGE(HepUtilities,$DEFAULT_HepUtilities, -lHepUtilities)
+
+dnl ######################################################
+dnl Objectivity
+dnl ######################################################
+
+AC_SUBST(STANDALONE)
+AC_SUBST(LOCKSERVER)
+AC_SUBST(FDBHOST)
+AC_SUBST(FDBPATH)
+AC_SUBST(DBSERVER)
+AC_SUBST(DBFILEPATH)
+AC_SUBST(CDBFLAGS)
+
+AC_ARG_WITH(lockserver,,
+if test "${with_lockserver}" = ""; then
+STANDALONE=-standalone
+FDBPATH=cdb
+LOCKSERVER="-lockserverhost \$(HOST)"
+DBFILEPATH="-filepath ./cdb"
+CDBFLAGS=-DSTANDALONE
+else
+LOCKSERVER="-lockserverhost ${with_lockserver}"
+FDBHOST="-fdfilehost ${with_lockserver}"
+FDBPATH=/usr/objy/CDB2001
+DBSERVER="-host compass001d"
+DBFILEPATH="-filepath /shift/compass001d/data01/objsrvvy/cdb"
+AC_CHECK_FILE($DIR_Objectivity/bin/oocheckls)
+fi
+,
+dnl STANDALONE=-standalone
+STANDALONE=
+FDBPATH=cdb
+LOCKSERVER="-lockserverhost \$(HOST)"
+DBFILEPATH="-filepath ./cdb"
+dnl CDBFLAGS=-DSTANDALONE
+CDBFLAGS=
+)
+
+fi
+
+AC_ARG_WITH(boot-file,,,)
+AC_ARG_WITH(schema-upgrade,,
+echo "ooschemaupgrade $STANDALONE -infile $DIR_HepODBMS/schema/HepODBMS.schema ${with_boot_file}"
+cd ../../../
+ooschemaupgrade ${STANDALONE} -infile ${DIR_HepODBMS}/schema/HepODBMS.schema ${with_boot_file}
+ooschemaupgrade $STANDALONE -infile $DIR_ConditionsDB/implementationObjy/schema/ConditionsDB.schema ${with_boot_file}
+cd src/condb/handler
+,)
+
+AC_OUTPUT(Makefile setup.csh setup.sh)
+
+echo
+echo '*************************************************'
+echo '*****   CDB Handler configuration success  ******'
+echo '*************************************************'
+echo
+
+
+
+
+
+
+

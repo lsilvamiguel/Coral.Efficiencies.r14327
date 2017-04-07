@@ -1,0 +1,69 @@
+Tue Aug 21 23:15:38 CEST 2007
+  Version 6.0:
+  New errors handling mechanism.
+  Added CMake build system support.
+
+Version 5.1.0:
+  Added support for ChipAPVRICH.
+
+Version 5.0.0:
+  Read DATE5 files.
+
+Version 3.3.1:
+  Allow limited event data scan (for preselected catches).
+
+Version 3.0.0:
+  Use unique ID for all channels,
+    - it fixed the bug in decoding channels for which >= 2 maps exist
+  In Chip::ReadMaps() read only maps for a particular run. (Don't read
+  ALL maps for ALL runs).
+
+Fri Jul 27 11:19:38 CEST 2001
+  Fix problem with DATE format change form version 3.7.0 to 3.7.1
+  Support for chips creation on the base of SLink format attribute.
+  Release DaqDataDecoding-2.8.0
+
+Wed May 16 11:35:54 CEST 2001
+  Major updates for ChipGassiplex.
+
+Sun May  6 17:01:03 CEST 2001
+  New class ChipCol as base class for ChipADC ChipGassiplex and ChipScalar
+
+Tue Apr 24 16:03:03 CEST 2001
+  Release 2.1.0
+  New APV decoding was added.
+  Chip::Digit were introduced for all chips.
+  New Decoding method Chip::Decode(const Maps &maps,Digits &digits_list);
+  Flexible chips creation (new section <ChipsCreation> in XML map file)
+
+Tue Mar 20 11:28:58 CET 2001
+  Merge rtree-example from Colin Bernert
+  Release 2.0.1
+
+Mon Mar 19 11:28:34 CET 2001
+  Soft-mapping is added
+  Release 2.0.0
+
+Mon Dec 11 13:21:27 CET 2000
+  new method ChipADC::GetCurDataUniqueID()
+
+Tue Dec 5 16:31:22 CET 2000
+  Release 1.4.1
+  Fixed bug in Chip::GetNextDataLine()
+  Merging with CORAL.
+
+Mon Nov 27 16:52:20 CET 2000
+  DATE library usage example was added.
+  Release 1.2.3
+  Fixed several bugs in APV decoding.
+
+Sat Nov 25 21:06:09 CET 2000
+  Move code to src/ directory
+  APV chip decoding.
+
+Tue Nov  7 17:45:16 CET 2000
+  The library is almost ready to public usage.
+  Documentation updates.
+
+August 2000
+  Start of work.

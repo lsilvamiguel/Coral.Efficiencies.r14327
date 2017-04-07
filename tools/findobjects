@@ -1,0 +1,137 @@
+#!/usr/local/bin/perl -w
+# Author: Massimo Lamanna (Massimo.Lamanna@cern.ch) April 2001
+# $Id: findobjects,v 1.2 2001/04/10 15:20:45 laman Exp $ 
+
+require 5.004;
+use strict;
+use diagnostics;
+
+use File::stat;
+use File::Find;
+
+my $CORAL = $ENV{CORAL};
+
+die "Undefined CORAL variable (run CORAL setup.sh/.csh script)" unless defined($CORAL);
+
+my $coraldir = $CORAL;
+
+$File::Find::dont_use_nlink = 1; # AFS needs it...
+
+print "#\n";
+print "# This script walks through under all\n";
+print "# CORAL subdirs and looks for object files\n";
+print "# and other by-products of compilations\n";
+print "# proposing the command lines to delete them\n";
+print "#\n";
+print "# Pipe the script into grep -v grep | grep hand | awk \'{print \$5\" \"\$6}\'\n";
+print "# might be useful to remove the extra files\n";
+print "#\n";
+
+chdir $coraldir;
+
+my @candidate;
+
+find(\&wanted,".");
+
+my $size = 0;
+for (@candidate) {
+
+    print " rm $_\n";
+    $size += stat($_)->size if -e;
+
+}
+
+print "# Total size to be deleted $size bytes\n";
+
+exit(0);
+
+sub wanted {
+
+# Note that $coraldir has to be used explicitely
+# to verify the existance of files, because of automatic
+# chdir done by perl find()
+
+    my $dir  = $File::Find::dir;
+    my $file = $File::Find::name;
+
+# No action on directories (by now)
+
+    if(-d "$coraldir/$file") { return; }
+
+# Enter Linux directories first
+# Only .o, .a, and .so are scheduled for immediate deletion 
+
+    if($dir =~ /Linux$/) {
+
+	if(
+	   $file =~ /\.a$/ ||
+	   $file =~ /\.o$/ ||
+	   $file =~ /\.so$/
+	   ) {   
+	    push @candidate,"$file";
+	    return;
+	}
+	else {
+	    print "# If you want, rm $file by hand?\n";
+	    return;
+	}
+
+    }
+
+# Files .o, .a, and .so in other directories
+# also scheduled for immediate deletion...
+
+    if(
+       $file =~ /\.a$/ ||
+       $file =~ /\.o$/ ||
+       $file =~ /\.so$/
+       ) {   
+	push @candidate,"$file";
+	return;
+    }
+
+# ddl gimnastic...
+# remove all ooddlx byproducts
+
+    if($file =~/\.ddl$/) {
+
+	my $ddl = $file;
+	$ddl =~ s/\.ddl$//;
+	my $f = "$ddl\_ddl.cc";
+	push @candidate,$f if -e "$coraldir/$f";
+	$f = "$ddl.h";
+	push @candidate,$f if -e "$coraldir/$f";
+	$f = "$ddl\_ref.h";
+	push @candidate,$f if -e "$coraldir/$f";
+	return;
+	
+    }
+
+# Remove all Root dictionary stuff
+
+    if($file =~/Dict\.cc$/ || $file =~/Dict\.h$/) {
+
+	push @candidate,"$file";
+	return;
+	
+    }
+
+# Remove all depend.mk
+
+    if($file =~/\/depend\.mk$/) {
+
+	push @candidate,"$file";
+	return;
+	
+    }
+
+# Remove all .dependencies
+
+    if($file =~/\/\.dependencies$/) {
+
+	push @candidate,"$file";
+	return;
+	
+    }
+
+}

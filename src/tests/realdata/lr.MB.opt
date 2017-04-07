@@ -1,0 +1,46 @@
+// $Id: lr.MB.opt,v 1.3 2002/11/06 14:07:04 hpereira Exp $
+
+//------------------------------
+//
+//   LR (Left/Right ambiguities) for Straw Tubes
+//   control options
+//
+//------------------------------
+
+LR make associations    // perform L/R associations and ambiguity raising
+// LR make histograms      // book and fill L/R histograms
+
+//--------------------------------------
+//
+// DETECTOR ASSOCIATION TABLE. 
+// FORMAT : TBNAME0 TBNAME1  ASSOCIATION_CUT(mm)  LRPROB_CUT LRMODE
+//
+// LRProbCut is supposed to be in [0,0.5]
+// drift-like clusters for which LRProb < LRProbCut can be removed
+//
+// LRMODE : optional parameter 
+//		nothing - 	Target pointing
+//		0 - 				Target pointing; 
+//		1 - 				Cell overlap; 
+// 		other - 		nothing;
+//-----------------------------
+
+// drift tubes        
+LR associate  MB01X1ub MB01X1db 35.0 0.5 1
+LR associate  MB02X2ub MB02X2db 35.0 0.5 1
+
+LR associate  MB01X1uc MB01X1dc 35.0 0.5 1
+LR associate  MB02X2uc MB02X2dc 35.0 0.5 1
+
+LR associate  MB01V1ub MB01V1db 35.0 0.5 1
+LR associate  MB02V2ub MB02V2db 35.0 0.5 1
+
+LR associate  MB01V1uc MB01V1dc 35.0 0.5 1
+LR associate  MB02V2uc MB02V2dc 35.0 0.5 1
+
+LR associate  MB01Y1ur MB01Y1dr 35.0 0.5 1
+LR associate  MB02Y2ur MB02Y2dr 35.0 0.5 1
+
+LR associate  MB01Y1ul MB01Y1dl 35.0 0.5 1
+LR associate  MB02Y2ul MB02Y2dl 35.0 0.5 1
+

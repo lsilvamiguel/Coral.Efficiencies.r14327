@@ -1,0 +1,267 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT
+AC_CONFIG_HEADER(src/config.h)
+
+dnl ****************************************************************************
+dnl Macros
+dnl ****************************************************************************
+
+AC_DEFUN(MY_ERROR,
+[
+  echo
+  echo 'x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x'
+  echo 'x x x      DaqDataDecoding Configuration failure      x x x'
+  echo '        '$1
+  echo 'x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x'
+  echo
+  exit 1
+])
+
+dnl MY_CHECK_SIZEOF(TYPE [, CROSS-SIZE])
+AC_DEFUN(MY_CHECK_SIZEOF,
+[changequote(<<, >>)dnl
+dnl The name to #define.
+define(<<AC_TYPE_NAME>>, translit(sizeof_$1, [a-z *], [A-Z_P]))dnl
+dnl The cache variable name.
+define(<<AC_CV_NAME>>, translit(ac_cv_sizeof_$1, [ *], [_p]))dnl
+changequote([, ])dnl
+AC_MSG_CHECKING(size of $1)
+AC_CACHE_VAL(AC_CV_NAME,
+[AC_TRY_RUN([
+#include <stdio.h>
+#include <stdlib.h>
+int main()
+{
+  FILE *f=fopen("conftestval", "w");
+  if (!f) exit(1);
+  fprintf(f, "%zu\n", sizeof($1));
+  exit(0);
+}], AC_CV_NAME=`cat conftestval`, AC_CV_NAME=0, ifelse([$2], , , AC_CV_NAME=$2))])dnl
+AC_MSG_RESULT($AC_CV_NAME)
+AC_DEFINE_UNQUOTED(AC_TYPE_NAME, $AC_CV_NAME)
+undefine([AC_TYPE_NAME])dnl
+])
+
+dnl AC_SET_PACKAGE(package_name,env_variable,help_string,default_value)
+dnl On output:
+dnl variable USE_package_name will be set
+dnl variable DIR_package_name will be non-empty for particular check
+AC_DEFUN(AC_SET_PACKAGE,
+[
+  DIR_$1=
+  AC_ARG_WITH($1,[$3],,with_$1=$4)
+  if test "${with_$1}" = "no" || test "${with_$1}" = ""; then
+    # Package is disable
+    echo Package $1 is disable
+    USE_$1=no
+    dnl AC_DEFINE(USE_$1,0)
+  else
+    USE_$1=yes
+    dnl AC_DEFINE(USE_$1,1)
+    # Package is enable
+    AC_CHECKING($1)
+    if test "${with_$1}" = "yes"; then
+      # Try to search in standard places.
+      # At first we check environment variable $2
+      AC_MSG_CHECKING(environment variable $2)
+      if test "$$2" = ""; then
+        AC_MSG_RESULT(variable was not set)
+      else
+        # The environment variable is defined. We shall use it.
+        AC_MSG_RESULT($$2)
+        with_$1=$$2
+      fi
+    else
+      # Exact value was given: --with-package=/dir1/dir2/
+      true
+    fi
+    
+    if test "${USE_$1}" = "yes" && test "${with_$1}" != "yes"; then
+      DIR_$1=${with_$1}
+    fi
+  fi
+  AC_SUBST(USE_$1)
+  AC_SUBST(DIR_$1)
+  AC_SUBST(LIB_$1)
+  AC_SUBST(INC_$1)
+])
+
+dnl ****************************************************************************
+dnl Create shared or static library
+dnl ****************************************************************************
+
+AC_ARG_ENABLE(shared, AS_HELP_STRING([--enable-shared], [build shared library; default is static library]))
+if test "${enable_shared}" = "yes" ; then
+  LIB_TYPE=shared
+else
+  LIB_TYPE=static
+fi
+AC_SUBST(LIB_TYPE)
+
+dnl ****************************************************************************
+
+dnl Checks for programs.
+AC_PROG_INSTALL
+
+dnl Check for compilers
+
+AC_PROG_CXX
+AC_PROG_CXXCPP
+
+dnl Do compilation using C++ 
+AC_LANG_CPLUSPLUS 
+
+AC_C_CHAR_UNSIGNED
+MY_CHECK_SIZEOF(char)
+MY_CHECK_SIZEOF(long long)
+MY_CHECK_SIZEOF(long)
+MY_CHECK_SIZEOF(int)
+MY_CHECK_SIZEOF(short)
+
+dnl This macro is for checking if some command line option of CXX is available
+dnl or not.
+AC_DEFUN([FLAGS_CXX_OPTION],[
+if echo $CXXFLAGS | grep -q -e "$1\($\|\s\)" ; then 
+  AC_MSG_NOTICE([$1 already in \$CXXFLAGS])
+else
+  AC_MSG_CHECKING([whether $CXX accepts $1])
+  tmpfile=$(mktemp -t)
+  $CXX $1 -c -xc /dev/null -o $tmpfile >/dev/zero 2>/dev/zero
+  ac_status=$?
+  rm -f $tmpfile
+  if test $ac_status -eq 0; then
+    AC_MSG_RESULT([yes])
+    CXXFLAGS="$CXXFLAGS $1"
+  else
+    AC_MSG_RESULT([no])
+  fi
+fi
+])
+
+dnl make sure -Wall and -Wextra are amongst the CXXFLAGS
+dnl and the compiler understands those flags
+FLAGS_CXX_OPTION(-Wall)
+FLAGS_CXX_OPTION(-Wextra)
+
+dnl to not print warnings for unused variables
+FLAGS_CXX_OPTION(-Wno-unused)
+FLAGS_CXX_OPTION(-Wno-unused-parameter)
+
+dnl ****************************************************************************
+dnl EXPAT
+dnl ****************************************************************************
+
+AC_SET_PACKAGE(EXPAT, EXPAT, AS_HELP_STRING([--with-EXPAT], [enable on default]), "yes")
+if test "$USE_EXPAT" = "yes"; then
+  if test "$DIR_EXPAT" != ""; then
+    AC_CHECK_HEADER($DIR_EXPAT/include/expat.h,INC_EXPAT=$DIR_EXPAT/include,MY_ERROR(Cannot find EXPAT include file expat.h in $DIR_EXPAT/include.))
+    CXXFLAGS="$CXXFLAGS -I$INC_EXPAT"
+    if echo $CXXFLAGS | grep -q -e "-m64" ; then
+      AC_CHECK_FILE($DIR_EXPAT/lib64/libexpat.so,LIB_EXPAT="$DIR_EXPAT/lib64/libexpat.so",
+        AC_CHECK_FILE($DIR_EXPAT/lib/libexpat.so,LIB_EXPAT="$DIR_EXPAT/lib/libexpat.so",
+          MY_ERROR(Cannot find EXPAT library in $DIR_EXPAT/lib64 or $DIR_EXPAT/lib.)))
+    else
+      AC_CHECK_FILE($DIR_EXPAT/lib/libexpat.so,,MY_ERROR(Cannot find EXPAT library in $DIR_EXPAT/lib.))
+      LIB_EXPAT="$DIR_EXPAT/lib/libexpat.so"
+    fi
+  else
+    AC_CHECK_HEADER(expat.h,,MY_ERROR(Cannot find EXPAT include file expat.h in default include directories.))
+    AC_CHECK_LIB(expat,XML_ParserCreate,LIB_EXPAT="-lexpat",MY_ERROR(Cannot find EXPAT library in default library directories.))
+  fi
+fi
+
+dnl ****************************************************************************
+dnl DATE_LIB
+dnl ****************************************************************************
+
+AC_SET_PACKAGE(DATE_LIB, DATE_LIB, AS_HELP_STRING([--with-DATE_LIB], [enable on default]), "yes")
+if test "$USE_DATE_LIB" = "yes"; then
+  if test "$DIR_DATE_LIB" = ""; then
+    DIR_DATE_LIB=/afs/cern.ch/compass/online/daq/dateV371
+  fi
+  AC_CHECK_FILE($DIR_DATE_LIB,,MY_ERROR(Problem with DATE library))
+
+  dnl Check Red Hat release and choose lib directory.
+  dnl Set default path
+
+  sys_name=Linux
+
+dnl  if grep --quiet "5." /etc/redhat-release; then
+dnl    sys_name=Linux.orig
+dnl  fi
+
+  AC_CHECK_FILE($DIR_DATE_LIB/monitoring/$sys_name/libmonitor.a,,MY_ERROR(Problem with DATE library))
+
+  LIB_DATE_LIB="$DIR_DATE_LIB/monitoring/$sys_name/libmonitor.a"
+  LIBS="$LIBS $LIB_DATE_LIB"
+  CXXFLAGS="$CXXFLAGS -I$DIR_DATE_LIB"
+  AC_DEFINE(USE_DATE_LIB,1)
+else
+  AC_DEFINE(USE_DATE_LIB,0)
+fi
+
+dnl ****************************************************************************
+dnl RFIO
+dnl ****************************************************************************
+
+AC_SET_PACKAGE(RFIO, RFIO, AS_HELP_STRING([--with-RFIO], [enable on default]), "yes")
+if test "$USE_RFIO" = "yes"; then
+  if test "$DIR_RFIO" = ""; then
+    mandatory_package=no
+    DIR_RFIO=/usr
+  else
+    mandatory_package=yes
+  fi
+fi
+
+if test "$USE_RFIO" = "yes"; then
+  AC_CHECK_FILE($DIR_RFIO/include/shift.h,,
+    if test "$mandatory_package" = "yes"; then
+      MY_ERROR(Can not find RFIO include file shift.h)
+    else
+      echo RFIO package was not found
+      DIR_RFIO=
+      USE_RFIO=no
+    fi
+  )
+fi
+
+if test "$USE_RFIO" = "yes" ; then
+  if echo $CXXFLAGS | grep -q -e "-m64" ; then
+    AC_CHECK_FILE($DIR_RFIO/lib64/libshift.so,LIB_RFIO=$DIR_RFIO/lib64/libshift.so,
+      AC_CHECK_FILE($DIR_RFIO/lib64/libshift.so.2.1,LIB_RFIO=$DIR_RFIO/lib64/libshift.so.2.1,
+        AC_CHECK_FILE($DIR_RFIO/lib64/libshift.a,LIB_RFIO=$DIR_RFIO/lib64/libshift.a, MY_ERROR(Can not find RFIO library)))
+    )
+  else
+    AC_CHECK_FILE($DIR_RFIO/lib/libshift.so,LIB_RFIO=$DIR_RFIO/lib/libshift.so,
+      AC_CHECK_FILE($DIR_RFIO/lib/libshift.so.2.1,LIB_RFIO=$DIR_RFIO/lib/libshift.so.2.1,
+        AC_CHECK_FILE($DIR_RFIO/lib/libshift.a,LIB_RFIO=$DIR_RFIO/lib/libshift.a,MY_ERROR(Can not find RFIO library)))
+    )
+  fi
+
+  if test "$DIR_RFIO" != "/usr/"; then
+    CXXFLAGS="$CXXFLAGS -I$DIR_RFIO/include"
+  fi
+  LIBS="$LIBS $LIB_RFIO"
+  AC_DEFINE(USE_RFIO,1)
+else
+  if test "$USE_DATE_LIB" = "yes"; then
+    MY_ERROR(You can not use DATE library without RFIO one)
+  fi
+  AC_DEFINE(USE_RFIO,0)
+fi
+
+dnl ****************************************************************************
+dnl ****************************************************************************
+dnl ****************************************************************************
+
+auto_config_files="Makefile.inc"
+AC_SUBST(auto_config_files)
+
+AC_OUTPUT($auto_config_files)
+
+echo
+echo '*************************************************'
+echo '***   DaqDataDecoding configuration success   ***'
+echo '*************************************************'
+echo

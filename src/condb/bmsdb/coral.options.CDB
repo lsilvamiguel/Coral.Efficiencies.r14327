@@ -1,0 +1,34 @@
+//
+// coral option file for CDB test
+//
+
+// To identify BOOT file, this must be set properly and 
+// DB BOOT file, [year].[period].BOOT, must exist
+Data year   1999
+Data period cdb
+Data type   raw
+
+// tracking method: (not used yet)
+tracking method 1
+
+//Histogramming
+//histograms package ROOT
+histograms package HBOOK
+histograms home    coral.root
+
+// detector table
+detector table /afs/cern.ch/compass/delivery/simevt/testout/pc/detectors.dat
+
+// options for the logger
+//error logger log level 0
+//error logger verbosity 1
+error logger log level -2
+error logger verbosity -2
+
+// When you create CDB at first time, you must specify wher you want to create.
+CDB	bms	/afs/cern.ch/user/m/miyachi/public/coral/conf/update/BMSDB.conf
+
+// For updating or reading, you need only this configuration file.
+CDB	bms	/afs/cern.ch/user/m/miyachi/public/coral/conf/read/BMSDB.conf
+
+// End

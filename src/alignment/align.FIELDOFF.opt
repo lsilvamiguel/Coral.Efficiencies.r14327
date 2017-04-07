@@ -1,0 +1,61 @@
+//$Id: align.FIELDOFF.opt,v 1.2 2006/06/16 15:21:48 conrad Exp $
+
+//=== magnetic field switch. 
+//=== WARNING: This option must match the one in coral option file used to generate the tree.
+main magnets off    // (on|off) default (i.e. no option) is off.
+
+//=== parameters to align (comment the line if parameter is not to be fitted)
+align U          // Offset in U
+align T          // Angle perp to the beam
+align P          // Pitch <- u*=(1+pictch_offset)
+// align Z          // Position along the beam
+// align R          // R0, prop to T0 for drift like detectors
+// align L          // Lorentz angle R scaling for drift like detectors
+
+align nStdDev   3     // cut track selection
+align nTracks   0     // number of selected tracks (0 means all)
+align projRange 2     // minimum angle diff to distinguish orientations (deg)
+make iterations       //=== Millepede iterations
+
+//=== Debugging options
+debug dump dets
+debug dump millepede
+debug counter rate 5000
+
+//=== Detector to be excluded/considered (WARNING excluded takes precedence over used)
+//=== TBNames can be abreviated. symbol '*' can replace any _single_ character.
+align excludeDets MA MB HI HO HM HL MB*****c MB*****l
+align useDets DC MM GM FI SI PA PB PS ST DW
+
+//=== overwrites the det.dat resolutions
+//=== TBNames can be abreviated. symbol '*' can replace any _single_ character.
+align change resolution MA 2.89 
+align change resolution MB 9.67
+align change resolution DW 1.5
+
+//=== parameters to fix
+//=== TBNames can be abreviated
+fix U GM04X1 GM04Y1 GM09X1 GM09Y1
+fix T GM04X1 GM04Y1 GM09X1 GM09Y1
+fix P GM04X1 GM04Y1 GM09X1 GM09Y1 MA
+fix Z *
+
+// MA pitch has to be fixed as values in det.dat are anyhow 
+// ignored by sergei patch in CsMuonWall1Detector
+
+//=== Detector table
+//=== Use absolute path for lsf jobs
+detector table /afs/cern.ch/user/h/hpereira/public/detectors/detectors.22751.dat
+
+//=== Rootfiles
+//=== WildCards and environment variables are accepted
+//=== Use absolute path for lsf jobs
+input tree traf.FIELDOFF.root.22751
+
+//=== Output file
+//=== Use absolute path for lsf jobs
+//=== environment vars not accepted.
+output file align.22751.out
+
+//=== track selection cut 
+// selection cut T_chi2/T_ndf<20

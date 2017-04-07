@@ -1,0 +1,265 @@
+//-----------------------------------
+//
+//   RICHONE (rich reconstruction)
+//         control options
+//
+//-----------------------------------
+
+//------ GENERAL :
+//----------------
+//--- Histogramming :
+//-------------------
+RICHONE   BookHistograms              YES           // YES = monitoring HISTOGRAMS requested  (def.=NO)
+RICHONE   BookHistoLevel               0            // HISTOGRAM booking priority  (0, 1, 2=all; def.=0)
+RICHONE   MomentumRange    [ 0 - 1 ]   0.   160.    // momentum range in histograms  (def.=0., 0.)
+RICHONE   HistoOffset                2000           // HBOOK monitoring HISTOGRAMS number offset  (def.=2000)
+
+//--- Prints level ( 0 - 4 , 0 => NO print )  (def.=NO print) :
+//-------------------------------------------------------------
+RICHONE   AcknoMethods          1   // prints methods in use   ( 1 )
+RICHONE   kPrintRichRec         0   // prints RichOne info   ( 1 )
+RICHONE   kPrintEventParts      0   // prints EventParticles obj   ( 1 - 2 )
+RICHONE   kPrintEventPads       0   // prints EventPads obj   ( 1 - 2 )
+RICHONE   kPrintEventClus       0   // prints EventClusters obj   ( 1 - 2 )
+RICHONE   kPrintPartPhotons     0   // prints EventPartPhotons obj   ( 1 - 3 )
+RICHONE   kPrintEventRings      0   // prints EventRings obj   ( 1 - 4 )
+RICHONE   kPrintEventAnalysis   0   // prints EventAnalysis obj   ( 1 )
+RICHONE   kPrintEventDisplay    0   // prints EventDisplay obj   ( 1 )
+
+RICHONE   printFrequency     1000   // prints exec times [& memory] every printFrequency events  (def.=10.000.000)
+RICHONE   PrintDetMirr          0   // prints Detectors and Mirrors data; 1 = print,  0 = No print  (def.=NO)
+RICHONE   PrintKeys             0   // 1 = print keys read,  0 = No print  (def.=NO)
+RICHONE   PrintConsts           0   // 1 = print rec. constants read,  0 = No print
+
+
+//------ EXECUTION KEYS ( answer YES or NO ) :
+//--------------------------------------------
+//--- Event-Particles :
+//---------------------
+RICHONE   ParticleFilter        YES   // (def.=NO)
+RICHONE   ParticleSelection     NO    // (def.=NO)  MC only
+RICHONE   ExitWindowCheck       NO    // (def.=NO)
+RICHONE   ParticleCorrection    NO    // (def.=NO)
+RICHONE   ParticleResolution    NO    // (def.=NO)  MC only
+
+//--- Event-Pads :
+//----------------
+RICHONE   UsePadThresh          NO    // (def.=NO)            !!! ---------- !!!
+RICHONE   killHaloPads          NO    // (def.=NO)            !!! ---------- !!!
+//---   pads SCRAMBLED
+RICHONE   padScrambled          NO    // (def.=NO)            !!! ---------- !!!
+
+//--- Event-Clusters :
+//--------------------
+//---   pad clustering
+RICHONE   doClustering          YES   // (def.=NO)            !!! ---------- !!!
+RICHONE   killHaloClus          NO    // (def.=NO)            !!! ---------- !!!
+
+//--- Event-PartPhotons :
+//-----------------------
+//---   correction for quartz window
+RICHONE   doQuartzWcorr         YES   // (def.=NO) 
+
+//--- Event-Rings :
+//-----------------
+//---   ring definition
+RICHONE   useClusterPH          NO   // (def.=NO)            !!! ---------- !!!   031112   !!!
+RICHONE   rejWrongPeak          NO    // (def.=NO)            !!! --- depends on refr.index
+RICHONE   doBkgFilter           NO    // (def.=NO) 
+RICHONE   doPhiPeakFilter       NO    // (def.=NO) 
+RICHONE   doThreeSigmaCut       NO    // (def.=NO)
+
+//--- Event-Analysis :
+//--------------------
+RICHONE   EventAnalysis         YES   // (def.=NO) 
+RICHONE   PartPhoSelection      YES   // (def.=NO)            !!! ---------- !!!
+RICHONE   RingSelection         YES   // (def.=NO)            !!! ---------- !!!
+RICHONE   MCMonitor             YES   // (def.=NO) 
+RICHONE   DataMonitor           YES   // (def.=NO) 
+RICHONE   PartIdent             YES   // (def.=NO)
+
+//--- Geometrical Corrections :
+//-----------------------------
+//---   Photon detector position corrections
+RICHONE   PhotonDetectorUP     [ 0 - 2 ]  0.  0. -12.   //   X-,Y-,Z-position (mm) (def=0.)
+RICHONE   PhotonDetectorDOWN   [ 0 - 2 ]  0.  0. -12.   //   X-,Y-,Z-position (mm) (def=0.)
+
+//---   Nominal mirror corrections
+RICHONE   MirrorUP      [ 0 ]  6607.            //   Average Radius(7 mirrors) (mm) (def=as from det.dat)
+RICHONE   MirrorDOWN    [ 0 ]  6598.            //   Average Radius(7 mirrors) (mm) (def=as from det.dat)
+
+//---   Mirror element corrections
+RICHONE   doMirrorCorr          YES   // (def.=NO)            !!!
+//---   Mirror correction files (if any)
+include ${CORAL}/src/pkopt/mirr-corr02-up0.inc            //   031112   !!!
+include ${CORAL}/src/pkopt/mirr-corr02-down0.inc          //   031112   !!!
+//include ${CORAL}/src/pkopt/mirr-corr02-up.inc
+//include ${CORAL}/src/pkopt/mirr-corr02-down.inc
+
+//---   Mirror element alignment
+RICHONE   doMirrorAlign         NO    // (def.=NO) 
+//---   Mirror elements to be aligned : NONE, ALL, UP, DOWN  or  name list
+//RICHONE   MirrorElemName        MB14 MB13 MB42 MB43 MB8 MB7 MB37 MT26 MT25 MT53 MT54 MT20 MT19 MT48
+RICHONE   MirrorElemName        MB15 MB14 MB13 MB42 MB43 MB44 MB9 MB8 MB7 MB37 MB38 MB2 MB1 MB31 MB32 MT27 MT26 MT25 MT53 MT54 MT55 MT21 MT20 MT19 MT48 MT49 MT2 MT1 MT31 MT32
+
+//--- Event-Display :
+//-------------------
+RICHONE   EventDisplay          NO    // (def.=NO) 
+
+
+//------ RECONSTRUCTION CONSTANTS :
+//---------------------------------
+//--- Event-Particles :
+//---------------------
+RICHONE   momMinAcc                   0.0           // GeV/c: mimimum momentum accepted  (def.=1.8)
+RICHONE   momMaxAcc                  50.0           // GeV/c: maximum momentum accepted  (def.=200.)
+//---    geoCorrections
+RICHONE   partDirCorrs   [ 0 - 2 ]   0. 0. 0.       // Corrections to particle direction (RICH mis-alignment)
+//---    process mirror centres
+//RICHONE   MirrorEleProcName          MB42           // Mirror Elements (centre only!) to be processed ONLY (def.=ALL)
+
+//--- Event-Pads :
+//----------------
+//---   Thresholds on pad PH for each cathode  (def.=16*0.0) 
+RICHONE   cathodeThresh    [ 0 - 15 ] 0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.
+
+//--- n-sigmas on every pad PH for each cathode  (def.=16*2.5)
+RICHONE   cathPadThresh    [ 0 - 15 ] 2.5  2.5  2.5  2.5  2.5  2.5  2.5  2.5  2.5  2.5  2.5  2.5  2.5  2.5  2.5  2.5
+
+//---   killHalo
+RICHONE   killHaloLim      [ 0 - 1 ]  4.  5.        // dRout, dRin in pad units(=8.mm) (def.=4.,4.)
+
+//--- Event-Clusters :
+//--------------------
+RICHONE   MaxCluSize                    6.          // Maximum size of pad clusters (def.=1000)
+
+//--- Event-PartPhotons :
+//-----------------------
+RICHONE   PHmipCut                    200.          // cluster PH cut to discard MIP through ph. chamb. (def.=1000.)           !!!
+RICHONE   CathodeUseReg    [ 0 - 1 ]  200. 200.     // Cathode useful region for pad selection, mm  (def.=200., 200.)
+//RICHONE   C4F10RefrIndex              1.00153       // C4F10 nominal refraction index  (def.=1.00153); (N2 nominal=1.00027)
+RICHONE   C4F10RefrIndex              1.00146       // mixed N2-C4F10 (20-80%) refraction index  (def.=1.00153)-data           !!!
+RICHONE   QuartzRefrIndex             1.6           // quartz refraction index  (def.=1.458)
+RICHONE   ParticlePathFrac            0.5           // fraction of particle path for PHOTON 'EMISSION' point  (def.=0.5)
+
+//--- Event-Rings :
+//-----------------
+//---   Rings
+RICHONE   PeakSearchMode              COUNT         // peak search mode, string COUNT, LIKE, MASS, CHI (def.=COUNT)
+RICHONE   PeakScanWindow   [ 0 - 1 ]  2   5         // peak scan window (channels = mrad)  (def.=5, 5)
+RICHONE   nMore                       3             // peak scan window +/- nMore channels (= mrad)  (def.=0)
+RICHONE   ThetaPeakBins               60            // binning of theta peak ( bins )  (def.=100)
+RICHONE   ThetaPeakRange   [ 0 - 1 ]  0.  60.       //                       ( range ) mrad  (def.=0., 100)
+//---   Background Filter
+RICHONE   nMinPhotons                 0             // minimum number of photons per ring  (def.=0)
+RICHONE   SigmaSingPhot               1.5           // average sigma single photon for Bf cut, mrad  (def.=1.0)
+RICHONE   nSigmaCut        [ 0 - 1 ]  1.  3.        // cut at n sigma's ( for kDoClu = 0 and kDoClu = 1 )  (def.=1., 3.)
+//---   Phi Peak Filter
+RICHONE   nBinsInPhi                  120.          // number of bins in phi  (def.=120)
+RICHONE   nBinThreshold               1             // threshold for bin content  (def.=1)
+RICHONE   BinWeight                   0.5           // weight of the bin  (def.=0.5)
+//---   3 sigma (single photon) CUT
+RICHONE   Sigma3SCut                  1.5           // average sigma single photon, mrad ( default, redefined )  (def.=1.)
+
+//--- Event-Analysis :
+//--------------------
+RICHONE   nPhotMinRing                 5            // minimum number of photons in the ring to be accepted  (def.= 0)
+RICHONE   momMinProc                   1.8          // GeV/c: mimimum momentum processed  (def.=1.8)
+RICHONE   momMaxProc                  50.           // GeV/c: mimimum momentum processed  (def.=200.)
+RICHONE   nSigmaCut                    3.           // n sigma cut for ring analysis  (def.=3.)
+RICHONE   thetaMaxLk                  70.           // theta max for like analysis  (def.=70.)
+RICHONE   nZero                       12.           // Nzero RICH constant  (def.=30.)
+RICHONE   ThetaType                   FIT           // string REC, LIKE, FIT, WAVE (def.=REC)
+RICHONE   LikeType                    RING          // string RING, ALL, MIX or CHISQ (def.=CHISQ)
+RICHONE   BackgrType                  02            // string 01, 02 (def.=02)
+//---   Mirror Alignment
+RICHONE   MinThetaAlign               47.           // minimum Cerenkov angle for mirror alignment, mrad  (def.=53.)       !!!
+RICHONE   MaxInternalRad              70.           // maximum internal particle acceptance radius, mm  (def.=70.)
+RICHONE   n-1Limits        [ 0 - 2 ]  30. 20.  8.   // minimum mom(GeV/c), angle(mrad), n-phot for n-1 (def.=60.,20.,10.)
+
+//--- Event-Display : 
+//-------------------
+RICHONE   nEveDSkip                    0            // nr. of Events to skip before display  (def.=0)
+RICHONE   nEveDisplay                10000          // nr. of Events to be displayed  (def.=0)
+RICHONE   DisplayMode                 REC           // ALL, REC = reconstr.only, NOREC = NOT reconstr.only  (def.=none)
+
+
+//------ READING myfile :
+//-----------------------
+RICHONE   readMyFile                  NO            // read pre-processed files; read only 1 Coral event.  (def.=NO)
+RICHONE   myFileType                   2            // = 0: OLD (Dima) files;  = 1: NEW (Paolo) files;  = 2: NEW NEW  (def.=2)
+RICHONE   nProMyEvs                 5000000         // events to read   (def.=0)
+
+//RICHONE   readMyFileName            /afs/cern.ch/compass/scratch/d10/schiavon/ph6-48k-linux.qfile
+//RICHONE   nProMyEvs                 48000           // events to read (<=48000)
+
+//RICHONE   readMyFileName            /afs/cern.ch/compass/scratch/d13/schiavon/myfile-33k6-2t-t25-laam2n3s.gfile
+//RICHONE   nProMyEvs                 33000           // events to read (<=33000)
+
+//RICHONE   readMyFileName            /afs/cern.ch/compass/scratch/d13/schiavon/myfile-data.gfile
+
+//RICHONE   readMyFileName            /castor/cern.ch/user/s/schiavon/pre02/gfile/r20330/f11001-20330.gfile
+
+
+//------ WRITING myfile :
+//-----------------------
+RICHONE   writeMyFile                  NO           // write NEW pre-processed files (type 2)  (def.=NO)
+RICHONE   writeMyFileName        myfile-data.gfile
+
+//------ WRITING Ntuple :
+//-----------------------
+RICHONE   writeNtuple                  NO           // YES = writing of ntuple requested  (def.=NO)
+RICHONE   BLOCK                 Ring  Photon  Like  // max 4; (any name)  (def.=NONE)
+
+
+//------ MONTECARLO :
+//-------------------
+//--- MC Photon Digitization Constants :
+//--------------------------------------
+RICHONE   PrintMCDig                  0             // 1 = print constants read, 0 = No print  (def.=0)
+RICHONE   DoPhoGen                    YES           // simulate photon interaction  (def.=NO)
+RICHONE   ElecNoise                   YES           // simulate electronic noise : Yes, No, Only  (def.=NO)
+RICHONE   Threshold                   2.5           // signal threshold, sigma (ref= 3.)  (def.=0)            // !!!
+RICHONE   DoFeedback                  YES           // simulate feedback photon generation  (def.=NO)
+RICHONE   DoReflection                YES           // simulate photon scattering on CsI surface  (def.=NO)
+RICHONE   DoQEtest                    NO            // do QE test for Cerenkov photons  (def.=NO)
+//---   mean pedestal, sigma of pedestals, mean value of noise, mean sigma of noise  (def.=0.)
+RICHONE   PedSigma         [ 0 - 3 ]  64.  21.  1.15  0.30  
+//---   CsI quantum efficiency ( Eph 5.5-7.9 eV )   (def.=0.)
+RICHONE   CsIQuantumEff    [ 0 -24 ]  0.00025  0.00035  0.0005  0.005  0.0075  0.0125  0.01775  0.0235  0.04  0.064  0.094  0.116  0.1585  0.192  0.207  0.23  0.2525  0.27  0.2845  0.3035  0.32  0.34  0.345  0.36  0.37
+//---   feedback rate in ADC^-1 for 16 cathodes   (def.=0.03)
+RICHONE   Alfa             [ 0 -15 ]  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03  0.03
+//---   mean Pulse Height   (def.=30.)
+RICHONE   PHslo            [ 0 -15 ]  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.  30.
+//---   overall QE reduction factor for 16 cathodes   (def.=1.)
+RICHONE   RedFactor        [ 0 -15 ]  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.  1.
+
+
+
+//---  Parameters for Analysis functions :
+//----------------------------------------
+
+//RICHONE   sigmaPhoRec      [ 0 - 2 ]  1.34  -0.019  0.00026   // sigmaPhot7 : from run 20330 (021210)
+//RICHONE   sigmaPhoPid      [ 0 - 4 ]  1.12  -0.021  0.01  0.025  0.042   // sigmaPhot6 :  from run 20330 (020916)
+//RICHONE   sigmaRing        [ 0 - 1 ]  0.47  -855.    // sigmaRing4 : from 2002 data
+//RICHONE   getLikeRing2     [ 0 - 1 ]  5.1 -0.074     // getLikeRing2 : from back4-fit on run 20330, 2002
+//RICHONE   getLikeAll2      [ 0 - 3 ]  0.007 -0.00013 -0.00008  0.0000017   // getLikeAll2 : from back4-fit on run 20330, 2002
+//RICHONE   getLikeAll3      [ 0 - 3 ]  0.01825 0.00305 0.00034 -0.0000045   // getLikeAll3 : from back5-fit on run 20330, 2002
+
+
+RICHONE   getCutXq         [ 0 - 1 ]  36.7   0.76    // getCutXq : from exwind.kumac on run 22642, 2002
+RICHONE   getCutYq         [ 0 - 1 ]  19.2   0.53    // getCutYq : from exwind.kumac on run 22642, 2002
+RICHONE   sigmaPhoRec      [ 0 - 2 ]  1.34  -0.019  0.00026   // sigmaPhot7 : from run 20330 (021210)
+RICHONE   sigmaPhoPid      [ 0 - 4 ]  1.12  -0.021  0.01  0.025  0.042   // sigmaPhot6 :  from run 20330 (020916)
+RICHONE   sigmaRing        [ 0 - 1 ]  0.47  -855.    // sigmaRing4 : from 2002 data
+RICHONE   BackgrParam02    [ 0 - 3 ]  0.007 -0.00013 -0.00008  0.0000017   // getLikeAll2 : from back4-fit.kumac on run 20330, 2002
+RICHONE   BackgrParam03    [ 0 - 3 ]  0.01825 0.00305 0.00034 -0.0000045   // getLikeAll3 : from back5-fit.kumac on run 20330, 2002
+
+
+
+
+
+
+
+
+

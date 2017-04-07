@@ -1,0 +1,6 @@
+Tag CORAL_r13230_COMGeant_r405
+
+// position corrections are not used right now
+ 
+// position dependent energy corrections are not used in MC, as the internal
+// structure of the blocks is not described

@@ -1,0 +1,81 @@
+// $Id: calorim_mc.opt 13185 2012-01-10 09:58:21Z suhl $
+
+
+// CALORIMETERS
+
+EC01P1__ MC response MCSmeared
+EC02P2__ MC response MCSmeared
+HC01P1__ MC response MCSmeared
+HC02P1__ MC response MCSmeared
+
+// EC01P1__ MC response MCExact
+// EC02P1__ MC response MCExact
+// HC01P1__ MC response MCExact
+// HC02P1__ MC response MCExact
+
+EC01P1__ BookHistograms
+EC02P1__ BookHistograms
+HC01P1__ BookHistograms
+HC02P1__ BookHistograms
+
+//      Possible RecoOptions:
+//      ---------------------
+// Option                               Possible values         Defaulf value
+// ------                               ---------------         -------------
+// DEBUG                                some integer            -1
+// PARTICLE_DEFAULT                     some integer            Particle::GAMMA
+// CALIB                                YES, NO                 NO
+// CALIB_ENERGY                         some float              0
+// ENABLE_TIME_CALIB                    YES, NO                 NO
+// TIME_GATE_CALIB                      some float              5.0
+// CLUSTER_SEARCH                       YES, NO                 NO
+// CLUSTER_SEARCH_ONLY                  YES, NO                 NO
+// USE_HINT_PARTICLES                   YES, NO                 NO
+// FIT                                  SIMPLE, NORMAL          SIMPLE
+// HIST                                 YES, NO                 YES
+// PARTICLE_ENERGY_THRESHOLD            some float              0.3
+// CELL_ENERGY_THRESHOLD                some float              0.1
+// CLUSTER_SEARCH_CELL_ENERGY_THRESHOLD some float              0.02
+// CLUSTER_SEARCH_CELL_AMPL_DEVIATION   some float              2
+
+EC01P1__ RecoOptions HIST=YES FIT=SIMPLE PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1 TOLERANCE_FOR_NEARBY_CELLS=15.0
+
+//  Vladimir's reconstruction
+// EC02P1__ RecoOptions HIST=YES FIT=SIMPLE PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1
+//  Anatoli Lednev's reconstruction
+EC02P1__ RecoOptions RECONSTRUCTION=FORTRAN HIST=YES FAST_RECONSTRUCTION=NO CELL_ENERGY_THRESHOLD=0.1 PARTICLE_ENERGY_THRESHOLD=0.2 SCALE_CALIBRATION=1.0
+
+// to use my (suhl) new reconstruction, comment the previous line and uncomment
+// the next, and the four ShowerProfile lines in the end of this file
+// EC02P1__ RecoOptions RECONSTRUCTION=COMBINED HIST=YES CELL_ENERGY_THRESHOLD=0.2 PARTICLE_ENERGY_THRESHOLD=0.2 SCALE_CALIBRATION=1.0 MIN_SHOWER_DISTANCE=0.7
+
+HC01P1__ RecoOptions HIST=YES FIT=SIMPLE PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1
+HC02P1__ RecoOptions HIST=YES FIT=SIMPLE PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1
+
+// the following parameters do only apply to the so called Lednev
+// reconstruction, which is switched on with setting RECONSTRUCTION=FORTRAN
+// in the RecoOptions.
+// the parameters have been extracted from COMGeant SVN rev. 91, using another
+// revision might require to change the parameters
+// parameters are in the same order as in the reconstruction, so:
+// FortranShowerProfA [0-3] (GAMS a1) (GAMS a2) (Shashlyk a1) (Shashlyk a2)
+// FortranShowerProfB [0-3] (GAMS b1) (GAMS b2) (Shashlyk b1) (Shashlyk b2)
+//
+EC02P1__ FortranShowerProfA [0-3]   1.4108  -0.4108 1.7868  -0.7867
+EC02P1__ FortranShowerProfB [0-3]   7.5128  24.8691 9.2912  20.7138
+
+// Define the shower profiles as used in my (suhl) new reconstruction,
+// uncomment if you want to use this reconstruction
+//
+EC02P1__ ShowerProfile Lednev
+EC02P1__ ShowerProfileParams gams       [0-3]   1.4108  -0.4108 7.5128  24.8581
+EC02P1__ ShowerProfileParams rhgams     [0-3]   1.4108  -0.4108 7.5128  24.8581
+EC02P1__ ShowerProfileParams shashlik   [0-3]   1.7868  -0.7867 9.2912  20.7138
+
+// Define an additional calibration file for ReconstructionCombined
+// this contains the position corrections and the position-dependent energy
+// corrections (the later being not neccessary with the current COMGeant as
+// the Shashlyk blocks are described without the holes for the fibers)
+//
+EC02P1__ RecoCombined McCalib ${CORAL}/src/pkopt/ecal2-recocombined-mccalib
+

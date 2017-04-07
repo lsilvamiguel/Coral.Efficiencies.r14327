@@ -1,0 +1,17 @@
+// Options for MAPMT simulation
+
+MCSettingsCathodeMAPMT UseQuantEffCorrections Yes     //  apply a wavelength dependent efficiency correction
+MCSettingsCathodeMAPMT PeakEff 1.                     //  the maximum efficiency of the above correction curve
+
+// Set the following to Yes if you like to run on the first two zebra files provided by Luis.
+// MCSettingsCathodeMAPMT UseObsoleteLensNumbering No 
+
+// Set the following to Yes if you like to run checks on zebra files 
+// which don't contain the hits on the spherical surface of the first lens
+// but only on the CsI plane (old zebra files)
+// MCSettingsCathodeMAPMT UseOldZebraFormat No
+
+// Set the following to Yes to rescale the wavelength to the 
+// PMT sensitive region (also used for old zebra files)
+// This disables the efficiency correction set above
+// MCSettingsCathodeMAPMT RescaleWavelength No

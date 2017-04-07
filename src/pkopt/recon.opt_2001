@@ -1,0 +1,144 @@
+//------------------------------
+//
+//   RECON (track reconstruction)
+//   control options
+//
+//------------------------------
+
+ReC     Switch              0    //if = 0  switch on Recon 
+                                 //if > 1  switch off Recon
+
+ReC     McPar [0]           410  // MC option: 0 (for real data - no ntuple, no MC quality check)  
+                                 //            1 (for MC data - no ntuple, full MC quality check)
+                                 //            2 (for real data - with ntuple, no MC quality check) 
+                                 //            3 (for MC data - with ntuple, full MC quality check) 
+                                 //            4 (for real data - with big ntuple, no MC quality check)
+                                 //            5 (for MC data - with big ntuple, full MC quality check)
+   // if > 100  then: mp1*100+mp2*10 + MC option (0-5); mp1,mp2 parameters for subsets option
+   //                 mp1 - # of iterations for set 1, mp2 - for set 2, 
+ 
+ReC     McPar [1-2]    8  8   // min number of hits in tel.1 and tel.2 for acc. track (external hits)
+
+ReC     inPar  [0]    53329   // 10000*print+1000*mode1+100*mode + 10*ffex + number of iterations
+                              // print - switch for printout 0 - all off, 1 - partially on, 2 - all on
+                              // if greater than 2-for subsetups mode: 3 ,4 and 5, respectively          
+                              // mode1 - switch for reiteration in spline 0 - off,1-8  - on
+                              // mode - parameter for control removing segments before SM1 (0-8)
+                              // ffex - switch for fringe field reconstruction and extrapolation:
+                              // 0 - all off, 1 - all on, 2 - ff off,extrap. on 3 - ff on extrap. off
+                              // number of iteration allowed: 1-9
+                            
+
+ReC     inPar [1]          80        //min. number of hits used for correct reconstruction
+
+ReC     inPar [2]          5        //parameter for refit in spline (for experts)
+
+ReC     inPar [3]          111        // 0 - standard Compass setup (straws "glued")
+                                     // 10 - standard Compass setup 
+                                     // 1 - 2001 setup version (straws "glued")
+                                     // 11 - 2001 setup version 
+ // 111 - 2001 setup version - straws not glued - warning: some planes must be off
+
+ReC     roadPar [0-1]     0.001   0.001              // roadwidth in y (det.1 - for target shot)
+
+ReC     roadPar [2-5]     0.001   0.001  0.005  0.005 // roadwidth in z (det.1-2 - for target shot)
+
+ReC     roadPar [6-9]     0.001  0.001  0.003 0.003 // roadwidth in theta (det.1-2, double set)
+
+ReC     roadPar [10-13]   0.04 0.02 0.005   0.07 // roadwidth in y,z and theta for fringe field 
+                                                 // reconstruction and for extrapolation (last)
+ReC     roadPar [14-16]   0.1  0.2  0.25       // fringe field parameters
+
+
+                  // parameters defining initial effective active regions (for experts)
+
+ReC     activeRegion [0-1] 0.0  0.0        // default 0.0 
+
+ReC     activeRegion [2-3] 0.0  0.0        // default 0.0
+
+ReC     activeRegion [4-6] 0.1 0.1 0.1     // "one-tenth" margin in the middle of telescope for
+                                           //  det1_new2, det2 and det1_mgmg routines (for experts) 
+
+ReC     nbPlanes [0-7] 0 2   2 4   1 3  0 2 //min. nb. of addit. planes in tel.1 (th and all)
+                                   // 1. micros, 2. all 3. not used 4. not used
+
+ReC     nbPlanes [8-15] 1 5  2 2  2 4  1 2  // min. nb. of addit. planes in tel.2 (th and all)  
+                                   // 1. DC/straws, 2. gems, 3. all 4. not used
+//ReC     nbPlanes [8-15] 2 2  1 2  2 4  1 2  // min. nb. of addit. planes in tel.2 (th and all)
+ 
+                                   // 1. gems, 2.   3. all 4. not used
+
+                  //tolerances in assoc (zp) for proj.        
+ReC    ReProj  [0-7]     0.08   0.12    0.16   0.16   0.16   0.16   0.16   0.26    
+
+                  //tolerances in assoc (z) for proj. 
+ReC   ReProj [8-15]      0.03  0.06   0.1   0.1   0.1   0.1   0.06   0.2    
+
+
+ReC    roadLengh [0-3]    0.0015    0.0023     0.0013     0.0013  
+
+                  //chi2 parameters
+
+ReC    chiPar [0]         25.0         //max chi2/nd in segment fit (normal reconstruction)
+
+ReC    chiPar [15]        65.0        // max chi2/nd in segment fit for fringe field
+
+ReC    chiPar [13-14]    20.0  25.0   // chi2/nd for fringe field and extrapolation from Rich to SM2
+
+
+ReC    chiPar [1-3]           5.0    7.0  10.0 
+ReC    chiPar [4-6]           9.0   12.0  15.0 
+ReC    chiPar [7-9]          11.0   15.0  18.0 
+ReC    chiPar [10-12]        15.0   17.0  20.0    
+
+//ReC    chiPar [1-3]       3.0  4.0  5.0 
+//ReC    chiPar [4-6]       4.0  5.0  6.0 
+//ReC    chiPar [7-9]       5.0  6.0  7.0 
+//Rec    chiPar [10-12]     4.0  5.0  6.0
+
+
+
+
+            //target parameters (temporary here !!!   xtarg0,hltarg,ytarg,ztarg)
+ReC    ReTarget [0-3]   -0.35     0.9      0.025     0.025   
+
+
+            // list od detectors (planes) off from reconstruction
+
+ReC    blacklist [0]      1          // 0-no active, 1 planes 
+
+//ReC    blacklist [1-2]   6  28    // nb of planes off before/behind SM1 (for setup 1)
+//ReC    blacklist [1-2]   6  34    // nb of planes off before/behind SM1 (for gems test)
+ReC    blacklist [1-2]   1  20    // nb of planes off before/behind SM1 (for working mode)
+
+ReC   deadPlanes1 [0] 100000        // dummy (must be if no planes before off)
+  
+//ReC   deadPlanes1 [0-5]  101 102 103 109 110 111 // coral nb of planes switched off before SM1 (micromegas)
+
+//ReC    deadPlanes1 [0-5]  1041 1042 1043 1031 1032 1033 // coral nb of planes switched off before SM1 (sci-fi)
+
+
+//ReC    deadPlanes2 [8-15]  5011 5012 5013 5014 5021 5022 5023 5024 // gems 
+
+ReC    deadPlanes2 [8-19]  3 4 5 6 12 14 16 18 21 22 23 24//   straws (no active)
+
+//ReC    deadPlanes2 [20-25] 1 2 8 10 19 20 //   active straws 
+//ReC    deadPlanes2 [16-27]  3 4 5 6 12 14 16 18 21 22 23 24//   straws (no active)
+
+ReC    deadPlanes2 [2-7]  7 9 11 13 15 17//   straws ( between gems - no active)
+
+//ReC    deadPlanes2 [26-33] 7001 7002 7003 7004 7005 7006 7007 7008 //  SDC's
+
+//ReC    deadPlanes2 [6-7] 1051 1052 // sci-fi
+
+ReC    deadPlanes2 [0-1] 1051 1052 // sci-fi
+
+//end
+
+
+
+
+
+
+
+

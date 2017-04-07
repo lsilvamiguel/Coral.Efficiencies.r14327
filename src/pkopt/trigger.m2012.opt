@@ -1,0 +1,49 @@
+// $Id: trigger.m2012.opt 13692 2013-03-26 22:33:49Z ybedfer $
+
+// DVCS data taking (cf. "./trigger.h2012.opt" for Primakoff), options for:
+// - Mu'-ID (i.e. scattered mu ID) in 2010
+// - Flux measurement.
+
+// Copied from "./trigger.2010.opt,r13249".
+// Modified:
+// - No Inner trigger
+
+// Scalers used for beam flux measurement
+FluxScalers SCFI01X1 SCFI01X2 SCFI01X3 SCFI01Y4 SCFI01Y5 SCFI01Y6
+
+// List of detector planes in coincidence
+Trigger	det	HL04X1_m	HL05X1_m
+
+Trigger	det	HM04X1_d	HM05X1_d	HM04Y1_d	HM05Y1_d
+Trigger	det	HM04X1_u	HM05X1_u	HM04Y1_u	HM05Y1_u
+
+Trigger	det	HO03Y1_m	HO04Y1_m
+Trigger	det	HO03Y1_m	HO04Y2_m
+
+Trigger det     HG01Y1__	HG02Y1__
+Trigger det     HG01Y1__	HG02Y2__
+
+// List of triggers
+// Hodo triggers: Correspondance trigger mask <-> hodo: "char" matches det's name[1] supra) 
+//             char   mask
+Trigger mask	M	2
+Trigger mask	L	4
+Trigger mask	O	8
+Trigger mask	C	16
+Trigger mask	G	512
+
+Trigger MW1_ID	ffff	// Although TCS can handle 0x7fffff, it was decided to limit max. #triggers to 16. And take advantage of the fact to make use of the other bits of the trigger TDC module.
+
+// If hodoscopes are used in tracking and last point of track is downstream of
+// triggering hodoscope: require a hit to be associated to the track
+Trigger	tracking	1	// 0-hodos not in tracking, 1-hodos in tracking
+
+// Time window for hodo hits
+Trigger	ClrTime	9	// In ns. If 0 - no check
+
+// If 'on' check on trigger matrix is performed.
+Trigger	Matix	1	// 0 - Off, 1 - ON
+
+Trigger	Print	0	// 0 - Off, 1 - ON
+
+Trigger	Hist	1	// 0 - Off, 1 - ON

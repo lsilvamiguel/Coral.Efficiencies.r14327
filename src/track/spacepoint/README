@@ -1,0 +1,31 @@
+// $Id: README,v 1.3 2010/06/18 10:44:22 tnagel Exp $
+
+LibCsSpacePoint.so 
+is designed to create spacepoints from a set of detectors consisting in a family. SpacePoints consist either in 
+ - 2 coordinates (x,y) at a given z (Fast minimisation). 
+ - 2 coordinates at z + 2 angles    (Full minimisation)
+Fast minimisation requires at least 3 detectors.
+Full minimisation requires at least 5 detectors.
+
+Might be helpfull for internal calibration of small sets of detectors. 
+Some switches have been added so that it works (with reasonable speed) on either alignment runs or physics run.
+Second option is presently beeing tested.
+
+Tests have been performed only for SDCs. 
+Most probably it works only for these detectors at the moment. 
+It may be generalised to other detectors (straw?) if needed.
+
+WARNING: CsResOpt.cc uses Root implementation of Minuit. Minuit library is not included by default in the Root standard library packages defined by General.mk.
+Therefore when linking LibCsSpacePoint library to a Main program, -lMinuit has to be added by hand to $(Libs). 
+
+i.e: LIBS+=-lMinuit in GNUMakefile.
+
+Examples for using LibCsSpacePoint objects can be found in src/tests/realdata.
+Root macros to display output histograms  can be found in src/tests/realdata/root.
+Directory src/tests/spacepoints was designed to test spacePoints on MC data but is obselete at the moment.
+
+Contact: <Hugo.Denis.Pereira.Da.Costa@cern.ch>
+
+
+
+

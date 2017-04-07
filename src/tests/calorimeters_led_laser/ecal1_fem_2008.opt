@@ -1,0 +1,6 @@
+// Option file for ECAL1 FEM monitoring
+EC01P1__ FEM_IS_IN_USE NO
+// EC01P1__ FEM_NORM_ID 6
+// EC01P1__ FEM_RANGE_MIN 31.
+// EC01P1__ FEM_RANGE_MAX 901.
+

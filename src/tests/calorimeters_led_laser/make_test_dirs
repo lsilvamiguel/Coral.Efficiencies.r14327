@@ -1,0 +1,31 @@
+
+mkdir test_2008
+cd ./test_2008
+ln -s ../Linux/led_laser 
+ln -s ../led_laser.2008.opt
+cd ../
+
+mkdir test_2009
+cd ./test_2009
+ln -s ../Linux/led_laser 
+ln -s ../led_laser.2009.opt
+cd ../
+
+mkdir test_2010
+cd ./test_2010
+ln -s ../Linux/led_laser 
+ln -s ../led_laser.2010.opt
+cd ../
+
+mkdir test_2011
+cd ./test_2011
+ln -s ../Linux/led_laser 
+ln -s ../led_laser.2011.opt
+cd ../
+
+mkdir test_2012
+cd ./test_2012
+ln -s ../Linux/led_laser 
+ln -s ../led_laser.2012.opt
+ln -s ../led_laser.2012.dvcs.opt
+cd ../

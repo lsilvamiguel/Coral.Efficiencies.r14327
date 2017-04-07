@@ -1,0 +1,102 @@
+//$Id: align.HALO.opt,v 1.7 2008/03/25 19:05:52 ybedfer Exp $
+
+// Options file for running "Linux/align", i.e. the 2nd stp of the
+// alignment procedure, on the ROOT TTree output of "Linux/traf" (1st step).
+// Specific for the adjustment of the scifi/Si telescope.
+//  - Offset, Theta and Pitch adjustment.
+
+// To be edited (cf. in fine) to specify:
+//   I) Detector table
+//  II) Input ROOT file
+// III) Output
+//  IV) Tracks selection (depends upon whether longitudinal or transverse)
+
+// $Log: align.HALO.opt,v $
+// Revision 1.7  2008/03/25 19:05:52  ybedfer
+//  - Bug fix: Include "FI55" in the list of fixed detectors.
+//  - Add comment about the splitting the transverse and longitudinal cases.
+//
+// Revision 1.6  2006/06/16 15:21:48  conrad
+// - Fixed ManyChunks so that it actually works not only compiles.
+// - Changed ManyChunks so that it can read option file from subdirectory.
+// - Added "-q <queue>" option to ManyChunks. Now user can specify queue name to use.
+// - CheckTracks::DrawDUvsU and CheckTracks::DrawDUvsV will plot TProfile plots instead of scatter plots.
+//   Scatter plots are still available via CheckTracks::FitDUvs*
+// - Fixed CheckTracks::FitDUvs*. With recent ROOTs only last fit was plotted.
+// - Added CheckTracks::DrawDUvsT, CheckTracks::FitDUvsT,
+//         CheckTracks::DrawDUvsT90, CheckTracks::FitDUvsT90 and CheckTracks::DrawDUvsP.
+//   Those methods plot residuals versus Theta angle or Momentum.
+// - Added CheckTracks::PrintDUvsP - slices sample of tracks in Momentum. And for each slice prints avarage residual with RMS.
+// - Added CheckTracks::PrintDUvsU - prints A and B parameters of line fitted to DUvsU data.
+//
+// Revision 1.5  2004/09/16 15:21:11  ybedfer
+//  cosmetics...
+//
+// Revision 1.4  2004/03/10 15:13:02  ybedfer
+//  - Selection of tracks: retain only those bridged over all magnets:
+//   SM1, SM2 and target).
+//  - Free SI pitches.
+//
+// Revision 1.3  2004/02/23 13:42:24  ybedfer
+//  Reintroduce pitch adjustment.
+//
+
+//=== magnetic field switch. 
+//=== WARNING: This option must match the one in coral option file used to generate the tree.
+main magnets on    // (on|off) default (i.e. no option) is off.
+
+//=== parameters to align (comment the line if parameter is not to be fitted)
+align  U	// Offset in U
+align  T	// Angle perp to the beam
+align  P	// Pitch <- u*=(1+pitch_offset)
+//align  Z	// Position along the beam
+//align  R	// Prop to T0 for drift like detectors
+//align  L	// Lorentz angle R scaling factor for drift like detectors
+
+align nStdDev   3     // cut track selection
+align nTracks   0     // number of selected tracks (0 means all)
+align projRange 2     // minimum angle diff to distinguish orientations (deg)
+make iterations       // Millepede iterations
+
+//=== Debugging options
+//debug dump dets
+debug dump millepede
+debug counter rate 5000
+
+//=== Detector to be considered/excluded 
+//=== (WARNING excluded takes precedence over used)
+//=== TBNames can be abreviated. symbol '*' can replace any _single_ character.
+align excludeDets  
+align useDets FI SI
+
+//=== overwrites the det.dat resolutions
+//=== TBNames can be abreviated. symbol '*' can replace any _single_ character.
+// align change resolution MA 2.89 
+// align change resolution MB 9.67
+// align change resolution DW 1.5
+
+//=== parameters to fix
+//=== TBNames can be abreviated
+fix U FI03 FI04 FI05 FI55 FI06 FI07 FI08
+fix T FI03 FI04 FI05 FI55 FI06 FI07 FI08 
+fix P FI03 FI04 FI05 FI55 FI06 FI07 FI08 
+//fix Z	*				// Z is not adjusted at all. Cf. supra.
+
+//=== Detector table
+detector table  	$COMPASS_FILES/geometry/2007/detectors.59963.transv.dat
+
+//=== Rootfiles
+//=== WildCards are accepted
+input tree	~/w0/csub/traf.HALO.07W30.root
+
+//=== Output file
+output file align.HALO.07W30.out
+
+//=== track selection cut 
+selection  cut  (T_zone==23&&T_chi2/T_ndf<15&&T_cop&&1/T_cop>140)
+// Note: The entry infra was meant to replace the one supra in the transverse
+//      case. But the rationale behind it is not clear: why couldn't we require
+//      the halo tracks to have a momentum greater than some cut in the that
+//      case? Anyway, in order to align "2007/detectors.59963.transv.dat,v1.3",
+//      I (Y.B.) decided to disregard it. 
+//selection  cut  T_zone==23T_chi2/T_ndf<15&&T_cop!=0	// Transverse case ???

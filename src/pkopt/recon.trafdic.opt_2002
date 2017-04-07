@@ -1,0 +1,164 @@
+//------------------------------
+//
+//   RECON (track reconstruction)
+//   control options
+//
+//------------------------------
+
+ReC     Switch              0    //if = 0  switch on Recon ( new format of detectors.dat is read)
+                                 //if = 1  switch on Recon ( old for mat of detectors.dat is read)
+                                 //if > 1  switch off Recon
+
+ReC     McPar [0]          420  // MC option: 0 (for real data - no ntuple, no MC quality check)  
+                                 //            1 (for MC data - no ntuple, full MC quality check)
+                                 //            2 (for real data - with ntuple, no MC quality check) 
+                                 //            3 (for MC data - with ntuple, full MC quality check) 
+                                 //            4 (for real data - with big ntuple, no MC quality check)
+                                 //            5 (for MC data - with big ntuple, full MC quality check)
+                                 //            6 (for real data - no reconstruction - only hit profiles)
+   // if > 100  then: mp1*100+mp2*10 + MC option (0-5); mp1,mp2 parameters for subsets option
+   //                 mp1 - # of iterations for set 1, mp2 - for set 2, 
+ 
+ReC     McPar [1-2]    7  8   // min number of hits in tel.1 and tel.2 for acc. track (external hits)
+
+ReC     inPar  [0]    1319   // 10000*print+1000*mode1+100*mode + 10*ffex + number of iterations
+                              // print - switch for printout 0 - all off, 1 - partially on, 2 - all on
+                              // if greater than 2-for subsetups mode: 3 ,4 and 5, respectively          
+                              // mode1 - switch for reiteration in spline 0 - off,1-8  - on
+                              // mode - parameter for control removing segments before SM1 (0-8)
+                              // ffex - switch for fringe field reconstruction and extrapolation:
+                              // 0 - all off, 1 - all on, 2 - ff off,extrap. on 3 - ff on extrap. off
+                              // number of iteration allowed: 1-9
+                            
+
+ReC     inPar [1]     61      //min. number of hits used for correct reconstruction (also in refit)
+
+ReC     inPar [2]     2311411     // erscal*100+fudge*10+refit.parameter (for experts)
+
+//ReC     inPar [2]     4444411     // erscal*100+fudge*10+refit.parameter (for experts)
+
+ReC     inPar [3]     0       // 0 - 2002 setup  1 - 2001 setup (probability selection)
+                              // 2 - 2002 setup  3 - 2001 setup (chi2 selection)
+                              // 4 - 2002 setup  5 - 2001 setup (chi2 in normal, probability in ff)
+                              // 6  -2002 setup  7 - 2001 setup (probability in normal, chi2 in ff)
+
+ReC     roadPar [0-1]     0.005   0.01               // roadwidth in y (det.1 - for target shot)
+
+ReC     roadPar [2-5]     0.001   0.001  0.005  0.005 // roadwidth in z (det.1-2 - for target shot)
+
+ReC     roadPar [6-9]     0.001  0.001  0.003 0.003   // roadwidth in theta (det.1-2, double set)
+
+ReC     roadPar [10-13]   0.04 0.02 0.005   0.07      // roadwidth in y,z and theta for fringe field 
+                                                      // reconstruction and for extrapolation (last)
+ReC     roadPar [14-16]   0.02  0.03  0.0              // fringe field parameters
+
+
+                  // parameters defining initial effective active regions (for experts)
+
+
+ReC     activeRegion [0-1] 0.05  0.15      // distmx_yz, distmx_th
+
+ReC     activeRegion [2-3] 0.05  0.15      // distm2_yz, distm2_th
+
+ReC     activeRegion [4] 0.004    // sagi_tot; for a 1 GeV particle for a distance of 1m and B.dl=0.1 T
+
+ReC     activeRegion [5-6] 0.011 0.015     // rd_comp, rd_com2;  
+                               //   max.dist* max. slope (curvature negligeable on rd_comp/rd_comp2 cm)
+
+ReC     nbPlanes [0-7] 2 2  2 2  2 4  8 7 
+//ReC     nbPlanes [0-7] 2 2  2 2  2 4  8 7   // min. nb. of addit. planes in tel.1 (th and all)
+
+//ReC     nbPlanes [0-7] 5 7  2 4  3 8  8 8   // min. nb. of addit. planes in tel.1 (th and all)
+                                            // 1. micros + SDC1, 2 micros. 3. all 
+                                            // 4. for refit: subset 1/2 (1 also for all)
+
+ReC     nbPlanes [8-15] 2 5  2 4  2 5  8 8
+//ReC     nbPlanes [8-15] 2 5  2 4  2 5  9 8  // min. nb. of addit. planes in tel.2 (th and all)
+
+//ReC     nbPlanes [8-15] 6 14  4 6  4 8  9 8  // min. nb. of addit. planes in tel.2 (th and all)  
+                                            // 1. DC/straws, 2. gems, 3. all 
+                                            // 4. for refit: subset 1/2 (1 also for all)
+
+
+                    //tolerances in assoc (zp) for proj.
+        
+ReC    ReProj  [0-6]      0.08   0.12    0.16   0.18   0.2   0.22   0.24    
+//ReC    ReProj  [0-6]      0.8   1.2    1.6   1.8   2.0   2.2   2.4    
+
+ReC    ReProj  [7]        260.0      // plow_mcs parameter  
+
+                    //tolerances in assoc (z) for proj.
+ 
+ReC    ReProj [8-15]      0.03  0.06   0.1   0.12   0.14   0.16   0.2   0.2    
+//ReC    ReProj [8-15]      0.3  0.6   1.   1.2   1.4   1.6   2.   0.2  
+
+ReC    roadLengh [0-3]    0.0015    0.0023     0.0013     0.0013  
+
+                    //chi2 parameters
+
+ReC    chiPar [0]         35.0        // max chi2/nd in segment fit (normal reconstruction)
+
+ReC    chiPar [15]        35.0        // max chi2/nd in segment fit for fringe field
+
+ReC    chiPar [16]        15.0        // max chi2/nd for fringe field
+
+ReC    chiPar [13-14]    0.001  1.0  // probability limits for fringe field reconstruction 
+                                     
+
+ReC    chiPar [1-3]       1.0  2.0  3.0    
+ReC    chiPar [4-6]       2.5  5.0  7.5 
+ReC    chiPar [7-9]       3.0  6.0  9.0        
+
+ReC    chiPar [10-11]     0.0001  1.0 // probability limits 
+                                             
+ReC    chiPar [12]        35.0        // max chi2 for extrapolation to SM2
+
+                    //target parameters (temporary here !!!   xtarg0,hltarg,ytarg,ztarg)
+
+ReC    ReTarget [0-3]   -0.35     0.9      0.025     0.025   
+
+
+                    // list od detectors (planes) off from reconstruction
+
+ReC    blacklist [0]      0          // 0- all planes active, 1 planes off 
+
+
+ReC    blacklist [1-2]   8  1    // nb of planes off before/behind SM1 (for working mode)
+
+ReC    deadPlanes1 [0] 1000000        // dummy (must be if no planes before off)
+
+//ReC    deadPlanes1 [0-7] 173 174 175 176 177 178 179 180        //  sdc1
+
+//ReC    deadPlanes1 [0-5] 46 47 48 49 50 51 // sci-fis
+
+//ReC    deadPlanes1 [6-17] 401 402 403 404 405 406 407 408 409 410 411 412 // micromegas1/2/3
+
+ReC    deadPlanes2 [0] 1000000        // dummy (must be if no planes behind off)
+
+//ReC    deadPlanes2 [0-1] 104 105    // sci-fi 
+
+//ReC    deadPlanes2 [2-22]  1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 // straws
+
+//ReC    deadPlanes2 [23-37] 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 //   straws cd.
+
+//ReC    deadPlanes2 [0-20]  1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 // straws
+
+//ReC    deadPlanes2 [21-35] 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 //   straws cd.
+
+//ReC    deadPlanes2 [38-45] 157 159 161 163 165 167 169 171        //  sdc2
+
+//ReC    deadPlanes2 [46-57] 56 66 76 86 57 67 77 87 78 88 58 68    //  gems1/2/3
+//ReC    deadPlanes2 [38-49] 56 66 76 86 57 67 77 87 78 88 58 68    //  gems1/2/3
+//ReC    deadPlanes2 [38-41] 56 66 76 86     //  gem1 
+//ReC    deadPlanes2 [38-41] 78 88 58 68     //  gem3
+//end
+
+
+
+
+
+
+
+
+
+

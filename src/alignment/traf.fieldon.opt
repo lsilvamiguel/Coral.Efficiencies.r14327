@@ -1,0 +1,170 @@
+// $Id: traf.fieldon.opt,v 1.6 2009/08/30 23:16:19 ybedfer Exp $
+
+// coral options file for field-ON reco for alignment purposes.
+
+// - By default, the file is valid for:
+//   - 2009,
+// - Alternative entries are provided for the other cases, commented out by
+//  default and to be commented back in.
+//   - For the transverse case, these concern the specification of the target
+//    field map and that of the extent of the reconstruction zone.
+//   - For the data taking year:
+//       - Almost everything is dealt w/ by a reference to a ``bare'' version of
+//        the main options file for TraFDic reco, taken from the "./user"
+//        directory, simplified and copied to this (alignment) directory:
+//               "./trafdic.<year>.bare.opt". 
+//       - Except for the list of detectors to be excluded from tracking.
+// - The case of the detector table ("detectors.dat"), and corresponding dico,
+//  is special: since what one has in view is to tune the table's parameter, an
+//  explicit reference to the file containing the initial parameters is to be
+//  given, instead of the traditional reference to a directory.
+
+// This file is therefore to be modified by:
+//   I)  Specifying input data one wants to process instead of the default
+//  II)  Setting accordingly:
+//     i) Target field map (either solenoid or dipole)
+//    ii) Zone extension: upstream of target (longitudinal case) or not.
+//   iii) "./trafdic.<year>.bare.opt" options file.
+//    iv) Beam charge, cf. entry "TraF iCut[15] infra.
+// III)  Specifying detector table.
+//  IV)  Setting options specific to alignment:
+//     i) Name of detectors to be excluded from tracking. Those to be excluded
+//       for the purpose of alignment have to be added to the, year-dependent,
+//       list of detectors to be excluded in any case. Typically these are
+//       detectors liable to upset the field off, momentum-less, reco, like
+//       those downstream of muon walls.
+//    ii) Criteria for selecting tracks to be written to output TTree (chi2
+//       cut, ...)
+
+// Tip: Set your "emacs" in "c++-mode" to view this ".opt" file. And have this
+//     done automatically by setting the appropriate hook in your "~/.emacs.el"
+//     init file, cf. "~ybedfer/.emacs.el".
+
+//     ********** Reference to options file for TraFDic reco **********
+//include 	${CORAL}/trafdic.2002.bare.opt
+//include 	${CORAL}/trafdic.2003.bare.opt
+//include 	${CORAL}/src/alignment/trafdic.2004.bare.opt
+//include 	${CORAL}/src/alignment/trafdic.2006.bare.opt
+//include 	${CORAL}/src/alignment/trafdic.2007.bare.opt
+//include 	${CORAL}/src/alignment/trafdic.2008.bare.opt
+include 	${CORAL}/src/alignment/trafdic.2009.bare.opt
+
+//					   ***** HISTOGRAMMING
+histograms package 	ROOT
+
+histograms home 	~/w0/csub/traf.78172.root
+
+//					   ***** INPUT DATA...
+Data job
+
+//						...either raw file
+Data file	/castor/cern.ch/compass/data/2009/raw/W33/cdr41049-78172.raw
+
+//					   ***** EVENT SELECTION
+events to read 5000 	// # of evts to read or file name of evt#'s (evt# = spill#<<16|evt#_in_spill)
+selection trigger mask fef		// Trigger selection (hexadecimal): excluding pure calo trigger, which jitter time is large
+
+//	Upon option, turn off drift-time measurement in drift-like detectors
+//ST	IS_MWPC
+//MB	IS_MWPC
+//DW	IS_MWPC	// Temporary setting, cf. comment in "detectors.49240.1T.dat"
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+// In case of transverse data: uncomment relevant entry among following 2:
+//CsField SOL_field	 $COMPASS_FILES/maps/mag_fields/SOL/smctgt_dipole.fieldmap
+//CsField SOL_field	 $COMPASS_FILES/maps/mag_fields/SOL/yet.to.be.created.map
+
+//					   ***** MAGNETs INFO
+CsMagInfo SM2 0 	// ==0: Do NOT use NMR, !=0: Rescaling factor (applied to NMR corrected map)
+//CsMagInfo Update solenoid		// To be enabled during target rotation
+
+
+//					   ***** LOGGER
+error logger log level error 	// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level none
+error logger verbosity normal 	// low, normal, high. 
+
+//	********** OVERWRITE WHAT'S IN "../pkopt/trafdic.????.opt"... **********
+// (Note: the reference to the "../pkopt/trafdic.????.opt" is embedded in the
+// "./trafdic.????.bare.opt" referenced supra.)
+
+// Specify the beam charge (Will be X-checked against magnet polarities from the detector table)
+TraF iCut [15] 1 	// Beam charge.		(TEv::TracksFit2,GetIncidentTracks)
+
+//	 	 ...SETTINGS SPECIFIC to ALIGNMENT
+
+//  Correction for propagation time (as well as X-ray correction or else in
+// drifts): the corrections have to be ported to coral's CsClusters (and then on
+// to the output TTree) => Set bit 0x4 of the bit pattern
+//  Note: In the newest (as of 2008/03) realeases of "./pkopt/trafdic.2009.opt",
+// this setting is already implemented. It is mandatory here and hence
+// re-instated here, as a reminder.
+TraF	ReMode	[29]	7	// Propagation+X-ray+latency correction in Drifts (&1: Pattern Recognotion, &2: Fit, &4: Modify CsClusters)	(TEv::FitSegments,BackTrackZ1,ForeTrack2RICHWall,TracksFit2,TracksRefit)
+
+//  List of detectors excluded from tracking (and hence, from alignment): the
+// list consists of 2 subsets:
+//   i) Detectors excluded from standard tracking, which depend upon each data
+//     taking year.
+//      E.g. particular SI plane that would happen to be out of order
+//  ii) Detectors excluded from the alignment procedure, because they would be
+//     difficult to align, given their crude ganularity and or their low
+//     sampling rate, etc...
+//     (Note that whether these are indeed valid reasons for excluding them is
+//     debatable...)
+TraF	DetNameOff	VO	VI	BM	DW02Y1	DW02X2	HH	//MP00	// One may or may not want to exclude "MP00" (which is not well calibrated, as of 2009/08). "DW02Y1/X2" are not completely out of order, but their yield is incomparably less than their counterparts'. As to "HH", it's inclusion in the tracking has not been tested.
+//TraF	DetNameOff	VO	VI	BM	DW02X2	HH	SI04Y	// Exclude "DW02X2" in all of 2008, "HH" because I(YB.) don't know what it is, "SI04Y" in week 08W30
+//TraF	DetNameOff	VO	VI	BM	DC04Y	// Exclude DC04Y in 2007
+//TraF	DetNameOff	VO	VI	BM	SI03	HM	HL	HO	MA	// Exclude also SI03 in 2003
+
+// The following entries are a consequence of the so many detectros turned off
+// supra: they disable options which otherwise would abort coral's execution
+// because requiring the presence of some of the turned off detectors (options
+// which in addition are useless for the reconstruction of paraxial tracks).
+//TraF	ReMode	[32]	0	// No ForeTrack to MAs (if MAs are turned off)	(TEv::TracksFit2)
+//TraF	ReMode	[17]	0	// Disable GEM amplitude correlations, if any GEM is among the turned-off detectors.
+
+// The following eases the reco in the context of an initally bad alignment.
+// (Note: May be cancelled in the later passes of the alignment procedure.)
+//TraF	dCut	[ 6]	12.	// Cut on chi2/NDF for dico fit		(TEv::PrePattern2)
+TraF	dCut	[84]	.0025	// SI position uncertainties correction term (when badly aligned)	(TEv::ImportClusters)
+
+
+// 					   ***** DETECTOR TABLE...
+// (Not necessarily the one retrieved from the official directory by automatic
+// search, which may not be the most appropriate starting point.)
+//detector	table	$COMPASS_FILES/geometry/2009/detectors.
+detector table /afs/cern.ch/user/y/ybedfer/public/2009/detectors.77896.hadron.2.dat
+// Corresponding dico file
+//TraF	Dicofit	$COMPASS_FILES/geometry/2009/dico/
+
+//	 	 ...OTHERWISE
+
+//TraF	Graph	[0]	0		// For INTERACTIVE coral w/o graphics
+//TraF	iCut	[0]	7		// Trigger selection in TraFDic
+//TraF	Print	[0]	3		// Event-by-event numbering
+//TraF	Print	[8]	3		// EoE
+
+// 					   ***** SMOOTHED HELICES
+TraF	SmoothPos [0]	100.	
+TraF	SmoothPos [1]	230.
+TraF	SmoothPos [2]	450.	
+TraF	SmoothPos [3]	550.	
+TraF	SmoothPos [4]	920.	
+TraF	SmoothPos [5]	1550.	
+TraF	SmoothPos [6]	2030.	
+TraF	SmoothPos [7]	2350.	
+TraF	SmoothPos [8]	3950.	
+TraF	SmoothPos [9]	5000.	
+
+//    ********** OPTIONS SPECIFIC to the FILLING the ALIGNMENT TTree **********
+main do alignment	// Book/fill alignment TTree
+main magnets	on	// (on|off) default is off
+// Upper limit on the chi2/NDF of selected tracks:
+//  One has to make a trade-off between too loose a selection cut that would let
+// through ghost tracks that might upset the minimisation and too tight a one
+// that might bias the alignment by restricting it to the sub-region of phase
+// space where the initial alignment is already good enough.
+main chi2 cut	30	// Cut on chi2/ndf
+main require	cop	// Keep only track with momentum
+
+//end

@@ -1,0 +1,7 @@
+//
+include ${CORAL}/src/tests/calorimeters_led_laser/coral_general.opt
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+CsField SM1m_field_measured $COMPASS_FILES/maps/mag_fields/SM1m/SM1M.map.172.data
+//CsField SM2_field $COMPASS_FILES/maps/mag_fields/SM2/FSM.map.5000.data
+CsField SM2_field $COMPASS_FILES/maps/mag_fields/SM2/FSM.map.4000.data
+

@@ -1,0 +1,249 @@
+// $Id: trafdic.mc.2004.opt,v 1.8 2011/02/15 22:16:28 ybedfer Exp $
+
+// Options file for TraFDic on 2004 MC
+
+// NOTA BENE:
+//  I) MC options files differ from their RD counterparts. Only slightly so.
+//    But they need make for our MC simulation not being 100% realistic. 
+// II) This version of the options file corresponds to the latest developments
+//    in both coral reconstruction software and understanding of the
+//    experimental apparatus.
+//     For the purpose of simulating a particular RD mass production:
+//   - The rule would be to use the version present the  production directory,
+//    viz.: "/afs/cern.ch/compass/scratch/d17/objsrvvy/2003/<period>/<slot>".
+//   - ...Wouldn't it be that MC options files are often carelessly maintained
+//    and may then not be up-to-date w/ their RD counterparts.
+//   - Best is then to use the version from the directory
+//         "$COMPASS_FILES/geometry/mc/<mass_production_version>"
+//    corresponding to one's needs. It was prepared to provide the best
+//    compatibility w/ that mass production. (And so were the include files
+//    stored there.)
+
+
+//  This file sums up the main options. Other options are specified elsewhere
+// and referenced here by "include <path_to_2ndary_options_file>" statements.
+// All options can be entered several times, whether in main or secondary files.
+// The last one, in the stream of entries and "include" statements, always wins.
+
+//  The file is to be edited for:
+//   I) Specifying input data one wants to process instead of the default
+//     pythia 2004.00
+//  II) Choosing between the two detector tables (so-called detectors.dat's)
+//     available: one valid for COMGeant,v7.2 (default) and other for v7.1.
+//     The diff is not so much a matter of COMGeant version than one of
+//     setup description: in so far as real data were mass produced w/ the
+//     description used in v7.1, MC, even if generated w/ v7.2 setup, should
+//     be processed w/ v7.1 setup.
+// III) Tailoring mDST filename and options to one's needs. Beware that PHAST
+//     mDST output is enabled by default, but active only if one's executable is
+//     PHAST-compatible, cf. "./README").
+//       Default mDST "information reduction" bit pattern is:
+//       - Only 1-st helix of each track,
+//       - Only tracks with momentum.
+//     Cf. $PHAST/coral/README for how to change this behaviour.
+//  IV) Specifying random generation seed and schmeme (Take care to leave the
+//     option "reset random seed every new event" commented out: it's meant for
+//     debugging and is inappropriate for  whatever kind of physics analysis.)
+//   V) Selecting appropriate field map (if one is simulating transverse data).
+
+// $Log: trafdic.mc.2004.opt,v $
+// Revision 1.8  2011/02/15 22:16:28  ybedfer
+//  Cosmetics...
+//
+// Revision 1.7  2007/12/13 11:07:53  ybedfer
+//  Cut on track's time cut for vertex reco. It has to be set to value
+// differing from the default one, specified in "../pkopt/vertex.2002.opt".
+// Instead of changing the latter, I overwrite the default here, for the
+// time being and utill all consequences implied by this change are under
+// control.
+//
+// Revision 1.5  2007/02/08 02:01:28  ybedfer
+//  - RICH options: use ``MC'' file from 2003.
+//  - Add smoothing points @ HCalorimeters.
+//
+// Revision 1.3  2006/04/21 17:19:37  ybedfer
+//  Specification of detector table moved into this main file (previously was
+// in the "./pkopt" file included in this file). 2 different tables, for
+// COMGeant,v7.2 (default) and v7.1, respectively.
+//
+// Revision 1.2  2005/10/07 14:09:11  ybedfer
+//  "MC response MCSmeared" for ECAL's (This is not set in "calorim_mc.opt",
+// contrary to what's done for HCAL's).
+//
+// Revision 1.1  2005/07/13 22:14:46  ybedfer
+//  - Derived from "./trafdic.mc.opt,v1.31".
+//  - Modified so as to be dedicated to 2004 MC alone.
+//
+
+//                                         ***** PHAST OUTPUT
+// - Active only if used on a PHAST-compatible executable, cf. "./README"
+// - Cf. "$PHAST/coral/README" for the details of the options
+mDST	file		${HOME}/phast.mc.root
+// - Information reduction bit pattern: "mDST select".
+mDST	select		6	// 0x6 = Only tracks w/ P | Only ONE helix per Track
+// - One may want to output more info, as exemplified infra:
+//mDST	hits		HL	// MegaDST...
+//mDST	MCgen		0	// MC generator info
+//mDST	MChits		FI04X	MM01X	DC01X	FI05X	GM03X	ST03X	FI06X	GM09X	ST04X
+
+
+//					   ***** HISTOGRAMMING
+histograms package ROOT
+
+histograms home    ${HOME}/trafdic.mc.root
+
+
+
+
+Monte Carlo job				// ***** THIS IS AN MC RUN
+
+//		CG,v7.1.2004.00
+
+//Monte Carlo file	/grid/fzk.de/compass/compass1/users/valexakh/data/mc/dstar/muplus160/2004/fz/dstar_test.160.full_p-up.2004.00.outpipe.fz.11	// .11 -> .20
+//Monte Carlo file	cchpsscompass:/hpss/in2p3.fr/group/compass/mc/2004/dstar/dstar_test.160.full_p-up.2004.00.outpipe.fz.11	// .11 -> .20
+//Monte Carlo file	cchpsscompass:/hpss/in2p3.fr/group/compass/mc/2004/pythia/pythia.160.full_p-up.2006.02.outpipe.fz.1	// .1 -> .10
+
+//		CG,v7.2.2004.00
+
+Monte Carlo file	/castor/cern.ch/user/c/comgeant/data/mc/pythia/muplus160/2004/fz/pythia_2004.160.full_p-up.2004.00.outpipe.fz.1	// .1 -> .10
+//Monte Carlo file	cchpsscompass:/hpss/in2p3.fr/group/compass/mc/2004/pythia/pythia_2004.160.full_p-up.2004.00.outpipe.fz.1	// .1 -> .10
+
+
+//					   ***** DETECTOR TABLE
+
+//detector table  	$COMPASS_FILES/geometry/mc/detectors.2004.00.real.dat	// File corresponding to COMGeant,v7.1
+detector table  	$COMPASS_FILES/geometry/mc/detectors.2004.00.v72.dat	// File corresponding to COMGeant,v7.2
+
+
+// 					   ***** MATERIAL MAPS
+
+//...is specified in the "./pkopt/trafdic.mc.2004.00.opt" file included in fine.
+
+
+
+//					   ***** EVENT SELECTION
+events to read 40000			// # of evts to read
+//events to skip 259
+//selection trigger mask ffff		// Trigger selection
+
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+//reset random seed every new event	// Option for debugging purposes: to be commented out for physics analysis.
+
+pattern method 1        // not used yet
+tracking method 1       // not used yet
+
+// 					   ***** DECODING
+make decoding 	 	// <nothing>, MCExact
+
+//  	 	 	 	 	   ***** CLUSTERING
+make clustering 	// <nothing>, MCExact, MCSmeared, MCQuantized
+
+//					   ***** RECONSTRUCTION SCHEMA
+reconstruction schema 1
+
+//					   ***** TRACKING
+make tracking
+track prepattern method traffic
+track bridging   method traffic
+track fitting    method traffic
+
+
+//					   ***** Beam RECONSTRUCTION 
+make beam reconstruction
+// Note: Beam options, which concern BMS reco or BMS<->scifiSi association, are
+// not really useful in MC, where no actual BMS simulation.
+include ${CORAL}/src/pkopt/beam_2004.opt
+//                   Overwrite what's set in "beam_2003.opt"
+BeamRecons	useTRAFFIC	1	// >0: Traffic is used, =0: standalone beampackage is used
+BeamRecons	doRescue	0	// Rescue cancelled, 'cause it makes coral abort. It's useless so far in MC, anyway.
+
+//					   ***** Vertex RECONSTRUCTION
+make vertex reconstruction
+vertex pattern method averaging
+vertex fitting method kalman
+include ${CORAL}/src/pkopt/vertex.2002.opt	// No change w.r.t. 2002
+//                   Overwrite what's set in "vertex.opt"
+CsAverPattern  AcceptTill	105	// in %
+CsAverPattern  Hist		1	// 0 - Off, 1 - ON
+CsAverPattern  findSec   	1	// 0 - Off, 1 - ON
+CsAverPattern  Print [ 0 ]	0	// Prefilter info.
+CsAverPattern  Print [ 1 ]	0	// Error info. 
+CsKalmanFitting  Hist		1	// 0 - Off, 1 - ON
+CsAverPattern TimePrimCut 10 	// in sigmas
+//CsKalmanFitting Covar		4	// 4 - plus mixed correlations of track momenta
+CsKalmanFitting  Print [ 0 ]	0	// Kalman filter info.
+CsKalmanFitting  Print [ 1 ]	0	// Global fit info.
+CsKalmanFitting  Print [ 2 ]	0	// IKF info.
+CsKalmanFitting  RefPlane	500	// in mm
+CsKalmanFitting  RefBeam	-1500	// in mm
+CsKalmanFitting  RefMargin	500	// in mm
+// Chi2 increment cuts:		DirChi2Trk	InvChi2Trk
+CsKalmanFitting  CUTS		7		10.5
+// Vertex Chi2 cut:
+CsKalmanFitting  Chi2VCut	10
+
+
+//					   ***** RICH1
+make rich1 reconstruction
+include ${CORAL}/src/pkopt/rich1.mc.2003.opt	// No option file specific to 2004 MC yet available
+
+//					   ***** CALORIMETERS
+make calorimeters reconstruction
+include ${CORAL}/src/pkopt/calorim_mc.opt
+//                   Overwrite what's set in "calorim.opt"
+EC01P1__ MC response MCSmeared		// Special setting for hadron
+EC02P1__ MC response MCSmeared		// Special setting for hadron
+
+//					   ***** MU' PID
+include ${CORAL}/src/pkopt/trigger.2003.opt	// Sic! Same as in 2003
+
+//  	 	 	 	 	   ***** GEOMETRICAL ZONES
+define zone 0 3500 before M1
+define zone 3500 17000 between M1 and M2
+define zone 17000 32500 between M2 and Muon Wall
+define zone 32500 99999 after Muon Wall
+
+define zone -8000 0 before the target
+
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+
+CsField SOL_field	$COMPASS_FILES/maps/mag_fields/SOL/smctgt_solenoide.fieldmap
+//CsField SOL_field	$COMPASS_FILES/maps/mag_fields/SOL/smctgt_dipole.fieldmap
+CsField SM1m_field_measured	$COMPASS_FILES/maps/mag_fields/SM1m/SM1M.map.172.data
+CsField SM2_field	$COMPASS_FILES/maps/mag_fields/SM2/FSM.map.4000.data
+
+
+//					   ***** LOGGER
+error logger log level   error		// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level none
+error logger verbosity   normal		// low, normal, high. 
+
+
+//	  	  	  	  	   ***** TraFDic (+DET OPTIONS+...)
+
+include 	${CORAL}/src/pkopt/trafdic.mc.2004.00.opt	// CG,v7.1/2 2004.00
+
+//	***** OVERWRITE WHAT'S SET IN "../pkopt/trafdic.mc.2004.??.opt" *****
+
+//TraF	Graph	[0]	0	// coral's graphics switches off automatically under BATCH @ CERN, gridKa and Lyon. This option forces it to do so in any case. 
+//TraF	Print	[ 0]	7	// Event-by-event numbering.
+//TraF	Print	[ 1]	1	// MC info
+//TraF	Print	[ 8]	7	// EoE
+
+//		   Smoothing points
+// The points @ RICH (resp. Calos) are to used by RICH (resp. Calo) software.
+TraF	SmoothPos [0]	745.		// RICH
+TraF	SmoothPos [1]	1266.5		// HCAL1
+TraF	SmoothPos [2]	3575.		// HCAL2
+
+// ********** SPECIAL SETTING TO HISTOGRAM GEMs Amplitude Correlation **********
+// (in "TEv::RDMonitor", which need be recompiled w/ "RDMon_DIGIT_DATA" and
+// "RDMon_DIGIT_GM" defined)
+//TraF	Hist	[ 1]	21	// MCMonitor (&2:D0Kpi,&4:Scat'd mu,&8:Lppi)
+//TraF	Hist	[18]	2	// Residuals: &Groups of tracks histo'ed
+// (in "TEv::Quadruples", which need be recompiled w/ "Quadruples_HISTO" defined)
+//end

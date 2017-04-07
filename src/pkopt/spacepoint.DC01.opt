@@ -1,0 +1,31 @@
+// $Id: spacepoint.DC01.opt,v 1.2 2002/04/22 08:21:49 hpereira Exp $
+//----------------------------------------
+//	SPACE POINTS MONITORING AND Definition
+// ___DC1
+SP Name 0 spDC1
+SP Family 0 DC01X1__ 2   //format is SP Family <FID> <TBNAME> [<MAXMLT>]
+SP Family 0 DC01X2__ 2 
+SP Family 0 DC01Y1__ 2 
+SP Family 0 DC01Y2__ 2  
+SP Family 0 DC01U1__ 2  
+SP Family 0 DC01U2__ 2  
+SP Family 0 DC01V1__ 2  
+SP Family 0 DC01V2__ 2
+  
+SP zrec 				0 4650              //spacepoint position along the beam (mm)
+SP geometry     0 -600 600 -600 600 //profiles dimensions (xMin,xMax) (yMin,yMax)
+SP NClCut 			0 -1                //number of clusters needed/space point
+SP chi2Cut_Fast	0 6                 //cut on fast minimization chi2 
+SP chi2Cut 			0 10                //cut on full minimization chi2
+SP mode					0 STRAIGHT          //mode for fast minimization (TPOINT||STRAIGHT)
+SP useLRFilter                      // mirror clusters are thrown away prior to the space point reconstruction
+SP useFastMinimisation              // fast minimisation: position only 
+// SP useFullMinimisation            // full minimisation: position+angles
+// SP useClusterAssociation          // ALL associate dets removed for combinations. 
+SP removeADet                       // associate det is removed from minimization for calibration (RT, resolution, efficiency)
+SP hist level none                  // none: no histograms, 
+                                    // normal: sp monitoring histograms
+                                    // high:   sp monitoring + internal calibration histograms
+
+SP make calibration                 // used in Main.cc
+RT nTBins 50

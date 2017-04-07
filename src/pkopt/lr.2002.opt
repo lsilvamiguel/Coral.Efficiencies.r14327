@@ -1,0 +1,195 @@
+// $Id: lr.2002.opt,v 1.9 2005/11/18 15:18:07 ybedfer Exp $
+
+//------------------------------
+//
+//   LR (Left/Right ambiguities) for Drift-like detectors
+//
+//------------------------------
+
+// $Log: lr.2002.opt,v $
+// Revision 1.9  2005/11/18 15:18:07  ybedfer
+//  "XYV1" entries for "MB02", for MC, in addition to the "XYV2" ones used
+// for RD.
+//
+// Revision 1.8  2005/05/27 21:40:58  ybedfer
+//  No actual change. Only commenting about previous v1.6 -> v1.7 modifs, viz.
+// target instead of infinity pointing for outer straws => No big change in
+// perfs (on either "~valexakh/test/dstar.160.full_p-up_61.2002.03.outpipe.fz"
+// or #22019) but still >0, which is consistent with explanation that infinity
+// pointing is a makeshift solution that is probably worse than target
+// pointing for most of the tracks but is never as boldly wrong as the latter
+// in the extreme case of the offspring of a far-off 2ndary vertex emitted
+// back toward spectrometer axis and that outer straws are unlikely to be
+// involved in such cases.
+//
+
+LR make associations    // perform L/R associations and ambiguity raising
+//LR make histograms      // book and fill L/R histograms
+
+//--------------------------------------
+//
+// DETECTOR ASSOCIATION TABLE. 
+// FORMAT : TBNAME0 TBNAME1  ASSOCIATION_CUT(mm)  LRPROB_CUT LRMODE
+//
+// LRProbCut is supposed to be in [0,0.5]
+// drift-like clusters for which LRProb < LRProbCut can be removed
+//
+// LRMODE : optional parameter 
+//		nothing - 	Target pointing
+//		0 - 		Target pointing; 
+//		1 - 		Cell overlap (i.e. infinity pointing); 
+// 		other - 	Nothing;
+//-----------------------------
+
+// NOTA BENE: Infinity pointing is opted for on view of reco performances
+// measured on CG,v7.0 and #22019
+
+//             Tracks                   Vertex                Beam
+//  toto    LAS     SAS     mu'   %(#Tracks)  mu/mu' 2nd    <1    OK   >1
+//Efficiency: LAS  +fring-field  [1,65GeV]   SAS  (yield)
+//Fake : Overall  +fring-field  [1-65GeV]
+//mu': efficiency vs. zones bit pattern, acceptance*efficiency (yield)
+
+// CG,v7.0 6000 PYTHIA events
+// (~valexakh/test/pythia.160.full_p-up_56.2002.03.outpipe.fz.1,2
+
+// Infinity pointing
+// 39510   26693   23715    7182  5475(4.339) 4708    15     75  5925     0
+//  6.58    4.45    3.95   1.197  91.2(4.339) 78.5 0.250   0.01  0.99  0.00
+//  1.47    1.40    1.47   1.527
+//Efficiency = 73.32  82.68  79.33  84.91  (7519)
+//Fake =        3.53   4.70   3.22
+//0x3 = 98.71 0xf = 87.46 0x7 =  1.09 0xe =  3.57 #mu = 4844: 80.73 
+//
+// Target pointing
+// 39687   26825   23790    7227  5475(4.349) 4710 15        75  5925     0
+//  6.61    4.47    3.96   1.204  91.2(4.349) 78.5 0.250   0.01  0.99  0.00
+//  1.46    1.39    1.46   1.499
+//Efficiency = 73.62  82.80  79.66  84.95  (7522)
+//Fake =        3.62   4.78   3.27
+//0x3 = 98.69 0xf = 87.46 0x7 =  1.09 0xe =  3.61 #mu = 4846: 80.77 
+//
+// DC1 target pointing + infinity pointing for the rest
+// 39550   26751   23725    7189  5478(4.341) 4716 15        75  5925     0
+//  6.59    4.46    3.95   1.198  91.3(4.341) 78.6 0.250   0.01  0.99  0.00
+//  1.47    1.40    1.47   1.538
+//Efficiency = 73.41  82.83  79.43  84.92  (7519)
+//Fake =        3.53   4.68   3.18
+//0x3 = 98.83 0xf = 87.65 0x7 =  1.05 0xe =  3.46 #mu = 4848: 80.80 
+
+// #22019 (19006) 14944 evnts trigger 0x7
+
+// Infinity pointing
+// 46953   37992   26647   13411  5699(3.265) 4664 62      2733 10068  2143
+//  3.14    2.54    1.78   0.897  38.1(3.265) 31.2 0.415   0.18  0.67  0.14
+//  2.88    3.01    2.27   2.274
+//
+// Target pointing
+// 46978   38036   26636   13406  5692(3.265) 4663 63      2733 10068  2143
+//  3.14    2.55    1.78   0.897  38.1(3.265) 31.2 0.422   0.18  0.67  0.14
+//  2.86    2.98    2.28   2.290
+//
+// DC1 target pointing + infinity pointing for the rest
+// 46940   37998   26637   13407  5689(3.264) 4659 62      2733 10068  2143
+//  3.14    2.54    1.78   0.897  38.1(3.264) 31.2 0.415   0.18  0.67  0.14
+//  2.87    3.00    2.27   2.274
+
+
+// DRIFT CHAMBERS
+LR associate  DC01X1__   DC01X2__  8.0	  0.5 	1
+LR associate  DC01Y1__   DC01Y2__  8.0    0.5   1
+LR associate  DC01U1__   DC01U2__  8.0    0.5   1
+LR associate  DC01V1__   DC01V2__  8.0    0.5   1
+
+LR associate  DC02X1__   DC02X2__  8.0	  0.5 	1
+LR associate  DC02Y1__   DC02Y2__  8.0    0.5   1
+LR associate  DC02U1__   DC02U2__  8.0    0.5   1
+LR associate  DC02V1__   DC02V2__  8.0    0.5   1
+
+LR associate  DC03X1__   DC03X2__  8.0	  0.5 	1
+LR associate  DC03Y1__   DC03Y2__  8.0    0.5   1
+LR associate  DC03U1__   DC03U2__  8.0    0.5   1
+LR associate  DC03V1__   DC03V2__  8.0    0.5   1
+
+// W45 (association cut set a priori = 45, i.e. somewhat larger than pitch. Y.B)
+LR associate  DW01X1__   DW01X2__ 45.0	  0.5 	1
+LR associate  DW01V1__   DW01V2__ 45.0	  0.5 	1
+LR associate  DW02Y1__   DW02Y2__ 45.0	  0.5 	1
+LR associate  DW02U1__   DW02U2__ 45.0	  0.5 	1
+// Added lately: DW03:4. They are not really part of 2002 setup, and , as such,
+// should not be present in this "lr.2002.opt" file. But the are introduced
+// in a preliminary draft of 2003 setup by Vadim. And have therefore
+// a somewhat imprecise status. Anyway their presence here cannot do any
+// harm: if the DW03:4 are not defined in the detector table, the entries infra
+// will simply be ignored (Y.B.).
+LR associate  DW03X1__   DW03X2__ 45.0	  0.5 	1
+LR associate  DW03V1__   DW03V2__ 45.0	  0.5 	1
+LR associate  DW04Y1__   DW04Y2__ 45.0	  0.5 	1
+LR associate  DW04U1__   DW04U2__ 45.0	  0.5 	1
+
+// 6mm STRAW TUBES
+LR associate  ST02Y2ub   ST02Y2db  7.0    0.5   1  // Present only in 2001
+
+LR associate  ST03X1ub   ST03X1db  7.0    0.5   1
+LR associate  ST03Y1ub   ST03Y1db  7.0    0.5   1
+LR associate  ST03U1ub   ST03U1db  7.0    0.5   1
+LR associate  ST03X2ub   ST03X2db  7.0    0.5   1
+LR associate  ST03Y2ub   ST03Y2db  7.0    0.5   1
+LR associate  ST03V1ub   ST03V1db  7.0    0.5   1
+LR associate  ST04V1ub   ST04V1db  7.0    0.5   1
+LR associate  ST04Y1ub   ST04Y1db  7.0    0.5   1
+LR associate  ST04X1ub   ST04X1db  7.0    0.5   1
+
+// 10mm
+LR associate  ST03X1ua   ST03X1da 11.0    0.5   0
+LR associate  ST03Y1ua   ST03Y1da 11.0    0.5   0
+LR associate  ST03U1ua   ST03U1da 11.0    0.5   0
+LR associate  ST03X2ua   ST03X2da 11.0    0.5   0
+LR associate  ST03Y2ua   ST03Y2da 11.0    0.5   0
+LR associate  ST03V1ua   ST03V1da 11.0    0.5   0
+LR associate  ST04V1ua   ST04V1da 11.0    0.5   0
+LR associate  ST04Y1ua   ST04Y1da 11.0    0.5   0
+LR associate  ST04X1ua   ST04X1da 11.0    0.5   0
+
+LR associate  ST03X1uc   ST03X1dc 11.0    0.5   0
+LR associate  ST03Y1uc   ST03Y1dc 11.0    0.5   0
+LR associate  ST03U1uc   ST03U1dc 11.0    0.5   0
+LR associate  ST03X2uc   ST03X2dc 11.0    0.5   0
+LR associate  ST03Y2uc   ST03Y2dc 11.0    0.5   0
+LR associate  ST03V1uc   ST03V1dc 11.0    0.5   0
+LR associate  ST04V1uc   ST04V1dc 11.0    0.5   0
+LR associate  ST04Y1uc   ST04Y1dc 11.0    0.5   0
+LR associate  ST04X1uc   ST04X1dc 11.0    0.5   0
+
+//=== DRIFT TUBES ===
+//------  Large parts ----
+LR associate  MB01X1ub   MB01X1db 35.0    0.5   1
+LR associate  MB01Y1ur   MB01Y1dr 35.0    0.5   1
+LR associate  MB01V1ub   MB01V1db 35.0    0.5   1
+
+LR associate  MB02X1ub   MB02X1db 35.0    0.5   1
+LR associate  MB02Y1ur   MB02Y1dr 35.0    0.5   1
+LR associate  MB02V1ub   MB02V1db 35.0    0.5   1
+
+LR associate  MB02X2ub   MB02X2db 35.0    0.5   1
+LR associate  MB02Y2ur   MB02Y2dr 35.0    0.5   1
+LR associate  MB02V2ub   MB02V2db 35.0    0.5   1
+
+//------- Small parts ----------
+LR associate  MB01X1uc   MB01X1dc 35.0    0.5   1
+LR associate  MB01Y1ul   MB01Y1dl 35.0    0.5   1
+LR associate  MB01V1uc   MB01V1dc 35.0    0.5   1
+
+LR associate  MB02X1uc   MB02X1dc 35.0    0.5   1
+LR associate  MB02Y1ul   MB02Y1dl 35.0    0.5   1
+LR associate  MB02V1uc   MB02V1dc 35.0    0.5   1
+
+LR associate  MB02X2uc   MB02X2dc 35.0    0.5   1
+LR associate  MB02Y2ul   MB02Y2dl 35.0    0.5   1
+LR associate  MB02V2uc   MB02V2dc 35.0    0.5   1
+
+// THESE DETECTORS SHOULD NOT EXIST BUT ARE 
+// PRESENT IN 2001 RUN (BAD NAMING SCHEME)
+LR associate  ST03V2ub   ST03V2db  7.0		 0.5   1
+
+// end

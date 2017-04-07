@@ -1,0 +1,9 @@
+// Options file for combined RICHwall+ECal1 charge reconstruction.
+
+RW_Charge_Recons HistogramLevel   1
+//
+RW_Charge_Recons RWoperdata   1
+
+RW_Charge_Recons RW_Space_Overlap  [  0 - 2 ]  200.  200.  250.
+RW_Charge_Recons RW_Projection_Overlap  [  0 - 2 ]  75.  75.  75.
+RW_Charge_Recons RW_Summ_Range  [  0 - 2 ]  50.  60.   70. 

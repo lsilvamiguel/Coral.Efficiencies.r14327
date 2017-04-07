@@ -1,0 +1,1187 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT
+AC_CONFIG_HEADER(coral_config.h)
+
+
+dnl ****************************************************************************
+dnl Macro for printing error message
+dnl ****************************************************************************
+
+AC_DEFUN(CONFIG_FAILED,
+[
+  echo 
+  echo 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+  echo 'CORAL CONFIGURATION FAILED WITH ERROR:'
+  echo $1
+  echo 'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
+  echo 
+  AC_ERROR(Fix the problem and run the configuration again)
+])
+
+dnl ****************************************************************************
+dnl Create macro to check an environment variable
+dnl ****************************************************************************
+
+AC_DEFUN(AC_CHECK_ENV,
+[
+  if test "$$1" = ""; then
+      CONFIG_FAILED('$1 environment variable is undefined!
+Please read file INSTALL for installation instructions.')
+  fi
+])
+
+dnl AC_SET_PACKAGE(package_name,env_variable,help_string,default_value)
+dnl On output:
+dnl variable USE_package_name will be set (both AC_DEFINE and AC_SUBST)
+dnl variable DIR_package_name will be non-empty for particular check (empty for CERN installation)
+AC_DEFUN(AC_SET_PACKAGE,
+[
+  DIR_$1=
+  AC_ARG_ENABLE($1)
+  if test "${enable_$1}" != ""; then
+    with_$1=${enable_$1}
+  else
+    AC_ARG_WITH($1,[$3],,with_$1=$4)
+  fi
+  echo Will you use package $1?  ${with_$1}
+  if test "${with_$1}" = "no"; then
+    # Package is disabled
+    USE_$1=no
+    AC_DEFINE(USE_$1,0)
+  else
+    # Package is enabled
+    AC_CHECKING($1)
+    if test "${with_$1}" = "yes"; then
+      # Try to search in standard places.
+      # At first we check environment variable $2
+      AC_MSG_CHECKING(environment variable $2)
+      if test "$$2" = ""; then
+        AC_MSG_RESULT(variable was not set)
+        with_$1=
+      else
+        # The environment variable is defined. We shall use it.
+        AC_MSG_RESULT($$2)
+        with_$1=$$2
+      fi
+    else
+      # Exact value was given: --with-package=/dir1/dir2/
+      true
+    fi
+    dnl AC_CHECK_FILE(${with_$1},,CONFIG_FAILED(Can not find ${with_$1}))
+    dnl DIR_$1=${with_$1}
+    DIR_$1=${with_$1}
+    USE_$1=yes
+    AC_DEFINE(USE_$1,1)
+  fi
+  AC_SUBST(USE_$1)
+  AC_SUBST(DIR_$1)
+  AC_SUBST(LIB_$1)
+])
+
+dnl ****************************************************************************
+dnl CFLAGS
+dnl ****************************************************************************
+
+AC_ARG_WITH(CFLAGS, AS_HELP_STRING([--with-CFLAGS], [default: "-O2 -DUSE_ObjectsCounter"]),
+if test "$with_CFLAGS" != "no"; then
+  CFLAGS=$with_CFLAGS
+fi
+,
+CFLAGS="-O2 -DUSE_ObjectsCounter"
+)
+
+FFLAGS=$CFLAGS
+
+dnl ****************************************************************************
+dnl Environmental Variables
+dnl ****************************************************************************
+
+AC_ARG_WITH(COMPASS_FILES, AS_HELP_STRING([--with-COMPASS_FILES=DIR], [Address of coral files [default=/afs/cern.ch/compass/detector]]), , with_COMPASS_FILES=/afs/cern.ch/compass/detector)
+echo "Environment COMPASS_FILES set to $with_COMPASS_FILES"
+DEF_COMPASS_FILES=$with_COMPASS_FILES
+AC_SUBST(DEF_COMPASS_FILES)
+
+dnl ****************************************************************************
+dnl Library type
+dnl ****************************************************************************
+
+AC_ARG_ENABLE(shared, AS_HELP_STRING([--enable-shared], [build shared libraries; default is static libraries]))
+if test "${enable_shared}" = "yes"; then
+  LIB_TYPE=shared
+else
+  LIB_TYPE=static
+fi
+AC_SUBST(LIB_TYPE)
+
+dnl ****************************************************************************
+
+LIBS=
+
+if test "$OS" = ""; then
+  OS=`uname -s`
+  echo Set variable OS=$OS
+fi
+AC_SUBST(OS)
+
+dnl get the SLC version from the content of /etc/redhat-release
+CERN_LINUX_VERSION=0
+if test -e /etc/redhat-release ; then
+    if grep -q "SLC release 6" /etc/redhat-release ; then
+        CERN_LINUX_VERSION=6
+    elif grep -q "CentOS Linux release 7" /etc/redhat-release ; then
+        CERN_LINUX_VERSION=7
+    fi
+fi
+AC_SUBST(CERN_LINUX_VERSION)
+
+dnl compiling for 32 or 64 bit system
+dnl default is 64 bits, fall back to 32 bits in case
+dnl configure is run on a non-64 bit machine
+if echo $CFLAGS | grep -q -e "-m32" ; then
+    PLATFORM=32
+elif echo $CFLAGS | grep -q -e "-m64" ; then
+    dnl so this should be 64 bit, but is this also a 64 bit machine
+    if uname -m | grep -q "x86_64" ; then 
+        dnl this is okay
+        PLATFORM=64
+    else
+        dnl this not
+        CONFIG_FAILED(Trying to configure for 64bit compilation on not x86_64 machine)
+    fi
+else
+    if uname -m | grep -q "x86_64" ; then
+        PLATFORM=64
+        CFLAGS="-m64 $CFLAGS"
+        FFLAGS="-m64 $FFLAGS"
+    else
+        PLATFORM=32
+        CFLAGS="-m32 $CFLAGS"
+        FFLAGS="-m32 $FFLAGS"
+    fi
+fi
+AC_SUBST(PLATFORM)
+GCC_MODE=$PLATFORM
+AC_SUBST(GCC_MODE)
+
+dnl Checks for programs.
+AC_PROG_INSTALL
+
+dnl Check for compilers
+dnl an unconditioned compiler has to go first
+AC_PROG_CC
+AC_PROG_CPP 
+
+AC_PROG_CXX
+AC_PROG_CXXCPP
+
+dnl Do compilation using C++
+AC_LANG_CPLUSPLUS
+
+dnl save compiler configuration
+GCC_ROOT=`which $CC | sed -re 's#/bin/'$CC'$##'`
+AC_SUBST(GCC_ROOT)
+
+
+dnl get the compiler version
+GCC_VERSION=`$CC --version | awk '{print $3}' | xargs |  awk '{print $1}'`
+AC_SUBST(GCC_VERSION)
+
+dnl get numeric gcc version
+GCC_NVERSION=`tools/gcc-version.sh $CC`
+
+dnl for gcc > 4.0 we need to use gfortran as the F77 compiler
+if test $GCC_NVERSION -ge 0400; then
+    AC_PROG_F77([gfortran])
+    dnl make sure gfortran was found
+    if test "$F77" != "gfortran" ; then
+        CONFIG_FAILED(Need to use gfortran as fortran compiler with gcc \> 4.0.)
+    fi
+else
+    AC_PROG_F77
+fi
+dnl There is bug with autoconf in the next line!!!! 
+dnl AC_F77_LIBRARY_LDFLAGS 
+
+
+dnl
+dnl Check for compiler flags
+dnl
+
+
+dnl This macro is for checking if some command line option of CC is available
+dnl or not.
+AC_DEFUN([CHECK_CC_OPT],[
+AC_MSG_CHECKING([whether $CC accepts $1])
+tmpfile=$(mktemp -t)
+$CC $1 -c -xc /dev/null -o $tmpfile >/dev/zero 2>/dev/zero
+ac_status=$?
+rm -f $tmpfile
+if test $ac_status -eq 0; then
+  AC_MSG_RESULT([yes])
+else
+  AC_MSG_RESULT([no])
+fi
+])
+
+
+dnl
+dnl Correctness checks go directly into CFLAGS
+dnl
+
+dnl for CC7 check that we can use C++11, otherwise blindly use ansi (as before)
+if test $CERN_LINUX_VERSION -lt 7 ; then
+  ansi_standard="-ansi"
+else
+  CHECK_CC_OPT(-std=c++11)
+  if test $ac_status -eq 0; then
+    ansi_standard="-std=c++11"
+  else
+    CONFIG_FAILED(Compiler on CC7 and later should have support for C++11, but does not.)
+  fi
+fi
+CFLAGS="${CFLAGS} ${ansi_standard}"
+
+CHECK_CC_OPT(-fno-strict-aliasing)
+if test $ac_status -eq 0; then
+   CFLAGS="$CFLAGS -fno-strict-aliasing"
+else
+   AC_WARN("Compiling without -fno-strict-aliasing is unsafe!")
+fi
+
+dnl Use -fno-strict-overflow to avoid wrong optimisations of signed integer
+dnl overflows (wraparounds).  Fall back to -fwrapv (which has bugs in some
+dnl versions of GCC but probably is better than nothing) if
+dnl -fno-strict-overflow doesn't exist.
+dnl The gory details:
+dnl http://e18.physik.tu-muenchen.de/~tnagel/signed-integer-overflow/
+CHECK_CC_OPT(-fno-strict-overflow)
+if test $ac_status -eq 0; then
+   CFLAGS="$CFLAGS -fno-strict-overflow"
+else
+   CHECK_CC_OPT(-fwrapv)
+   if test $ac_status -eq 0; then
+      CFLAGS="$CFLAGS -fwrapv"
+   fi
+fi
+
+dnl enable all warnings
+CHECK_CC_OPT(-Wall)
+if test $ac_status -eq 0; then
+  CFLAGS="${CFLAGS} -Wall"
+fi
+
+dnl enable extra warnings
+CHECK_CC_OPT(-Wextra)
+if test $ac_status -eq 0; then
+  CFLAGS="${CFLAGS} -Wextra"
+fi
+
+dnl disable some warnings with a lot of messages
+CHECK_CC_OPT(-Wno-unused)
+if test $ac_status -eq 0; then
+  CFLAGS="${CFLAGS} -Wno-unused"
+fi
+
+CHECK_CC_OPT(-Wno-unused-parameter)
+if test $ac_status -eq 0; then
+  CFLAGS="${CFLAGS} -Wno-unused-parameter"
+fi
+
+dnl Let's disable -Wparentheses by default for the time being: because it
+dnl yields, as of 2014/03, far too many warning messages.
+CHECK_CC_OPT(-Wno-parentheses)
+if test $ac_status -eq 0; then
+  CFLAGS="${CFLAGS} -Wno-parentheses"
+fi
+
+dnl enable some warnings not covered by all and extra
+CHECK_CC_OPT(-Woverloaded-virtual)
+if test $ac_status -eq 0; then
+  CFLAGS="${CFLAGS} -Woverloaded-virtual"
+fi
+
+CHECK_CC_OPT(-Wpointer-arith)
+if test $ac_status -eq 0; then
+  CFLAGS="${CFLAGS} -Wpointer-arith"
+fi
+
+dnl With -Wcast_qual gcc 3.4 or 4.7 emits an obnoxious amount of warnings for the
+dnl ROOT headers, therefore we test for it only when gcc 4.0 or later has been
+dnl detected.  (TN 2010-04-15)
+if test $GCC_NVERSION -ge 0400 && test $GCC_NVERSION -lt 0407; then
+   CHECK_CC_OPT(-Wcast-qual)
+   if test $ac_status -eq 0; then
+      CFLAGS="${CFLAGS} -Wcast-qual"
+   fi
+fi
+
+dnl X-windows system configuration (x_includes,x_libraries or no_x)
+AC_PATH_X
+AC_SUBST(x_libraries)
+AC_SUBST(x_includes)
+
+dnl ****************************************************************************
+dnl ****************************** O P T I O N S *******************************
+dnl ****************************************************************************
+
+
+dnl ****************************************************************************
+dnl ORACLE
+dnl ****************************************************************************
+
+AC_SET_PACKAGE(ORACLE, ORACLE_ROOT, AS_HELP_STRING([--with-ORACLE], [enabled by default]), "yes")
+
+if test "$USE_ORACLE" = "yes"; then
+  if test "$DIR_ORACLE" = ""; then
+    if test $CERN_LINUX_VERSION -eq 7 ; then
+      DIR_ORACLE=/afs/cern.ch/sw/lcg/releases/oracle/11.2.0.3.0-e33b7/x86_64-cc7-gcc49-opt
+    elif test $CERN_LINUX_VERSION -eq 6 ; then
+      if test $PLATFORM -eq 64 ; then
+        DIR_ORACLE=/afs/cern.ch/sw/lcg/external/oracle/11.2.0.3.0/x86_64-slc6-gcc47-opt
+      else
+        DIR_ORACLE=/afs/cern.ch/sw/lcg/external/oracle/11.2.0.3.0/i686-slc6-gcc47-opt
+      fi
+    else
+      CONFIG_FAILED(Unsupported OS for Oracle client libraries)
+    fi
+  fi
+
+  AC_CHECK_FILE($DIR_ORACLE,,CONFIG_FAILED(Bad path to Oracle))
+  AC_CHECK_FILE($DIR_ORACLE/lib,LIB_ORACLE=$DIR_ORACLE/lib,CONFIG_FAILED(Bad path to Oracle library))
+fi
+
+dnl ****************************************************************************
+dnl MySQL
+dnl ****************************************************************************
+
+AC_SET_PACKAGE(MySQL, MySQLDIR, AS_HELP_STRING([--with-MySQL], [enabled by default (To use mysql_config specify "--with-MySQL=mysql_config". mysql_config has to be in your PATH.)]), "yes")
+
+if test "$USE_MySQL" = "yes"; then
+  if test "$DIR_MySQL" = ""; then
+    if test $CERN_LINUX_VERSION -eq 7 ; then
+      DIR_MySQL=/afs/cern.ch/sw/lcg/releases/mysql/5.5.27-c4d2c/x86_64-cc7-gcc49-opt
+    elif test $CERN_LINUX_VERSION -eq 6 ; then
+      if test $PLATFORM -eq 64 ; then
+        DIR_MySQL=/afs/cern.ch/sw/lcg/external/mysql/5.5.14/x86_64-slc6-gcc47-opt
+      else
+        DIR_MySQL=/afs/cern.ch/sw/lcg/external/mysql/5.5.14/i686-slc6-gcc47-opt
+      fi
+    else
+      CONFIG_FAILED(Unsupported OS for MySQL client libraries)
+    fi
+  fi
+
+  if test "$DIR_MySQL" = "mysql_config"; then
+    DIR_MySQL=`which mysql_config` 
+    AC_CHECK_FILE($DIR_MySQL,,CONFIG_FAILED(No MySQL directory found))
+    LIB_MySQL=`$DIR_MySQL --libs`
+    LIBS="$LIBS $LIB_MySQL"
+    MySQL_INCLUDES=`$DIR_MySQL --include` 
+    C_INCLUDES="$C_INCLUDES $MySQL_INCLUDES"
+    DIR_MySQL=""
+  else
+    export MySQLDIR=$DIR_MySQL
+    AC_CHECK_FILE($DIR_MySQL,,CONFIG_FAILED(No MySQL directory found))
+    LIB_MySQL="-L$DIR_MySQL/lib -lmysqlclient"
+    LIBS="$LIBS $LIB_MySQL"
+    MySQL_INCLUDES="-I$DIR_MySQL/include -I$DIR_MySQL/include/mysql" 
+    C_INCLUDES="$C_INCLUDES $MySQL_INCLUDES"
+  fi
+fi
+
+dnl ****************************************************************************
+dnl EXPAT
+dnl ****************************************************************************
+
+AC_SET_PACKAGE(EXPAT, EXPAT, AS_HELP_STRING([--with-EXPAT], []), "yes")
+
+if test "$USE_EXPAT" = "yes"; then
+    if test "$DIR_EXPAT" = "" ; then
+        if test $CERN_LINUX_VERSION -eq 7; then
+            # the commented paths would probably be the more correct choice, but
+            # they require to correctly pass this information to the configuration
+            # of DDD, and also to modify (at least) setup.(c)sh
+            # DIR_EXPAT=/afs/cern.ch/sw/lcg/releases/expat/2.0.1-6c8ce/x86_64-cc7-gcc49-opt
+            DIR_EXPAT=/usr
+        elif test $CERN_LINUX_VERSION -eq 6; then
+            if test $PLATFORM -eq 64 ; then
+                # DIR_EXPAT=/afs/cern.ch/sw/lcg/external/expat/2.0.1/x86_64-slc6-gcc47-opt
+                DIR_EXPAT=/usr
+            else
+                # DIR_EXPAT=/afs/cern.ch/sw/lcg/external/expat/2.0.1/i686-slc6-gcc47-opt
+                DIR_EXPAT=/usr
+            fi
+        else
+            if test $PLATFORM -eq 64 ; then
+                DIR_EXPAT=/usr
+            else
+                DIR_EXPAT=/usr
+            fi
+        fi
+    fi
+
+    LIB_EXPAT=""
+    if test $PLATFORM -eq 64 ; then
+        AC_CHECK_FILE($DIR_EXPAT/lib64/libexpat.so, LIB_EXPAT=$DIR_EXPAT/lib64/libexpat.so,
+            AC_CHECK_FILE($DIR_EXPAT/lib64/libexpat.so.0, LIB_EXPAT=$DIR_EXPAT/lib64/libexpat.so.0,
+                AC_CHECK_FILE($DIR_EXPAT/lib64/libexpat.so.1, LIB_EXPAT=$DIR_EXPAT/lib64/libexpat.so.1)))
+    fi
+    if test "$LIB_EXPAT" = "" ; then
+        AC_CHECK_FILE($DIR_EXPAT/lib/libexpat.so, LIB_EXPAT=$DIR_EXPAT/lib/libexpat.so,
+            AC_CHECK_FILE($DIR_EXPAT/lib/libexpat.so.0, LIB_EXPAT=$DIR_EXPAT/lib/libexpat.so.0,
+                AC_CHECK_FILE($DIR_EXPAT/lib/libexpat.so.1, LIB_EXPAT=$DIR_EXPAT/lib/libexpat.so.1,
+                    CONFIG_FAILED('libexpat.so not found'))))
+    fi
+
+    LIBS="$LIBS $LIB_EXPAT"
+    C_INCLUDES="$C_INCLUDES -I$DIR_EXPAT/include"
+fi
+
+dnl ****************************************************************************
+dnl TGEANT Geant4-Monte-Carlo
+dnl ****************************************************************************
+
+AC_ARG_ENABLE(TGEANT, AS_HELP_STRING([--enable-TGEANT], [disabled by default]), , enable_TGEANT=no)
+USE_TGEANT=$enable_TGEANT
+echo Will you use package TGEANT?  $USE_TGEANT
+if test "$USE_TGEANT" = "yes"; then
+  AC_DEFINE(USE_TGEANT,1)
+else
+  AC_DEFINE(USE_TGEANT,0)
+fi
+AC_SUBST(USE_TGEANT)
+
+
+dnl ****************************************************************************
+dnl ROOT based event display
+dnl ****************************************************************************
+
+AC_ARG_ENABLE(NewEDIS, AS_HELP_STRING([--enable-NewEDIS], [disabled by default]), , enable_NewEDIS=no)
+USE_NewEDIS=$enable_NewEDIS
+echo Will you use package NewEDIS?  $USE_NewEDIS
+if test "$USE_NewEDIS" = "yes"; then
+  AC_DEFINE(USE_NewEDIS,1)
+else
+  AC_DEFINE(USE_NewEDIS,0)
+fi
+AC_SUBST(USE_NewEDIS)
+
+
+dnl ****************************************************************************
+dnl ROOT
+dnl ****************************************************************************
+
+AC_SET_PACKAGE(ROOT, ROOTSYS, AS_HELP_STRING([--with-ROOT], [ROOT directory]), "yes")
+if test "$USE_ROOT" = "yes"; then
+  if test "$DIR_ROOT" = ""; then
+    if test $CERN_LINUX_VERSION -eq 7 ; then
+      DIR_ROOT=/afs/cern.ch/sw/lcg/releases/ROOT/6.02.05-b8270/x86_64-cc7-gcc49-opt
+    elif test $CERN_LINUX_VERSION -eq 6 ; then
+      if test $PLATFORM -eq 64 ; then
+        DIR_ROOT=/afs/cern.ch/sw/lcg/app/releases/ROOT/5.34.07a/x86_64-slc6-gcc47-opt/root
+      else
+        DIR_ROOT=/afs/cern.ch/sw/lcg/app/releases/ROOT/5.34.07a/i686-slc6-gcc47-opt/root
+      fi
+    fi
+  fi
+
+  if test "$DIR_ROOT" != "$ROOTSYS"; then
+    AC_WARN(Your environment variable ROOTSYS is incorrect (or it was not set))
+    AC_WARN(You MUST set it to $DIR_ROOT BEFORE running 'make' program)
+    AC_WARN(Script setup.csh/setup.sh will do this job for you)
+    AC_WARN(Type '. setup.sh' under bash/ksh or 'source setup.csh' under csh/tcsh)
+    warnings="$warnings ROOT"
+  fi
+
+  export ROOTSYS=$DIR_ROOT
+  AC_CHECK_FILE($DIR_ROOT,,CONFIG_FAILED(Can not find base ROOT directory))
+  AC_CHECK_FILE($DIR_ROOT/bin/rootcint,,CONFIG_FAILED(Can not find rootcint))
+  AC_CHECK_FILE($DIR_ROOT/bin/root-config,
+    which_root_libs="--glibs"
+    if test "$enable_NewEDIS" = "yes" ; then
+        which_root_libs="--evelibs"
+    fi
+    echo You have 'root-config' program. Good.
+    LIB_ROOT=`$DIR_ROOT/bin/root-config $which_root_libs`
+  ,
+    echo You do not have 'root-config' program. Guessing ROOT libraries...
+    LIB_ROOT="-L$DIR_ROOT/lib -lNew -lCore -lCint -lHist -lGraf -lGraf3d -lGpad -lTree -lRint -lPostscript -lMatrix -lPhysics -lGui -lm -ldl -rdynamic"
+  )
+  echo I add libraries -lMinuit -lGeom by hand...
+  LIB_ROOT="$LIB_ROOT -lMinuit -lGeom"
+  LIBS="$LIBS $LIB_ROOT"
+  C_INCLUDES="$C_INCLUDES `$DIR_ROOT/bin/root-config --cflags`"
+
+  CXXFLAGS_save=$CXXFLAGS
+  if test $PLATFORM -eq 64 ; then
+    CXXFLAGS="`$DIR_ROOT/bin/root-config --cflags` -m64"
+  else
+    CXXFLAGS="`$DIR_ROOT/bin/root-config --cflags` -m32"
+  fi
+  
+  LIBS_save=$LIBS
+  LIBS="`$DIR_ROOT/bin/root-config --libs`"
+ 
+  AC_TRY_LINK([#include "TFile.h"], [TFile f("f.root");],echo YES ,
+    echo
+    echo Check that ROOT was compiled with the same GCC version which are you using now
+    CONFIG_FAILED(Can not create a simple ROOT program)
+  )
+  CXXFLAGS=$CXXFLAGS_save
+  LIBS=$LIBS_save
+
+dnl only use -Wcast-qual for ROOT version > 5.18 to avoid warnings from
+dnl ROOT header files
+dnl  ROOT_VERSION_MAJOR=`$DIR_ROOT/bin/root-config --version | cut -d. -f1`
+dnl  ROOT_VERSION_MINOR=`$DIR_ROOT/bin/root-config --version | cut -d/ -f1 | cut -d. -f2`
+dnl  if test -n "$ROOT_VERSION_MAJOR"; then
+dnl     if test $ROOT_VERSION_MAJOR -le 5; then
+dnl        if test $ROOT_VERSION_MINOR -le 18; then
+dnl           Wcast_qual=
+dnl        fi
+dnl     fi
+dnl  fi
+else
+  CONFIG_FAILED('ROOT is required!')
+fi
+
+dnl ****************************************************************************
+dnl Qt
+dnl ****************************************************************************
+
+AC_SET_PACKAGE(Qt, QTDIR, AS_HELP_STRING([--with-Qt], [disabled by default]), "no")
+if test "$USE_Qt" = "yes"; then
+  if test "$DIR_Qt" = ""; then
+    if test $CERN_LINUX_VERSION -eq 7 ; then
+      DIR_Qt=/afs/cern.ch/sw/lcg/releases/qt/4.8.4-f642c/x86_64-cc7-gcc49-opt
+    elif test $CERN_LINUX_VERSION -eq 6 ; then
+      if test $PLATFORM -eq 64 ; then
+        DIR_Qt=/afs/cern.ch/sw/lcg/external/qt/4.8.4/x86_64-slc6-gcc47-opt
+      else
+        DIR_Qt=/afs/cern.ch/sw/lcg/external/qt/4.8.4/i686-slc6-gcc47-opt
+      fi
+    else
+      CONFIG_FAILED([Qt directory was not found])
+    fi
+  fi
+  if test "$DIR_Qt" != "$QTDIR"; then
+    AC_WARN(Your environment variable QTDIR is incorrect (or it was not set))
+    AC_WARN(You MUST set it to $DIR_QT BEFORE running 'make' program)
+    AC_WARN(Script setup.csh/setup.sh will do this job for you)
+    AC_WARN(Type '. setup.sh' under bash/ksh or 'source setup.csh' under csh/tcsh)
+    warnings="$warnings Qt"
+  fi
+  export QTDIR=$DIR_Qt
+
+  AC_CHECK_FILE($DIR_Qt,,CONFIG_FAILED(Bad Qt path))
+  AC_CHECK_FILE($DIR_Qt/lib/libQtGui.so,
+    AC_CHECK_FILE($DIR_Qt/lib/libQtCore.so,lqt="-lQtGui -lQtCore",
+      CONFIG_FAILED("Could not find library lib/libQtCore.so")),
+    CONFIG_FAILED("Could not find library lib/libQtGui.so"))
+  LIB_Qt="-L$DIR_Qt/lib $lqt"
+  LIBS="$LIBS $LIB_Qt"
+
+  AC_CHECK_FILE($DIR_Qt/include/Qt/QtCore,Qt_INCLUDE="-I$DIR_Qt/include",
+    AC_CHECK_FILE($DIR_Qt/include/qt4/Qt/QtCore,Qt_INCLUDE="-I$DIR_Qt/include/qt4",
+      CONFIG_FAILED("Could not find include file Qt/QtCore.")))
+  C_INCLUDES="$C_INCLUDES $Qt_INCLUDE"
+
+  AC_PATH_PROGS(Qt_MOC, moc-qt4 moc,, [$DIR_Qt/bin$PATH_SEPARATOR$PATH])
+  if test -z "$Qt_MOC" ; then
+    CONFIG_FAILED("Could not find Qt moc program.")
+  fi
+  AC_SUBST(Qt_MOC)
+
+  AC_PATH_PROGS(Qt_UIC, uic-qt4 uic,, [$DIR_Qt/bin$PATH_SEPARATOR$PATH])
+  if test -z "$Qt_UIC" ; then
+    CONFIG_FAILED("Could not find Qt uic program.")
+  fi
+  AC_SUBST(Qt_UIC)
+fi
+
+dnl ****************************************************************************
+dnl CERN_LIBRARY
+dnl ****************************************************************************
+
+AC_ARG_ENABLE(CERN_LIBRARY, AS_HELP_STRING([--enable-CERN_LIBRARY], [enabled by default]), , enable_CERN_LIBRARY=yes)
+
+AC_ARG_WITH(CERN_LIBRARY, AS_HELP_STRING([--with-CERN_LIBRARY], [CERN library path, default depends on machine type]))
+
+if test "$enable_CERN_LIBRARY" = "no"; then
+  USE_CERN_LIBRARY=no
+  DIR_CERN_LIBRARY=
+  LIB_CERN_LIBRARY=
+  AC_DEFINE(USE_CERN_LIBRARY,0)
+else
+  USE_CERN_LIBRARY=yes
+  if test "${with_CERN_LIBRARY+set}" = set; then
+    DIR_CERN_LIBRARY="$with_CERN_LIBRARY"
+  else
+    if test $CERN_LINUX_VERSION -eq 7 ; then
+      DIR_CERN_LIBRARY=/afs/cern.ch/sw/lcg/external/cernlib/2006a/x86_64-slc6-gcc47-opt
+    elif test $CERN_LINUX_VERSION -eq 6 ; then
+      if test $PLATFORM -eq 64 ; then
+        DIR_CERN_LIBRARY=/afs/cern.ch/sw/lcg/external/cernlib/2006a/x86_64-slc6-gcc47-opt
+      else
+        DIR_CERN_LIBRARY=/afs/cern.ch/sw/lcg/external/cernlib/2006a/i686-slc6-gcc47-opt
+      fi
+    else
+      DIR_CERN_LIBRARY="/cern/pro"
+    fi
+  fi
+
+  AC_CHECK_FILE($DIR_CERN_LIBRARY/lib/libmathlib.a,,CONFIG_FAILED(Wrong path to CERN libraries))
+  AC_CHECK_FILE($DIR_CERN_LIBRARY/lib/libpacklib.a,,CONFIG_FAILED(Wrong path to CERN libraries))
+  AC_CHECK_FILE($DIR_CERN_LIBRARY/lib/libkernlib.a,,CONFIG_FAILED(Wrong path to CERN libraries))
+    
+  LIB_CERN_LIBRARY="-L$DIR_CERN_LIBRARY/lib -Wl,-Bstatic"
+  CFLAGS="$CFLAGS -I$DIR_CERN_LIBRARY/include "
+  AC_DEFINE(USE_CERN_LIBRARY,1)
+fi
+AC_SUBST(USE_CERN_LIBRARY)
+AC_SUBST(DIR_CERN_LIBRARY)
+AC_SUBST(LIB_CERN_LIBRARY)
+
+dnl ****************************************************************************
+dnl HIGZ
+dnl ****************************************************************************
+
+AC_ARG_ENABLE(HIGZ, AS_HELP_STRING([--with-HIGZ], [enabled by default]), , enable_HIGZ=yes)
+if test "$enable_HIGZ" = "no"; then
+  USE_HIGZ=no
+  DIR_HIGZ=
+  LIB_HIGZ=
+  AC_DEFINE(USE_HIGZ,0)
+else
+  if test "$enable_CERN_LIBRARY" = "no"; then
+    CONFIG_FAILED('You can not use HIGZ without CERN_LIBRARY!
+Recomendation: add option --disable-HIGZ')
+  fi
+  USE_HIGZ=yes
+  DIR_HIGZ=$LIB_CERN_LIBRARY
+  AC_CHECK_FILE($DIR_CERN_LIBRARY/lib/libgraflib.a,,CONFIG_FAILED(Did not find part of CERN library: graflib))
+  AC_CHECK_FILE($DIR_CERN_LIBRARY/lib/libgrafX11.a,,CONFIG_FAILED(Did not find part of CERN library: grafX11))
+  AC_CHECK_FILE($DIR_CERN_LIBRARY/lib/libpacklib.a,,CONFIG_FAILED(Did not find part of CERN library: packlib))
+  LIB_CERN_LIBRARY="$LIB_CERN_LIBRARY -lgraflib -lgrafX11 -lpacklib"
+  AC_DEFINE(USE_HIGZ,1)
+fi
+AC_SUBST(USE_HIGZ)
+AC_SUBST(DIR_HIGZ)
+AC_SUBST(LIB_HIGZ)
+
+dnl ****************************************************************************
+dnl HBOOK
+dnl ****************************************************************************
+
+AC_ARG_ENABLE(HBOOK, AS_HELP_STRING([--with-HBOOK], [enabled by default]), , enable_HBOOK=yes)
+if test "$enable_HBOOK" = "no"; then
+  USE_HBOOK=no
+  DIR_HBOOK=
+  LIB_HBOOK=
+  AC_DEFINE(USE_HBOOK,0)
+else
+  if test "$enable_CERN_LIBRARY" = "no"; then
+    CONFIG_FAILED('You can not use HBOOK without CERN_LIBRARY!
+Recomendation: add option --disable-HBOOK')
+  fi
+  USE_HBOOK=yes
+  DIR_HBOOK=$LIB_CERN_LIBRARY
+  AC_CHECK_FILE($DIR_CERN_LIBRARY/lib/libpacklib.a,,CONFIG_FAILED(Did not find part of CERN library: packlib))
+  if test "$USE_HIGZ" = "no"; then
+    LIB_CERN_LIBRARY="$LIB_CERN_LIBRARY -lpacklib"
+  fi
+  AC_DEFINE(USE_HBOOK,1)
+fi
+AC_SUBST(USE_HBOOK)
+AC_SUBST(DIR_HBOOK)
+AC_SUBST(LIB_HBOOK)
+
+dnl ****************************************************************************
+dnl ZEBRA
+dnl ****************************************************************************
+
+AC_ARG_ENABLE(ZEBRA, AS_HELP_STRING([--with-ZEBRA], [enabled by default]), , enable_ZEBRA=yes)
+if test "$enable_ZEBRA" = "no"; then
+  USE_ZEBRA=no
+  DIR_ZEBRA=
+  LIB_ZEBRA=
+  AC_DEFINE(USE_ZEBRA,0)
+else
+  if test "$enable_CERN_LIBRARY" = "no"; then
+    CONFIG_FAILED('You can not use ZEBRA without CERN_LIBRARY!
+Recomendation: add option --disable-ZEBRA')
+  fi
+  USE_ZEBRA=yes
+  DIR_ZEBRA=$LIB_CERN_LIBRARY
+  AC_CHECK_FILE($DIR_CERN_LIBRARY/lib/libpacklib.a,,CONFIG_FAILED(Did not find part of CERN library: packlib))
+  if test "$USE_HBOOK" = "no" && test "$USE_HIGZ" = "no"; then
+    LIB_CERN_LIBRARY="$LIB_CERN_LIBRARY -lpacklib"
+  fi
+  AC_DEFINE(USE_ZEBRA,1)
+fi
+AC_SUBST(USE_ZEBRA)
+AC_SUBST(DIR_ZEBRA)
+AC_SUBST(LIB_ZEBRA)
+
+dnl ****************************************************************************
+dnl Final configuration of CERN_LIBRARY
+dnl ****************************************************************************
+
+if test "$USE_CERN_LIBRARY" = "yes"; then
+  if test "$F77" = "gfortran" ; then
+    LIB_CERN_LIBRARY="$LIB_CERN_LIBRARY -lmathlib -lpacklib -lkernlib -Wl,-Bdynamic -lnsl -lcrypt -lgfortran"
+  else
+    LIB_CERN_LIBRARY="$LIB_CERN_LIBRARY -lmathlib -lpacklib -lkernlib -Wl,-Bdynamic -lnsl -lcrypt -lg2c"
+  fi
+fi
+
+dnl ****************************************************************************
+dnl XPM
+dnl ****************************************************************************
+
+AC_ARG_WITH(XPM, AS_HELP_STRING([--with-XPM], [XPM library path, default: /usr/X11R6]))
+if test "${with_XPM+set}" = set; then
+  DIR_XPM_LIBRARY="$with_XPM"
+  AC_CHECK_FILE($DIR_XPM_LIBRARY,,CONFIG_FAILED(Wrong path to XPM library))
+  LIB_XPM_LIBRARY="-L$DIR_XPM_LIBRARY/lib "
+else
+  DIR_XPM_LIBRARY=
+  LIB_XPM_LIBRARY=
+fi
+AC_SUBST(DIR_XPM_LIBRARY)
+AC_SUBST(LIB_XPM_LIBRARY)
+
+dnl ****************************************************************************
+dnl CLHEP
+dnl ****************************************************************************
+
+AC_SET_PACKAGE(CLHEP, CLHEP_DIR, AS_HELP_STRING([--with-CLHEP], [enabled by default]), "yes")
+if test "$USE_CLHEP" = "yes"; then
+  if test "$DIR_CLHEP" = ""; then
+    if test $CERN_LINUX_VERSION -eq 7 ; then
+      DIR_CLHEP=/afs/cern.ch/sw/lcg/releases/clhep/1.9.4.7-4f730/x86_64-cc7-gcc49-opt
+    elif test $CERN_LINUX_VERSION -eq 6 ; then
+      if test $PLATFORM -eq 64 ; then
+        DIR_CLHEP=/afs/cern.ch/sw/lcg/external/clhep/1.9.4.7/x86_64-slc6-gcc47-opt
+      else
+        DIR_CLHEP=/afs/cern.ch/sw/lcg/external/clhep/1.9.4.7/i686-slc6-gcc47-opt
+      fi
+    else
+      CONFIG_FAILED(Unsupported OS for CLHEP client libraries)
+    fi
+  fi
+
+  AC_CHECK_FILE($DIR_CLHEP,,CONFIG_FAILED(Wrong path to CLHEP))
+  AC_MSG_CHECKING(Checking for CLHEP include directory)
+  AC_CHECK_FILE($DIR_CLHEP/CLHEP, CLHEP_INCL=$DIR_CLHEP,
+     AC_CHECK_FILE($DIR_CLHEP/include/CLHEP,CLHEP_INCL=$DIR_CLHEP/include,
+                                            CONFIG_FAILED(Can not find CLHEP include directory)))
+  AC_CHECK_FILE($CLHEP_INCL/CLHEP/Vector/LorentzVector.h,,CONFIG_FAILED(Can not find CLHEP include files))
+  AC_MSG_RESULT(CLHEP include files were found in directory $CLHEP_INCL)
+  
+  AC_MSG_CHECKING(Checking for CLHEP library)
+  AC_CHECK_FILE($DIR_CLHEP/CLHEP/libCLHEP.a,LIB_CLHEP=$DIR_CLHEP/CLHEP/libCLHEP.a,
+    AC_CHECK_FILE($DIR_CLHEP/CLHEP/libCLHEP-g++.a,LIB_CLHEP=$DIR_CLHEP/CLHEP/libCLHEP-g++.a,
+      AC_CHECK_FILE($DIR_CLHEP/lib/libCLHEP.a,LIB_CLHEP=$DIR_CLHEP/lib/libCLHEP.a,
+        AC_CHECK_FILE($DIR_CLHEP/lib/libCLHEP.so,LIB_CLHEP="-L$DIR_CLHEP/lib -lCLHEP",
+          CONFIG_FAILED(Can not find CLHEP library)))))
+  AC_MSG_RESULT(CLHEP library was found in $LIB_CLHEP)
+
+  LIBS="$LIBS $LIB_CLHEP"
+  C_INCLUDES="$C_INCLUDES -I$DIR_CLHEP/include"
+else
+  CONFIG_FAILED([Sorry, CLHEP package is mandatory.])
+fi
+
+dnl ****************************************************************************
+dnl COMPASS_Date
+dnl ****************************************************************************
+
+AC_SET_PACKAGE(COMPASS_Date, COMPASS_Date, AS_HELP_STRING([--with-COMPASS_Date], [disabled by default]), "no")
+if test "$USE_COMPASS_Date" = "yes"; then
+  if test "$DIR_COMPASS_Date" = ""; then
+    DIR_COMPASS_Date=/afs/cern.ch/compass/delivery/tools/dateV371_slc3
+  fi
+  AC_CHECK_FILE($DIR_COMPASS_Date,,CONFIG_FAILED(Wrong path to DATE library))
+
+  DIR_COMPASS_Date2=$DIR_COMPASS_Date/monitoring/Linux
+  
+  AC_CHECK_FILE($DIR_COMPASS_Date2,,CONFIG_FAILED(Bad path to DATE library))
+  
+  LIBS="$LIBS $DIR_COMPASS_Date2/libmonitor.a"
+  LIB_COMPASS_Date="$DIR_COMPASS_Date2/libmonitor.a"
+  C_INCLUDES="$C_INCLUDES -I$DIR_COMPASS_Date/commonDefs -I$DIR_COMPASS_Date/monitoring"
+fi
+
+dnl ****************************************************************************
+dnl RFIO library
+dnl ****************************************************************************
+
+AC_SET_PACKAGE(RFIO, RFIO, AS_HELP_STRING([--with-RFIO], [enabled by default]), "yes")
+if test "$USE_RFIO" = "yes"; then
+  if test "$DIR_RFIO" = ""; then
+    if test $CERN_LINUX_VERSION -eq 7 ; then
+      # the commented paths would probably be the more correct choice, but
+      # they require to correctly pass this information to the configuration
+      # of DDD, and also to modify (at least) setup.(c)sh
+      # DIR_RFIO=
+      DIR_RFIO=
+    elif test $CERN_LINUX_VERSION -eq 6 ; then
+      if test $PLATFORM -eq 64 ; then
+        # DIR_RFIO=/afs/cern.ch/sw/lcg/external/castor/2.1.13-6/x86_64-slc6-gcc47-opt/usr
+        DIR_RFIO=/usr
+      else
+        # DIR_RFIO=/afs/cern.ch/sw/lcg/external/castor/2.1.13-6/i686-slc6-gcc47-opt/usr
+        DIR_RFIO=/usr
+      fi
+    else
+      DIR_RFIO=/usr
+    fi
+  fi
+
+  AC_CHECK_FILE($DIR_RFIO/include/shift.h,,USE_RFIO=no)
+
+  if test $PLATFORM -eq 64 ; then
+    AC_CHECK_FILE($DIR_RFIO/lib64/libshift.so,LIB_RFIO=$DIR_RFIO/lib64/libshift.so,
+      AC_CHECK_FILE($DIR_RFIO/lib64/libshift.so.2.1,LIB_RFIO=$DIR_RFIO/lib64/libshift.so.2.1,
+        AC_CHECK_FILE($DIR_RFIO/lib64/libshift.a,LIB_RFIO=$DIR_RFIO/lib64/libshift.a,USE_RFIO=no)))
+  else
+    AC_CHECK_FILE($DIR_RFIO/lib/libshift.so,LIB_RFIO=$DIR_RFIO/lib/libshift.so,
+      AC_CHECK_FILE($DIR_RFIO/lib/libshift.so.2.1,LIB_RFIO=$DIR_RFIO/lib/libshift.so.2.1,
+        AC_CHECK_FILE($DIR_RFIO/lib/libshift.a,LIB_RFIO=$DIR_RFIO/lib/libshift.a,USE_RFIO=no)))
+  fi
+
+  if test "$USE_RFIO" = "yes"; then
+    LIBS="$LIBS $LIB_RFIO -Wl,-rpath,$LIB_RFIO"
+    C_INCLUDES="$C_INCLUDES -I$DIR_RFIO/include -I$DIR_RFIO/include/shift"
+  else
+    CONFIG_FAILED(['RFIO package was not found!
+Specify --without-RFIO if you want to compile without RFIO (libshift).'])
+  fi
+fi
+
+
+dnl ****************************************************************************
+dnl COMPASS SETUP YEAR
+dnl ****************************************************************************
+
+AC_ARG_WITH(CompassSetup, AS_HELP_STRING([--with-CompassSetup=year], [default: 2002]), , with_CompassSetup="2002")
+
+if test "$with_CompassSetup" = "2001"; then  
+  CompassSetup="COMPASS_SETUP=2001"
+else
+  if test "$with_CompassSetup" = "2002"; then
+    CompassSetup="COMPASS_SETUP=2002"
+  else
+    CONFIG_FAILED([Wrong year in CompassSetup setting. Allowed values: 2001, 2002])
+    exit 1
+  fi
+fi
+AC_SUBST(CompassSetup)
+
+
+dnl ****************************************************************************
+dnl OBJECT FILES DELETIONS
+dnl ****************************************************************************
+
+AC_ARG_WITH(ObjectFilesDeletion, AS_HELP_STRING([--with-ObjectFilesDeletion], [disabled by default]), , with_ObjectFilesDeletion="no")
+
+if test "$with_ObjectFilesDeletion" = "yes"; then  
+  ObjectFilesDeletion="yes"
+else
+  ObjectFilesDeletion="no"
+fi
+AC_SUBST(ObjectFilesDeletion)
+
+
+dnl ****************************************************************************
+dnl ****************************************************************************
+dnl ****************************************************************************
+
+AC_SUBST(C_INCLUDES)
+
+dnl Checks for libraries.
+
+dnl Checks for header files.
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+
+dnl Checks for library functions.
+
+echo Creating 'include' directory
+mkdir -p include
+rm -f include/*
+cd include
+
+dnl Can not use AC_LINK_FILES due to a bug in bash.
+ln -sf ../coral_config.h
+
+ln -sf ../src/base/Coral.h
+ln -sf ../src/base/CoralCompilationDate.h
+ln -sf ../src/base/CsHbookProto.h
+ln -sf ../src/base/CsHome.h
+ln -sf ../src/base/CsInit.h
+ln -sf ../src/base/CsZebraProto.h
+
+ln -sf ../src/beam/CsBeam.h
+ln -sf ../src/beam/rec_method_0/CsBMSrecons.h
+ln -sf ../src/beam/rec_method_0/CsBeamRecons.h
+ln -sf ../src/beam/rec_method_0/CsBmFiHod.h
+ln -sf ../src/beam/rec_method_1/CsBeamReconstruction.h
+ln -sf ../src/beam/rec_method_1/CsBMSReconstruction.h
+ln -sf ../src/beam/rec_method_1/CsBTReconstruction.h
+ln -sf ../src/beam/rec_method_1/CsBeamMomCalculation.h
+ln -sf ../src/beam/rec_method_1/CsBeamBackPropagation.h
+ln -sf ../src/beam/rec_method_1/CsBeamReconstructionSupport.h
+ln -sf ../src/beam/rec_method_1/beam_coefficients
+
+ln -sf ../src/calorim/CsCalorimeter.h
+ln -sf ../src/calorim/CsDigitizerSADC.h
+ln -sf ../src/calorim/CsECAL0.h
+ln -sf ../src/calorim/CsECAL1.h
+ln -sf ../src/calorim/CsECAL2.h
+ln -sf ../src/calorim/CsHCAL1.h
+ln -sf ../src/calorim/CsHCAL2.h
+ln -sf ../src/calorim/CsTrigGroupData.h
+ln -sf ../src/calorim/CsTimingInfo.h
+ln -sf ../src/calorim/CsTimingInfoFormat.h
+ln -sf ../src/calorim/DigitizerSADCBase.h
+
+ln -sf ../src/condb/bmsdb/CsBmsDbReader.h
+ln -sf ../src/condb/bmsdb/CsBmsDbUpdater.h
+ln -sf ../src/condb/handler/CDB.h
+ln -sf ../src/condb/handler/CondDbHandler.h
+ln -sf ../src/condb/filedb/FileDB.h
+ln -sf ../src/condb/mysqldb/MyInterface/MyInterface.h
+ln -sf ../src/condb/mysqldb/MyInterface/MySQLDB.h
+ln -sf ../src/condb/mysqldb/MyInterface/MySQLDBInterface.h
+ln -sf ../src/condb/mysqldb/MyInterface/MySQLInterface.h
+ln -sf ../src/condb/handler/Interval.h
+ln -sf ../src/condb/geomdb/CsGeoDbDetector.h
+ln -sf ../src/condb/geomdb/CsGeoDbReader.h
+ln -sf ../src/condb/geomdb/CsGeoDbUpdater.h
+ln -sf ../src/condb/trighoddb/CsTrigHodConstants.h
+ln -sf ../src/condb/trighoddb/CsTrigHodDbReader.h
+ln -sf ../src/condb/trighoddb/CsTrigHodDbUpdater.h
+ln -sf ../src/condb/mfdb/CsMagDbReader.h
+ln -sf ../src/condb/mfdb/CsMagDbUpdater.h
+ln -sf ../src/condb/mfdb/CsFieldGridSM1.h
+ln -sf ../src/condb/mfdb/CsFieldGridSol.h
+ln -sf ../src/condb/mfdb/CsMagFieldSM1.h
+ln -sf ../src/condb/mfdb/CsMagFieldSM2.h
+ln -sf ../src/condb/mfdb/CsMagFieldSol.h
+ln -sf ../src/condb/sfdb/CsScifiDbUpdater.h
+
+ln -sf ../src/evdb/CsDateStore.h
+ln -sf ../src/evdb/CsDummyStore.h
+ln -sf ../src/evdb/CsStore.h
+
+ln -sf ../src/evdis/CsEvdis.h
+
+ln -sf ../src/event/CsBuildParticles.h
+ln -sf ../src/event/CsCluster.h
+ln -sf ../src/event/CsDigit.h
+ln -sf ../src/event/CsEvent.h
+ln -sf ../src/event/CsEventUtils.h
+ln -sf ../src/event/CsMCDigit.h
+ln -sf ../src/event/CsParticle.h
+ln -sf ../src/event/CsRecoEvent.h
+ln -sf ../src/event/CsMW1Pid.h
+
+ln -sf ../src/evmc/CsComgNtCommons.h
+ln -sf ../src/evmc/CsGeant3.h
+ln -sf ../src/evmc/CsMCHit.h
+ln -sf ../src/evmc/CsMCTrkHit.h
+ln -sf ../src/evmc/CsMCRICH1Hit.h
+ln -sf ../src/evmc/CsMCParticle.h
+ln -sf ../src/evmc/CsMCTrack.h
+ln -sf ../src/evmc/CsMCUtils.h
+ln -sf ../src/evmc/CsMCVertex.h
+ln -sf ../src/evmc/CsTmpTrigger.h
+
+ln -sf ../src/geom/CsBMSDetector.h
+ln -sf ../src/geom/CsDecMap.h
+ln -sf ../src/geom/CsDet.h
+ln -sf ../src/geom/CsDetector.h
+ln -sf ../src/geom/CsCEDARDetector.h
+ln -sf ../src/geom/CsDFiberHodoDetector.h
+ln -sf ../src/geom/CsDriftChamberDetector.h
+ln -sf ../src/geom/CsDriftTubeDetector.h
+ln -sf ../src/geom/CsDWDetector.h
+ln -sf ../src/geom/CsField.h
+ln -sf ../src/geom/CsGEMDetector.h
+ln -sf ../src/geom/CsGeom.h
+ln -sf ../src/geom/CsJFiberHodoDetector.h
+ln -sf ../src/geom/CsMaterialMap.h
+ln -sf ../src/geom/CsMicroMegaDetector.h
+ln -sf ../src/geom/CsMiscDetector.h
+ln -sf ../src/geom/CsMWPCDetector.h
+ln -sf ../src/geom/CsPixelGEMDetector.h
+ln -sf ../src/geom/CsPixelMumegaDetector.h
+ln -sf ../src/geom/CsRICH1Detector.h
+ln -sf ../src/geom/CsRTRelation.h
+ln -sf ../src/geom/CsRTGridPoint.h
+ln -sf ../src/geom/CsStrawTubesDetector.h
+ln -sf ../src/geom/CsTriggerHodoDetector.h
+ln -sf ../src/geom/CsSiTrackerDetector.h 
+ln -sf ../src/geom/CsRichWallDetector.h
+ln -sf ../src/geom/CsRwChargeRecons.h
+ln -sf ../src/geom/CsRwRecons.h
+ln -sf ../src/geom/CsZone.h
+ln -sf ../src/geom/MMLibrary.h
+ln -sf ../src/geom/mumega/CsMumegaPlane.h
+ln -sf ../src/geom/mumega/CsPixelMumegaPlane.h
+ln -sf ../src/geom/mumega/CsMumegaTimeCal.h
+ln -sf ../src/geom/mumega/CsMumegaChan.h
+ln -sf ../src/geom/mumega/CsMumegaHit.h
+ln -sf ../src/geom/mumega/CsMumegaCluster.h
+ln -sf ../src/geom/mumega/CsPixelMumegaCluster.h
+ln -sf ../src/geom/mumega/CsRectPixelMumegaPlane.h
+ln -sf ../src/geom/mumega/CsRectPixelMumegaCluster.h
+ln -sf ../src/geom/gem/CsGEMChan.h
+ln -sf ../src/geom/gem/CsGEMCluster.h
+ln -sf ../src/geom/gem/CsGEMHit.h
+ln -sf ../src/geom/gem/CsGEMPlane.h
+ln -sf ../src/geom/gem/CsGEMPlaneHeader.h
+ln -sf ../src/geom/gem/CsGEMPlanePar.h
+ln -sf ../src/geom/gem/CsGEMTimeCal.h
+ln -sf ../src/geom/gem/CsPixelGEMCluster.h
+ln -sf ../src/geom/gem/CsPixelGEMPlane.h
+ln -sf ../src/geom/gem/CsPixelGEMPlanePar.h
+
+ln -sf ../src/hist/CsHist.h
+ln -sf ../src/hist/CsHistograms.h
+ln -sf ../src/hist/CsNtuple.h
+
+ln -sf ../src/ppi/include/CsPP.h
+ln -sf ../src/ppi/include/CsPPI.h
+ln -sf ../src/ppi/include/CsPPI_EC02time.h
+
+ln -sf ../src/rich/CsRichOne.h
+ln -sf ../src/rich/CsRCDetectors.h
+ln -sf ../src/rich/CsRCPhotonDet.h
+ln -sf ../src/rich/CsRCCathode.h
+ln -sf ../src/rich/CsRCMirrors.h
+ln -sf ../src/rich/CsRCMirrorNom.h
+ln -sf ../src/rich/CsRCMirrorElem.h
+ln -sf ../src/rich/evdis/CsRichOneDisplay.h
+dnl The following is required by $PHAST/coral
+ln -sf ../src/rich/CsRCEventPads.h
+ln -sf ../src/rich/CsRCPad.h
+ln -sf ../src/rich/CsRCRecConst.h
+
+ln -sf ../src/track/CsHelix.h
+ln -sf ../src/track/CsTrack.h
+ln -sf ../src/track/CsTrkBridging.h
+ln -sf ../src/track/CsTrkFitting.h
+ln -sf ../src/track/CsTrkPrepattern.h
+ln -sf ../src/track/CsTrkUtils.h
+ln -sf ../src/track/trafdic/src/CsTrafficBridging.h
+ln -sf ../src/track/trafdic/src/CsTrafficFitting.h
+ln -sf ../src/track/trafdic/src/CsTrafficPrepattern.h
+ln -sf ../src/track/trafdic/src/CsTrafficRefitting.h
+ln -sf ../src/track/trafdic/src/CsTrafficUtils.h
+ln -sf ../src/track/trafdic/src/THlx.h
+ln -sf ../src/track/trafdic/src/TMtx.h
+ln -sf ../src/track/trafdic/src/TOpt.h
+ln -sf ../src/track/trafdic/src/Traffic.h
+ln -sf ../src/track/trafdic/src/TWatches.h
+ln -sf ../src/track/spacepoint/CsCalSpacePoint.h
+ln -sf ../src/track/spacepoint/CsDetFamily.h
+ln -sf ../src/track/spacepoint/CsResOpt.h
+ln -sf ../src/track/spacepoint/CsSPMaker.h
+ln -sf ../src/track/spacepoint/CsSPUtils.h
+ln -sf ../src/track/spacepoint/CsSpacePoint.h
+
+ln -sf ../src/util/ObjectsCounter.h
+ln -sf ../src/util/CsSTD.h
+ln -sf ../src/util/CsEndOfJob.h
+ln -sf ../src/util/CsEndOfEvent.h
+ln -sf ../src/util/CsErrLog.h
+ln -sf ../src/util/CsGauss.h
+ln -sf ../src/util/CsOpt.h
+ln -sf ../src/util/CsPlatforms.h
+ln -sf ../src/util/CsRandom.h
+ln -sf ../src/util/CsRegistry.h
+ln -sf ../src/util/CsRegistrySing.h
+ln -sf ../src/util/CsResource.h
+ln -sf ../src/util/CsStartOfRun.h
+ln -sf ../src/util/CsStopwatch.h
+ln -sf ../src/util/CsTime.h
+ln -sf ../src/util/CsTimer.h
+ln -sf ../src/util/CsTypes.h
+
+ln -sf ../src/vertex/CsVertex.h
+ln -sf ../src/vertex/Kalman/CsVTrack.h
+ln -sf ../src/vertex/Kalman/CsAverPattern.h
+ln -sf ../src/vertex/Kalman/CsKalmanFitting.h
+ln -sf ../src/vertex/Roland/CsRolandPattern.h
+ln -sf ../src/vertex/CsVrtFitting.h
+ln -sf ../src/vertex/CsVrtPattern.h
+
+ln -sf ../src/DaqDataDecoding/src DaqDataDecoding
+ln -sf ../src/calorim/Reco/src Reco
+
+if test "$USE_TGEANT" = "yes"; then
+  ln -sf $TGEANT/include includeTGEANT
+fi
+
+cd ..
+
+if test "$LIB_TYPE" = "shared" ; then
+  OPTION_SHARED="--enable-shared"
+else
+  OPTION_SHARED="--disable-shared"
+fi
+if test "$USE_COMPASS_Date" = "yes" ; then
+  OPTION_DATE_LIB="--with-DATE_LIB=$DIR_COMPASS_Date"
+else
+  OPTION_DATE_LIB="--without-DATE_LIB"
+fi
+if test "$USE_EXPAT" = "yes" ; then
+  OPTION_EXPAT="--with-EXPAT=$DIR_EXPAT"
+else
+  OPTION_EXPAT="--without-EXPAT"
+fi
+if test "$USE_Qt" = "yes" ; then
+  OPTION_Qt="--with-Qt=$DIR_Qt"
+else
+  OPTION_Qt="--without-Qt"
+fi
+if test "$USE_RFIO" = "yes" ; then
+  OPTION_RFIO="--with-RFIO=$DIR_RFIO"
+else
+  OPTION_RFIO="--without-RFIO"
+fi
+if test "$USE_ROOT" = "yes" ; then
+  OPTION_ROOT="--with-ROOT=$DIR_ROOT"
+else
+  OPTION_ROOT="--without-ROOT"
+fi
+
+AC_CHECK_FILE(src/calorim/Reco,,CONFIG_FAILED([Can not find Reco subdirectory]))
+(cd src/calorim/Reco;
+CXXFLAGS=$CFLAGS F77=$F77 FFLAGS=$FFLAGS ./configure $OPTION_SHARED $OPTION_ROOT $OPTION_Qt)
+if test "$?" = "1"; then
+  CONFIG_FAILED([Calorimeter reconstruction library configuration failed])
+fi
+
+AC_CHECK_FILE(src/DaqDataDecoding,,CONFIG_FAILED([Can not find DaqDataDecoding subdirectory]))
+(cd src/DaqDataDecoding;
+CXXFLAGS=$CFLAGS ./configure $OPTION_SHARED $OPTION_DATE_LIB $OPTION_EXPAT $OPTION_RFIO)
+if test "$?" = "1"; then
+  CONFIG_FAILED([DaqDataDecoding library configuration failed])
+fi
+
+auto_config_files="setup.csh setup.sh makefiles/Include.mk GNUmakefile"
+AC_SUBST(auto_config_files)
+AC_OUTPUT($auto_config_files)
+
+echo CFLAGS=$CFLAGS
+cat coral_config.h | grep define | grep USE_
+echo
+echo "********************************************************************"
+echo "* Run 'source setup.csh' or '. setup.sh' to set env. variables     *"
+echo "* Type 'make' to compile the library                               *"
+echo "********************************************************************"
+echo

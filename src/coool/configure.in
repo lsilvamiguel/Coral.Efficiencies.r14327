@@ -1,0 +1,387 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT
+AC_CONFIG_HEADER(src/config.h)
+
+dnl ****************************************************************************
+dnl Macros
+dnl ****************************************************************************
+
+AC_DEFUN(MY_ERROR,
+[
+  echo
+  echo 'x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x'
+  echo 'x x x      COOOL    Configuration failure             x x x'
+  echo 'x x x x x x x x x x x x x x x x x x x x x x x x x x x x x x'
+  echo 'hint :'
+  echo '      ' $1
+  exit 1
+])
+
+if test "$OS" = ""; then
+  OS=`uname -s`
+  echo Set variable OS=$OS
+fi
+AC_SUBST(OS)
+
+dnl MY_CHECK_SIZEOF(TYPE [, CROSS-SIZE])
+AC_DEFUN(MY_CHECK_SIZEOF,
+[changequote(<<, >>)dnl
+dnl The name to #define.
+define(<<AC_TYPE_NAME>>, translit(sizeof_$1, [a-z *], [A-Z_P]))dnl
+dnl The cache variable name.
+define(<<AC_CV_NAME>>, translit(ac_cv_sizeof_$1, [ *], [_p]))dnl
+changequote([, ])dnl
+AC_MSG_CHECKING(size of $1)
+AC_CACHE_VAL(AC_CV_NAME,
+[AC_TRY_RUN([#include <stdio.h>
+main()
+{
+  FILE *f=fopen("conftestval", "w");
+  if (!f) exit(1);
+  fprintf(f, "%d\n", sizeof($1));
+  exit(0);
+}], AC_CV_NAME=`cat conftestval`, AC_CV_NAME=0, ifelse([$2], , , AC_CV_NAME=$2))])dnl
+AC_MSG_RESULT($AC_CV_NAME)
+AC_DEFINE_UNQUOTED(AC_TYPE_NAME, $AC_CV_NAME)
+undefine([AC_TYPE_NAME])dnl
+])
+
+dnl AC_SET_PACKAGE(package_name,env_variable,help_string,default_value)
+dnl On output:
+dnl variable USE_package_name will be set
+dnl variable DIR_package_name will be non-empty for particular check
+AC_DEFUN(AC_SET_PACKAGE,
+[
+  DIR_$1=
+  AC_ARG_WITH($1,[$3],,with_$1=$4)
+  if test "${with_$1}" = "no" || test "${with_$1}" = ""; then
+    # Package is disable
+    echo Package $1 is disable
+    USE_$1=no
+    AC_DEFINE(USE_$1,0)
+  else
+    USE_$1=yes
+    AC_DEFINE(USE_$1,1)
+    # Package is enable
+    AC_CHECKING($1)
+    if test "${with_$1}" = "yes"; then
+      # Try to search in standard places.
+      # At first we check environment variable $2
+      AC_MSG_CHECKING(environment variable $2)
+      if test "$$2" = ""; then
+        AC_MSG_RESULT(variable was not set)
+      else
+        # The enviaronment variable is defined. We shall use it.
+        AC_MSG_RESULT($$2)
+        with_$1=$$2
+      fi
+    else
+      # Exact value was given: --with-package=/dir1/dir2/
+      true
+    fi
+    
+    if test "${USE_$1}" = "yes" && test "${with_$1}" != "yes"; then
+      DIR_$1=${with_$1}
+    fi
+  fi
+  AC_SUBST(USE_$1)
+  AC_SUBST(DIR_$1)
+  AC_SUBST(LIB_$1)
+])
+
+dnl ****************************************************************************
+dnl CFLAGS
+dnl ****************************************************************************
+
+AC_ARG_WITH(CFLAGS,
+[  --with-CFLAGS           default value is  --with-CFLAGS=\"-Wall -Wextra -Wno-unused -O2 \"],
+if test "$with_CFLAGS" != "no"; then
+  CFLAGS=$with_CFLAGS
+fi
+,
+CFLAGS="-Wall -Wextra -Wno-unused -O2 "
+)
+
+dnl ****************************************************************************
+dnl Create shared or static library
+dnl ****************************************************************************
+
+AC_ARG_ENABLE(shared,[  --enable-shared         library type;  default is static library],,enable_shared="no")
+if test "${enable_shared}" = "yes"; then
+  LIB_TYPE=shared
+else
+  LIB_TYPE=static
+fi
+AC_SUBST(LIB_TYPE)
+
+dnl ****************************************************************************
+
+dnl Checks for programs.
+AC_PROG_INSTALL
+
+dnl Check for compilers
+
+AC_PROG_CC
+AC_PROG_CPP 
+
+AC_PROG_CXX
+AC_PROG_CXXCPP
+
+dnl If words are stored with the most significant byte first 
+dnl (like Motorola and SPARC, but not Intel and VAX, CPUs), define WORDS_BIGENDIAN. 
+AC_C_BIGENDIAN
+
+AC_C_CHAR_UNSIGNED
+MY_CHECK_SIZEOF(char)
+MY_CHECK_SIZEOF(long long)
+MY_CHECK_SIZEOF(long)
+MY_CHECK_SIZEOF(int)
+MY_CHECK_SIZEOF(short)
+
+dnl X-windows system configuration (x_includes,x_libraries or no_x)
+dnl AC_PATH_X
+
+dnl **************************************************************************
+dnl AFS
+dnl **************************************************************************
+
+AC_CHECK_FILE(/afs/cern.ch/compass/detector/monitor/compass.xpm,
+	AC_DEFINE(AFS_ACCESS,1),
+	AC_DEFINE(AFS_ACCESS,0))
+AC_SUBST(AFS_ACCESS)
+
+
+dnl **************************************************************************
+dnl ROOT
+dnl **************************************************************************
+
+if test "$ROOTSYS" = ""; then
+  ROOT_default=no
+else
+  ROOT_default=yes
+fi
+
+AC_SET_PACKAGE(ROOT,ROOTSYS,[  --with-ROOT             ],$ROOT_default)
+if test "$USE_ROOT" = "yes"; then
+  if test "$DIR_ROOT" != "$ROOTSYS"; then
+    AC_WARN(Your environment variable ROOTSYS is incorrect (or it was not set))
+    AC_WARN(You MUST set it to $DIR_ROOT BEFORE running 'make' program)
+    AC_WARN(Script setup.csh/setup.sh will do this job for you)
+    AC_WARN(Type '. setup.sh' under bash/ksh or 'source setup.csh' under csh/tcsh)
+    warnings="$warnings ROOT"
+  fi
+  export ROOTSYS=$DIR_ROOT
+  AC_CHECK_FILE($DIR_ROOT,,MY_ERROR(check that $DIR_ROOT exists))
+  AC_CHECK_FILE($DIR_ROOT/bin/rootcint,,MY_ERROR(is rootcint in $DIR_ROOT/bin/?))
+  AC_CHECK_FILE($DIR_ROOT/bin/root-config,,MY_ERROR(is root-config in $DIR_ROOT/bin/?))
+  LIB_ROOT=`$DIR_ROOT/bin/root-config --glibs` 
+  LIB_ROOT="$LIB_ROOT -lThread"
+  LIBS="$LIBS -Wl,-rpath,$DIR_ROOT/lib $LIB_ROOT"
+  CFLAGS="$CFLAGS -I$DIR_ROOT/include"
+else
+  MY_ERROR('ROOT is required!')
+fi
+
+dnl **************************************************************************
+dnl **************************************************************************
+dnl **************************************************************************
+
+DIR_DECODING_default="`pwd`/../DaqDataDecoding"
+DECODING_default="yes"
+AC_SET_PACKAGE(DECODING,DIR_DECODING_default,
+	[  --with-DECODING         default is ../DaqDataDecoding],
+	$DECODING_default)
+if test "$USE_DECODING" = "yes"; then
+  AC_CHECK_FILE($DIR_DECODING,,MY_ERROR($DIR_DECODING not found. Use an absolute path))
+  AC_CHECK_FILE($DIR_DECODING/src/Chip.h,,MY_ERROR(Bad decoding library structure))
+  LIB_DECODING="-L$DIR_DECODING/src -lDaqDataDecoding"
+  LIBS="$LIBS -Wl,-rpath,$DIR_DECODING/src $LIB_DECODING"
+  CFLAGS="$CFLAGS -I$DIR_DECODING/src"
+fi
+
+dnl **************************************************************************
+dnl RFIO
+dnl **************************************************************************
+
+USE_RFIO=`grep USE_RFIO $DIR_DECODING/Makefile.inc | sed 's/USE\_RFIO *= *//' -`
+DIR_RFIO=`grep DIR_RFIO $DIR_DECODING/Makefile.inc | sed 's/DIR\_RFIO *= *//' -`
+LIB_RFIO=`grep LIB_RFIO $DIR_DECODING/Makefile.inc | sed 's/LIB\_RFIO *= *//' -`
+
+if test "$USE_RFIO" = "yes"; then
+  if echo $CFLAGS | grep -q -e "-m32" ; then
+    AC_CHECK_FILE($DIR_RFIO/lib/libshift.so,LIB_RFIO=$DIR_RFIO/lib/libshift.so,
+      AC_CHECK_FILE($DIR_RFIO/lib/libshift.so.2.1,LIB_RFIO=$DIR_RFIO/lib/libshift.so.2.1,
+        AC_CHECK_FILE($DIR_RFIO/lib/libshift.a,LIB_RFIO=$DIR_RFIO/lib/libshift.a,MY_ERROR(Can not find RFIO library)))
+    )
+  else
+    AC_CHECK_FILE($DIR_RFIO/lib64/libshift.so,LIB_RFIO=$DIR_RFIO/lib64/libshift.so,
+      AC_CHECK_FILE($DIR_RFIO/lib64/libshift.so.2.1,LIB_RFIO=$DIR_RFIO/lib64/libshift.so.2.1,
+        AC_CHECK_FILE($DIR_RFIO/lib64/libshift.a,LIB_RFIO=$DIR_RFIO/lib64/libshift.a, MY_ERROR(Can not find RFIO library)))
+    )
+  fi
+  if echo $LIB_RFIO | grep -q -e "lib64" ; then
+    DIRLIB_RFIO=$DIR_RFIO/lib64
+  else
+    DIRLIB_RFIO=$DIR_RFIO/lib
+  fi
+  LIBS="$LIBS $LIB_RFIO -Wl,-rpath,$DIRLIB_RFIO"
+
+dnl	AC_CHECK_FILE($DIR_RFIO/lib/libshift.so,LIB_RFIO=$DIR_RFIO/lib/libshift.so, AC_CHECK_FILE($DIR_RFIO/lib/libshift.a,LIB_RFIO=$DIR_RFIO/lib/libshift.a,MY_ERROR(Can not find RFIO library)))
+
+  if test "$DIR_RFIO" != "/usr"; then
+	CFLAGS="$CFLAGS -I$DIR_RFIO/include"
+  fi
+	AC_DEFINE(USE_RFIO,1)
+else
+	AC_DEFINE(USE_RFIO,0)	
+fi
+AC_SUBST(USE_RFIO)
+AC_SUBST(DIR_RFIO)
+AC_SUBST(LIB_RFIO)
+
+dnl **************************************************************************
+dnl DATE_LIB
+dnl **************************************************************************
+
+USE_DATE_LIB=`grep USE_DATE_LIB $DIR_DECODING/Makefile.inc | sed 's/USE\_DATE_LIB *= *//' -`
+DIR_DATE_LIB=`grep DIR_DATE_LIB $DIR_DECODING/Makefile.inc | sed 's/DIR\_DATE_LIB *= *//' -`
+LIB_DATE_LIB=`grep LIB_DATE_LIB $DIR_DECODING/Makefile.inc | sed 's/LIB\_DATE_LIB *= *//' -`
+
+if test "$USE_DATE_LIB" = "yes"; then
+  	AC_CHECK_FILE($DIR_DATE_LIB,,MY_ERROR(Problem with DATE library))
+	
+  	dnl Check Red Hat release and choose lib directory.
+  	dnl Set default path
+
+	sys_name=Linux
+
+dnl	if grep --quiet "5." /etc/redhat-release; then
+dnl		sys_name=Linux.orig
+dnl  	fi
+
+	AC_CHECK_FILE($DIR_DATE_LIB/monitoring/$sys_name/libmonitor.a,,MY_ERROR(Problem with DATE library))
+
+  	LIB_DATE_LIB="$DIR_DATE_LIB/monitoring/$sys_name/libmonitor.a"
+  	LIBS="$LIBS $LIB_DATE_LIB"
+  	CFLAGS="$CFLAGS -I$DIR_DATE_LIB"
+
+	AC_DEFINE(USE_DATE_LIB,1)
+else
+	AC_DEFINE(USE_DATE_LIB,0)	
+fi
+AC_SUBST(USE_DATE_LIB)
+AC_SUBST(DIR_DATE_LIB)
+AC_SUBST(LIB_DATE_LIB)
+
+dnl **************************************************************************
+dnl DataBase 
+dnl **************************************************************************
+
+# interface
+
+AC_SET_PACKAGE(DATABASE,DATABASE,[  --with-DATABASE         enable on default, "--with-DATABASE=mysql_config" works like with coral],"yes")
+if test "$USE_DATABASE" = "yes"; then
+  if test "$DIR_DATABASE" = "mysql_config"; then
+    DIR_DATABASE=`which mysql_config` 
+    AC_CHECK_FILE($DIR_DATABASE,,MY_ERROR(No MySQL mysql_config tool found))
+    LIB_TMP_DATABASE=`$DIR_DATABASE --libs`
+    DIR_RPATH_DATABASE=`$DIR_DATABASE --variable=pkglibdir`
+    LIB_DATABASE="-Wl,-rpath,$DIR_RPATH_DATABASE/lib $LIB_TMP_DATABASE"
+    LIBS="$LIBS $LIB_DATABASE "
+    DATABASE_CFLAGS=`$DIR_DATABASE --include`
+    CFLAGS="$CFLAGS $DATABASE_CFLAGS"
+  else
+    if test "$USE_GCC_295" = "yes"; then
+      if test "$DIR_DATABASE" = ""; then
+        DIR_DATABASE=/afs/cern.ch/compass/detector/monitor/mysql
+      fi
+    else
+      if test "$DIR_DATABASE" = ""; then
+        DIR_DATABASE=/afs/cern.ch/compass/detector/monitor/mysql4
+      fi
+    fi   
+    AC_CHECK_FILE($DIR_DATABASE,,MY_ERROR(Problem with MYSQL library))
+    AC_CHECK_FILE($DIR_DATABASE/lib/libmysqlclient.a,,MY_ERROR(Problem with MYSQL library))
+    LIB_DATABASE="-L$DIR_DATABASE/lib -Wl,-rpath,$DIR_DATABASE/lib -lmysqlclient -lz "
+    LIBS="$LIBS $LIB_DATABASE"
+
+    CFLAGS="$CFLAGS -I$DIR_DATABASE/include"
+  fi
+fi
+
+AC_SUBST(USE_DATABASE)
+AC_SUBST(DIR_DATABASE)
+AC_SUBST(LIB_DATABASE)
+
+
+DIR_CALIB_default="`pwd`/../condb"
+CALIB_default="yes"
+AC_SET_PACKAGE(CALIB,DIR_CALIB_default,[  --with-CALIB            default is ../condb],$CALIB_default)
+if test "$USE_DATABASE" != "yes"; then
+  USE_CALIB = "no"
+fi
+if test "$USE_CALIB" = "yes"; then
+  AC_CHECK_FILE($DIR_CALIB,,MY_ERROR($DIR_CALIB not found. Use an absolute path))
+  AC_CHECK_FILE($DIR_CALIB/mysqldb/MyInterface/libMySQLDB.a,,MY_ERROR($DIR_CALIB/lib/libMyInterface.a not found))
+  LIB_CALIB="-L$DIR_CALIB/mysqldb/MyInterface -lMySQLDB -lmysqlclient "
+  LIBS="$LIBS -Wl,-rpath,$DIR_CALIB/mysqldb/MyInterface $LIB_CALIB"
+  CFLAGS="$CFLAGS -I$DIR_CALIB/mysqldb/MyInterface -I$DIR_CALIB/handler"
+fi
+
+
+
+dnl **************************************************************************
+dnl Tracking
+dnl **************************************************************************
+
+DIR_TRACK_default="`pwd`/lstrack"
+TRACK_default="no"
+AC_SET_PACKAGE(TRACK,DIR_TRACK_default,[  --with-TRACK            default is ../mondb],$TRACK_default)
+if test "$USE_TRACK" = "yes"; then
+  AC_CHECK_FILE($DIR_TRACK,,MY_ERROR($DIR_TRACK not found. Use an absolute path))
+  AC_CHECK_FILE($DIR_TRACK/lib/liblstrack.a,,MY_ERROR($DIR_TRACK/lib/liblstrack.a not found))
+  LIB_TRACK="-L$DIR_TRACK/lib -llstrack"
+  LIBS="$LIBS -Wl,-rpath,$DIR_TRACK/lib $LIB_TRACK"
+  CFLAGS="$CFLAGS -I$DIR_TRACK/include"
+fi
+
+
+dnl **************************************************************************
+dnl GEMs
+dnl **************************************************************************
+
+DIR_GEM="`pwd`/../geom/gem"
+AC_CHECK_FILE($DIR_GEM,,MY_ERROR($DIR_GEM not found. Make sure you have full CORAL repository checked out))
+AC_CHECK_FILE($DIR_GEM/$OS/libCsGEM.a,,MY_ERROR($DIR_GEM/$OS/libCsGEM.a not found. Change to $DIR_GEM and "make LIB_TYPE=static"))
+LIBS="$LIBS -lCsGEM -L$DIR_GEM/$OS"
+CFLAGS="$CFLAGS -I$DIR_GEM"
+
+
+dnl **************************************************************************
+dnl MMs
+dnl **************************************************************************
+
+DIR_MM="`pwd`/../geom/mumega"
+AC_CHECK_FILE($DIR_MM,,MY_ERROR($DIR_MM not found. Make sure you have full CORAL repository checked out))
+AC_CHECK_FILE($DIR_MM/$OS/libCsMumega.a,,MY_ERROR($DIR_MM/$OS/libCsMumega.a not found. Change to $DIR_MM and "make LIB_TYPE=static"))
+LIBS="$LIBS -lCsMumega -L$DIR_MM/$OS"
+CFLAGS="$CFLAGS -I$DIR_MM"
+
+
+###########################################################################
+#  The end
+###########################################################################
+
+LIBS="$LIBS -lnsl"
+
+auto_config_files="Makefile.inc"
+AC_SUBST(auto_config_files)
+AC_OUTPUT($auto_config_files)
+
+grep define src/config.h | grep USE_
+echo
+echo '*************************************************'
+echo '***   DaqDataDecoding configuration success   ***'
+echo '*************************************************'
+echo
+

@@ -1,0 +1,46 @@
+// $Id: lr.DC.opt,v 1.10 2002/06/23 22:34:07 hpereira Exp $
+
+//------------------------------
+//
+//   LR (Left/Right ambiguities) for Drift Chambers
+//   control options
+//
+//------------------------------
+
+LR make associations    // perform L/R associations and ambiguity raising
+//LR make histograms      // book and fill L/R histograms
+
+//--------------------------------------
+//
+// DETECTOR ASSOCIATION TABLE. 
+// FORMAT : TBNAME0 TBNAME1  ASSOCIATION_CUT(mm)  LRPROB_CUT LRMODE
+//
+// LRProbCut is supposed to be in [0,0.5]
+// drift-like clusters for which LRProb < LRProbCut can be removed
+//
+// LRMODE : optional parameter 
+//		nothing - 	Target pointing
+//		0 - 				Target pointing; 
+//		1 - 				Cell overlap; 
+// 		other - 		nothing;
+//-----------------------------
+
+//=== DC01 ===
+LR associate  DC01X1__   DC01X2__  8.0		0.5 	1
+LR associate  DC01Y1__   DC01Y2__  8.0    0.5   1
+LR associate  DC01U1__   DC01U2__  8.0    0.5   1
+LR associate  DC01V1__   DC01V2__  8.0    0.5   1
+
+//=== DC02 ===
+LR associate  DC02X1__   DC02X2__  8.0		0.5 	1
+LR associate  DC02Y1__   DC02Y2__  8.0    0.5   1
+LR associate  DC02U1__   DC02U2__  8.0    0.5   1
+LR associate  DC02V1__   DC02V2__  8.0    0.5   1
+
+//=== DC03 ===
+LR associate  DC03X1__   DC03X2__  8.0		0.5 	1
+LR associate  DC03Y1__   DC03Y2__  8.0    0.5   1
+LR associate  DC03U1__   DC03U2__  8.0    0.5   1
+LR associate  DC03V1__   DC03V2__  8.0    0.5   1
+
+// end

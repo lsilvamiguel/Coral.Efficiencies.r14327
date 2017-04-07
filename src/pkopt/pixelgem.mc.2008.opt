@@ -1,0 +1,37 @@
+// $Id: pixelgem.mc.2008.opt 14069 2015-09-17 20:44:46Z lsilva $
+
+// PixelGEM options for MC setup
+// this file should also be usable for any set-up
+
+
+// Thresholds for strip and cluster amplitudes in units of sigma
+GP	Threshold [0-1] 3.  5.
+
+
+// Polygon cut on amplitude ratios in A2/A3 (x) - A1/A3 (y) plane: (x,y) pairs
+GP	AmplitudeRatio [0-7] .15  .05  1.3  .05  1.3  1.2  .15  1.2
+
+
+// Hit time window for MC hits (hit time smeared with 12 ns RMS)
+// Since we use amplitudeMCDecoding, this should be large, cf. comment in
+// CsPixelGEMDetector.cc:
+// "***** REQUIRE w/in fiducial T Gate, reasonable: -300+100ns"
+GP	MCHitTime [0-1] -300. 100.	// Don't know whether this is useful, in the context of "amplitudeMCDecoding"(?)
+GP01P1__ MCHitTime [0-1] -50 50	// No "amplitudeMCDecoding" yet for CsPixelGEM => resort to simple hit time window: +/-~4sigma(=12ns)
+GP01P2__ MCHitTime [0-1] -50 50
+GP02P1__ MCHitTime [0-1] -50 50
+GP02P2__ MCHitTime [0-1] -50 50
+GP03P1__ MCHitTime [0-1] -50 50
+GP03P2__ MCHitTime [0-1] -50 50
+
+
+GP	amplitudeMCDecoding	// This applies only to the strip pieces (viz. GPxxXYUV...), and not to the pixel ones (viz. GPxxP...)
+// spSig_ detector space resolution (mm) 
+// eGain_ effective gain - should be tuned to reproduce cluster amlitudes   
+// eGSig_ gain sigma (a.u.) for amplitude correlation, for example.
+// sWidth_ signal width (mm) (should be tuned to have correct number of strips/cluster
+// tRes_ time resolution (ns)
+GP	ampParsMC [0-4]	0.07	2500.	100.	0.30	12.
+GP	ampCorrelationMC
+pixelGEM	make associations	// Associate X<->Y and U<->V in CsPixelGEM. Pixel pieces are not concerned.
+GP	Master	XV

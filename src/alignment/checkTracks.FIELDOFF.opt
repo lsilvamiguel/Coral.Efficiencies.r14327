@@ -1,0 +1,88 @@
+//$Id: checkTracks.FIELDOFF.opt,v 1.2 2006/06/16 15:21:49 conrad Exp $
+main magnets off // (on|off) Default (no option) is off
+
+detector table /afs/cern.ch/user/h/hpereira/public/detectors/detectors.22751.dat
+input tree traf.FIELDOFF.root.22751
+
+CheckTracks psfile check.22751.ps
+CheckTracks geometry [0-1] 700 700  // canvas size: width, height
+
+//=== Add cut to all histograms selection
+CheckTracks globalCut T_chi2/T_ndf<30&&T_ndf>40
+
+// uncomment the following lines to have corresponding histograms created
+
+//=== Global plots
+//=== Format is <VAR> <NEVT|0> <CUT|0> <OPTION|0>
+// CheckTracks draw T_chi2/T_ndf   0  T_chi2/T_ndf<30    
+// CheckTracks draw T_nDets        0  T_chi2/T_ndf<30  
+
+//=== DU plots
+//=== format is <var> <nEnt> <cut> <opt> <DET1> [<DET2>] ...
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<7   0 DC01
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<7   0 DC02
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<7   0 DC03
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<3   0 MM
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<3   0 GM01 GM02 GM03 GM04
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<3   0 GM05 GM06 GM07 GM08
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<3   0 GM09 GM10
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<3   0 FI
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<3   0 SI
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<30  0 PA
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<30  0 PB
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<30  0 PS
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<6   0 ST03***b
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<20  0 DW
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<100 0 MA
+// CheckTracks drawDet T_duVect 0   abs(T_duVect)<100 0 MB
+// 
+// // //=== DU vs U plots
+// // //=== format is <nEnt> <cut> <opt> <DET1> [<DET2>] ...
+// CheckTracks fitUCor 0    abs(T_duVect)<3   box DC01
+// CheckTracks fitUCor 0    abs(T_duVect)<3   box DC02
+// CheckTracks fitUCor 0    abs(T_duVect)<3   box DC03
+// CheckTracks fitUCor 0    abs(T_duVect)<1   box MM
+// CheckTracks fitUCor 0    abs(T_duVect)<1   box GM01 GM02 GM03 GM04
+// CheckTracks fitUCor 0    abs(T_duVect)<1   box GM05 GM06 GM07 GM08
+// CheckTracks fitUCor 0    abs(T_duVect)<1   box GM09 GM10
+// CheckTracks fitUCor 0    abs(T_duVect)<2   box FI
+// CheckTracks fitUCor 0    abs(T_duVect)<2   box SI
+// CheckTracks fitUCor 0    abs(T_duVect)<10  box PA
+// CheckTracks fitUCor 0    abs(T_duVect)<10  box PB
+// CheckTracks fitUCor 0    abs(T_duVect)<10  box PS
+// CheckTracks fitUCor 0    abs(T_duVect)<6   box ST03***b
+// CheckTracks fitUCor 0    abs(T_duVect)<10  box DW
+// CheckTracks fitUCor 0    abs(T_duVect)<100 box MA
+// CheckTracks fitUCor 0    abs(T_duVect)<100 box MB
+// 
+// CheckTracks fitUCor  0    abs(T_duVect)<20  box HI
+// CheckTracks fitUCor  0    abs(T_duVect)<100 box HL
+// CheckTracks fitUCor  0    abs(T_duVect)<50  box HM
+// CheckTracks fitUCor  0    abs(T_duVect)<100 box HO
+// 
+// //=== DU vs V plots
+// //=== format is <nEnt> <cut> <opt> <DET1> [<DET2>] ...
+// CheckTracks fitVCor 0    abs(T_duVect)<3   box DC01
+// CheckTracks fitVCor 0    abs(T_duVect)<3   box DC02
+// CheckTracks fitVCor 0    abs(T_duVect)<3   box DC03
+// CheckTracks fitVCor 0    abs(T_duVect)<1   box MM
+// CheckTracks fitVCor 0    abs(T_duVect)<1   box GM01 GM02 GM03 GM04
+// CheckTracks fitVCor 0    abs(T_duVect)<1   box GM05 GM06 GM07 GM08
+// CheckTracks fitVCor 0    abs(T_duVect)<1   box GM09 GM10
+// CheckTracks fitVCor 0    abs(T_duVect)<2   box FI
+// CheckTracks fitVCor 0    abs(T_duVect)<2   box SI
+// CheckTracks fitVCor 0    abs(T_duVect)<10  box PA
+// CheckTracks fitVCor 0    abs(T_duVect)<10  box PB
+// CheckTracks fitVCor 0    abs(T_duVect)<10  box PS
+// CheckTracks fitVCor 0    abs(T_duVect)<6   box ST03***b
+// CheckTracks fitVCor 0    abs(T_duVect)<10  box DW
+// CheckTracks fitVCor 0    abs(T_duVect)<100 box MA
+// CheckTracks fitVCor 0    abs(T_duVect)<100 box MB
+// 
+// CheckTracks fitVCor  0    abs(T_duVect)<20  box HI
+// CheckTracks fitVCor  0    abs(T_duVect)<100 box HL
+// CheckTracks fitVCor  0    abs(T_duVect)<50  box HM
+// CheckTracks fitVCor  0    abs(T_duVect)<100 box HO
+
+//=== Format is <NEVT|0> <CUT|0> <DET1> [<DET2>] ...
+// CheckTracks drawZCor 0 T_chi2/T_ndf<30&&abs(T_duVect)<10 *

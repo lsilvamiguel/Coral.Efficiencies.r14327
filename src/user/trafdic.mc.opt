@@ -1,0 +1,265 @@
+// $Id: trafdic.mc.opt,v 1.31 2005/06/15 16:16:31 ybedfer Exp $
+
+// Example coral options file for TraFDic on MC
+
+// This is to be completed by:
+//   I) Specifying input data one wants to process instead of the default
+//     pythia CG,v7.0.2002.03
+//  II) Selecting accordingly the statement including options specific to
+//     trafdic (cf. in fine).
+//      There is at present the choice between 6 options:
+//      - 2001                        <-> ../pkopt/trafdic.mc.2001.opt
+//      - CG,v6.9                     <-> ../pkopt/trafdic.mc.opt
+//      - CG,v6.9.2002.02             <-> ../pkopt/trafdic.mc.2002.opt
+//      - CG,v6.9.2003                <-> ../pkopt/trafdic.mc.2003.opt
+//      - CG,v7.0.2002.03             <-> ../pkopt/trafdic.mc.2002.03.opt
+//      - CG,v7.0.2002.03.sgap        <-> ../pkopt/trafdic.mc.2002.sgap.opt
+//      - CG,v7.1.2002.04             <-> ../pkopt/trafdic.mc.2002.04.opt
+//      - CG,v7.1.2003.01             <-> ../pkopt/trafdic.mc.2003.01.opt
+//     NOTA.BENE: Some include trafdic files may be still refering by DEFAULT
+//     to IDEAL GEOMETRIES: Have to edit them if this does not please you
+// III) Adding whatever options are needed to enable a given output, e.g.
+//     mDST (default, but active only if executable is phast-compatible, cf.
+//     "./README"), DST or ROOT tree output.
+//  IV) (Possibly) Trigger selection
+
+// $Log: trafdic.mc.opt,v $
+// Revision 1.31  2005/06/15 16:16:31  ybedfer
+//  Make explicit reference to tape server "cchpsscompass" @ Lyon.
+//
+// Revision 1.30  2005/04/28 00:12:43  ybedfer
+//  ...
+//
+// Revision 1.29  2004/11/13 00:25:26  ybedfer
+//  - Make use of env var "COMPASS_FILES".
+//  - Disable beam rescue procedure: it seems it gets stuck in infinite loop
+//   at times and is anyway meaningless w/ present coral where there is
+//   no BMS simulation.
+//
+// Revision 1.28  2004/10/13 13:21:58  ybedfer
+//  - CsKalmanFitting: "InvChi2Trk", "Chi2VCut".
+//  - Reference to 2002.04 files.
+//
+// Revision 1.27  2004/09/21 23:37:10  ybedfer
+//   - Default: No output of MC hits to mDST.
+//   - Specification of vertexing ref. planes, overwriting "../pkopt/vertex.2002.opt".
+//
+
+//                                         ***** phast OUTPUT
+// - Active only if used on a phast-compatible executable, cf. "./README"
+// - Cf. "$PHAST/coral/README" for the details of the options
+mDST	file		${HOME}/phast.mc.root
+//              mDST select (resp. selection) w/ PHAST>=6.013(resp. PHAST<6.013)
+// NO EVENT SELECTION to be requested. Indeed! No discarding of events allowed
+// for unbiased estimate of tracking efficiency. Anyway this selection
+// is nostly ineffective for MC (in its present, pure trigger, acceptation).
+//mDST	selection  	0	// 0: no selection, 1: at least 1 vertex.
+mDST	select		6	// 6: Only tracks w/ P, Only ONE helix per Track
+//mDST	hits		HL	// MegaDST...
+//mDST	MCgen		0	// MC generator info
+// MC hits: Select a set of det's covering all of acceptance, outside magnetic field
+//mDST	MChits		FI04X	MM01X	DC01X	FI05X	GM03X	ST03X	FI06X	GM09X	ST04X
+
+//			 		   ***** ROOT tree OUTPUT
+//CsOutnt Print 	0      // 1 - On, 0 - Off
+//		MC track Rec track MC vert  Rec vert  Calor  Clusters  Digit
+//CsOutnt BLOCK	    1	     1	       1	 1	 1	 0	  0
+//CsOutnt Cond	    0	     1	       0	 0	 0	 1	  0
+//CsOutnt Cluster  MM  GM	// define clusters of which detector to store
+//CsOutnt ChipF1  H		// define digits of which detector to store
+//CsOutnt CsOutnt trkMom		// store tracks with momentum only
+//CsOutnt MagField
+
+//make DST 4				// ***** DST OUTPUT
+
+
+//					   ***** HISTOGRAMMING
+histograms package ROOT
+
+histograms home    ${HOME}/trafdic.mc.root
+
+
+
+
+Monte Carlo job				// ***** THIS IS AN MC RUN
+
+//		CG,v6.9
+
+//Monte Carlo file	/afs/cern.ch/compass/delivery/simevt/testntfz69/zebradat.69.fz
+//Monte Carlo file	/castor/cern.ch/user/c/comgeant/data/mc/pythia/muplus160/2002/fz/pythia.160.full_p-up.6.09.outpipe.fz.1
+//Monte Carlo file	/castor/cern.ch/user/c/comgeant/data/mc/pythia/muplus160/2002/fz/pythia.IT.160.full_p-up.6.09.outpipe.fz.1
+//Monte Carlo file	/castor/cern.ch/user/c/comgeant/data/mc/pythia/muplus160/2002/fz/pythia.LT.160.full_p-up.6.09.outpipe.fz.1
+
+//		CG,v6.9.2002.02
+
+//Monte Carlo file	/castor/cern.ch/user/c/comgeant/data/mc/pythia/muplus160/2002/fz/pythia.160.full_p-up.2002.02.outpipe.fz.1
+//Monte Carlo file	/castor/cern.ch/user/c/comgeant/data/mc/dzero/muplus160/2002/fz/dzero.160.full_p-up.2002.00.outpipe.fz
+//Monte Carlo file	/afs/cern.ch/compass/scratch/d71/D0/fz/bg/5/zebradat.1.fz
+//Monte Carlo file	/castor/cern.ch/user/c/comgeant/data/mc/aroma/muplus160/2002/fz/jpsi.160.full_p-up.6.09.outpipe.fz.1
+
+//		CG,v7.0.2002.03
+
+//Monte Carlo file	/afs/cern.ch/compass/scratch/d01/data05/valexakh/zebradat.1.fz
+//Monte Carlo file	/castor/cern.ch/user/v/valexakh/test/pythia_full.2002.03.fz
+//Monte Carlo file	/castor/cern.ch/user/v/valexakh/test/pythia.160.full_p-up_56.2002.03.outpipe.fz.1
+//Monte Carlo file	/castor/cern.ch/user/v/valexakh/test/dzero.160.full_p-up_61.2002.03.outpipe.fz.1
+//Monte Carlo file	/castor/cern.ch/user/v/valexakh/test/dstar.160.full_p-up_61.2002.03.outpipe.fz.1
+//Monte Carlo file	cchpsscompass:/hpss/in2p3.fr/group/compass/mc/2002/dstar/dstar.160.full_p-up_61.2002.03.outpipe.fz.1
+//Monte Carlo file	/castor/cern.ch/user/c/comgeant/data/mc/dipsi/muplus160/2002/fz/dipsi_jpsi.160.full_p-up.2002.03.outpipe.fz.1
+
+//		CG,v7.0.2002.03.sgap
+
+//Monte Carlo file	/castor/cern.ch/user/v/valexakh/test/dzero.160.full_p-up_61.2002.03.sgap.outpipe.fz.1
+
+//		CG,v7.1.2002.04
+
+//Monte Carlo file	/grid/fzk.de/mounts/nfs/data/compass1/users/valexakh/data/mc/dzero/muplus160/2002/fz/dzero.160.full_p-up.2002.04.outpipe.fz.1	// 10 files
+//Monte Carlo file	/grid/fzk.de/mounts/nfs/data/compass1/users/valexakh/data/mc/dstar/muplus160/2002/fz/dstar.160.full_p-up.2002.04.outpipe.fz.1	// 10 files
+//Monte Carlo file	/grid/fzk.de/mounts/nfs/data/compass1/users/valexakh/data/mc/adstar/muplus160/2002/fz/adstar.160.full_p-up.2002.04.outpipe.fz.1	// 10 files
+
+//		CG,v6.9.2003
+
+//Monte Carlo file	/castor/cern.ch/user/c/comgeant/data/mc/pythia/muplus160/2003/fz/pythia.160.full_p-up.2003.00.outpipe.fz.1
+
+//		CG,v7.1.2003.01
+
+Monte Carlo file	/castor/cern.ch/user/c/comgeant/data/mc/pythia/muplus160/2002/fz/pythia_rich.160.full_p-up.2003.01.outpipe.fz.1
+//Monte Carlo file	/grid/fzk.de/compass/compass3/users/valexakh/data/mc/dstar/muplus160/2003/fz/dstar_rich_std.160.full_p-up.2003.01.outpipe.fz.1
+//Monte Carlo file	/afs/in2p3.fr/throng/compass/detector/geometry/mc/dstar_rich_std.160.full_p-up.2003.01.outpipe.fz.1
+//Monte Carlo file	/sps/compass/yann/dstar_rich_std.160.full_p-up.2003.01.outpipe.fz.1
+//Monte Carlo file	cchpsscompass:/hpss/in2p3.fr/group/compass/mc/2003/dstar/dstar_rich_std.160.full_p-up.2003.01.outpipe.fz.1
+
+// 					   ***** DETECTOR TABLE...
+
+//...is specified in the TraFDic include options file, cf. in fine.
+
+
+
+// 					   ***** MATERIAL MAPS
+
+//...is specified in the TraFDic include options file, cf. in fine.
+
+
+
+
+
+//					   ***** EVENT SELECTION
+events to read 40000			// # of evts to read or file name of evt#'s (evt# = spill#<<16|evt#_in_spill)
+//events to skip 259
+//selection trigger mask 15		// Trigger selection
+
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+//reset random seed every new event
+
+pattern method 1        // not used yet
+tracking method 1       // not used yet
+
+// 					   ***** DECODING
+make decoding 	 	// <nothing>, MCExact
+
+//  	 	 	 	 	   ***** CLUSTERING
+make clustering 	// <nothing>, MCExact, MCSmeared, MCQuantized
+
+//					   ***** RECONSTRUCTION SCHEMA
+reconstruction schema 1
+
+//					   ***** TRACKING
+make tracking
+track prepattern method traffic
+track bridging   method traffic
+track fitting    method traffic
+
+
+//					   ***** Beam RECONSTRUCTION 
+make beam reconstruction
+include ${CORAL}/src/pkopt/beam_2002.opt
+//                   Overwrite what's set in "beam.opt"
+BeamRecons	useTRAFFIC	1	// >0: Traffic is used, =0: standalone beampackage is used
+BeamRecons	doRescue	0	// Rescue cancelled, 'cause it makes coral abort. It's useless so far in MC, anyway.
+
+//					   ***** Vertex RECONSTRUCTION
+make vertex reconstruction
+vertex pattern method averaging
+vertex fitting method kalman
+include ${CORAL}/src/pkopt/vertex.2002.opt
+//                   Overwrite what's set in "vertex.opt"
+CsAverPattern  AcceptTill	105	// in %
+CsAverPattern  Hist		1	// 0 - Off, 1 - ON
+CsAverPattern  findSec   	1	// 0 - Off, 1 - ON
+CsAverPattern  Print [ 0 ]	0	// Prefilter info.
+CsAverPattern  Print [ 1 ]	0	// Error info. 
+CsKalmanFitting  Hist		1	// 0 - Off, 1 - ON
+//CsKalmanFitting Covar		4	// 4 - plus mixed correlations of track momenta
+CsKalmanFitting  Print [ 0 ]	0	// Kalman filter info.
+CsKalmanFitting  Print [ 1 ]	0	// Global fit info.
+CsKalmanFitting  Print [ 2 ]	0	// IKF info.
+CsKalmanFitting  RefPlane	500	// in mm
+CsKalmanFitting  RefBeam	-1500	// in mm
+CsKalmanFitting  RefMargin	500	// in mm
+// Chi2 increment cuts:		DirChi2Trk	InvChi2Trk
+CsKalmanFitting  CUTS		7		10.5
+// Vertex Chi2 cut:
+CsKalmanFitting  Chi2VCut	10
+
+
+//					   ***** RICH1
+make rich1 reconstruction
+include ${CORAL}/src/pkopt/rich1.2002.opt
+
+//					   ***** CALORIMETERS
+make calorimeters reconstruction
+include ${CORAL}/src/pkopt/calorim_mc.opt
+
+//					   ***** MU' PID
+include ${CORAL}/src/pkopt/trigger.2002.opt
+
+//  	 	 	 	 	   ***** GEOMETRICAL ZONES
+define zone 0 3500 before M1
+define zone 3500 17000 between M1 and M2
+define zone 17000 32500 between M2 and Muon Wall
+define zone 32500 99999 after Muon Wall
+
+define zone -8000 0 before the target
+
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+
+CsField SOL_field	$COMPASS_FILES/maps/mag_fields/SOL/smctgt_solenoide.fieldmap
+//CsField SOL_field	$COMPASS_FILES/maps/mag_fields/SOL/smctgt_dipole.fieldmap
+CsField SM1m_field_measured	$COMPASS_FILES/maps/mag_fields/SM1m/SM1M.map.172.data
+CsField SM2_field	$COMPASS_FILES/maps/mag_fields/SM2/FSM.map.4000.data
+
+
+//					   ***** LOGGER
+error logger log level   error		// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level none
+error logger verbosity   normal		// low, normal, high. 
+
+
+//	  	  	  	  	   ***** TraFDic
+
+//include 	${CORAL}/src/pkopt/trafdic.mc.2001.opt
+//include 	${CORAL}/src/pkopt/trafdic.mc.opt
+//include 	${CORAL}/src/pkopt/trafdic.mc.2002.opt
+//include 	${CORAL}/src/pkopt/trafdic.mc.2003.opt	// Self service file
+//include 	${CORAL}/src/pkopt/trafdic.mc.2002.03.opt	// CG,v7.0
+//include 	${CORAL}/src/pkopt/trafdic.mc.2002.sgap.opt	// CG,v7.0 small gap
+//include 	${CORAL}/src/pkopt/trafdic.mc.2002.04.opt	// CG,v7.1 2002
+include 	${CORAL}/src/pkopt/trafdic.mc.2003.01.opt	// CG,v7.1 2003
+
+//                   Overwrite what's set in "trafdic.*.opt"
+TraF	SmoothPos [0]	745.1		// Smooth track at Rich entrance
+//TraF	Graph [0]	0		// For interactive coral w/o graphics
+//TraF	Print [ 0 ]	7		// Event-by-event numbering.
+//TraF	Print [ 8 ]	7		// EoE
+
+// ********** SPECIAL SETTING TO HISTOGRAM GEMs Amplitude Correlation **********
+// (in "TEv::RDMonitor", which need be recompiled w/ "RDMon_DIGIT_DATA" and
+// "RDMon_DIGIT_GM" defined)
+//TraF	Hist	[ 1]	21	// MCMonitor (&2:D0Kpi,&4:Scat'd mu,&8:Lppi)
+//TraF	Hist	[18]	2	// Residuals: &Groups of tracks histo'ed
+// (in "TEv::Quadruples", which need be recompiled w/ "Quadruples_HISTO" defined)
+//end

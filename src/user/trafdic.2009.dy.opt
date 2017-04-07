@@ -1,0 +1,371 @@
+// $Id: trafdic.2009.dy.opt 13465 2012-06-06 21:32:14Z ybedfer $
+
+// TraFDic on 2009 DY data @ CERN.
+
+// It's derived from "template.opt" in 2009/W47/slot2 mass prod.
+// Important modification: TraFFiC muwall bridging (TraF ReMode [16]") disabled.
+
+//  This file sums up the main options. Other options are specified elsewhere
+// and referenced here by "include <path_to_2ndary_options_file>" statements.
+// All options can be entered several times, whether in main or secondary files.
+// The last one, in the stream of entries and "include" statements, always wins.
+
+//  This file can serve as the basis for the template of mass production (
+// i.e. so-called "template.opt" file). It has to be adapted though, e.g. in
+// order to specify placeholders for the IO. Cf. in fine the block entitled:
+//         "TEMPLATE FOR MASS PRODUCTION".
+
+//  For any other application, it may have to be edited or, better, ``included
+// and overwritten''. Cf. the TWiki page:
+// wwwcompass.cern.ch/twiki/bin/view/DataReconstruction/CoralSoftware#Options_files
+
+
+//                                         ***** PHAST OUTPUT
+// - Active only if used on a PHAST-compatible executable, cf. "./README"
+// - Cf. "$PHAST/coral/README" for the details of the options
+mDST file		${HOME}/phast.root
+// Information reduction bit pattern: "mDST select".
+mDST select		9	// At least one vertex or particle | First and last helices only.
+//mDST hits		HL	// MegaDST...
+//mDST Digits		EC	// GigaDST... (raw information after calibrations are applied, according to documentation only useful for non-tracking detectors, use mDST hits for tracking detectors)
+//mDST DAQdigits	SC	// GigaDST... (raw information as read from raw data stream, no calibrations applied)
+
+//					// ***** WRITE-BACK of RAW DATA
+//				<File name>	<Type>
+//CsKalmanFitting WriteBack	evtDump.raw	Physics		// As of 08/02: excl. 5/7 pions, K0, Lambda, J/psi(?)
+//CsEvent         WriteBack	evtDump.raw	Randoms		// <File name> may differ from CsKalmanFitting's
+
+
+//					   ***** HISTOGRAMMING
+histograms package	ROOT
+histograms home		${HOME}/trafdic.root
+
+
+
+
+
+//					   ***** THIS IS A DATA RUN
+Data job
+
+hadron run					// ...of the hadron type
+
+//					   ***** INPUT DATA...
+
+Data file  /castor/cern.ch/compass/data/2009/raw/W47/cdr31041-82224.raw
+
+
+// 					   ***** DETECTOR TABLE...
+//  A full directory (path name terminated by a slash "/") or the full path to
+// a particular file can be specified.
+detector table	$COMPASS_FILES/geometry/2009/
+
+// 					   ***** ROOTGeometry
+// File created using COMGeant, with MC of DY 2009: geom_general, geom_hadron_2008, geom_drellyan_2009
+CsROOTGeometry  file	$COMPASS_FILES/geometry/2009/ROOTGeometry/detectors.dy.rUnknown.C
+CsROOTGeometry  massDefault	.1057	// Muon mass in use
+CsROOTGeometry	simpleELoss	0	// Use the full Energy loss formulas (correction (*Len) included in src/geom/CsMaterialMaps.cc)
+CsROOTGeometry	ELossStraggling	0	// Special option read via Marcia's patch
+TraF		ELossStraggling	0
+
+//					   ***** CALIBRATION
+
+
+
+
+
+use calibration
+CDB use 	MySQLDB
+
+CDB server	wwwcompass	// This is, as of 07/05, pointing to "compass02" located in computer center (reachable outside CERN)
+// "CDB entrytime Y-M-D-H:M:S" can be entered to reject all calibrations issued
+// after specified date. CDB being constantly evolving, leaving "CDB entrytime"
+// disabled may give rise to unpredictable behaviour.
+//CDB	entrytime	2007-12-01-00:00:00
+// "entrytime" entry can be made to affect only a (set of) specific TBName(s):
+// "TBname(or TB) CDBentrytime(sic!)"
+//DW	CDBentrytime	2007-12-01-00:00:00	// Disregarding the calibs entered on Dec. 14th, 2007
+// CDB can be replaced by a File DB, for any given (set of) TBname(s):
+
+//DW FileDB	/afs/cern.ch/user/l/leberig/public/marcin/
+
+
+
+
+
+//					   ***** MAPPING
+decoding map	$COMPASS_FILES/maps/2009.xml
+
+
+//					   ***** EVENT SELECTION
+events to read 30000			// # of events to read
+//events to skip 29//22001-81883#1048944 //9//22001-81883#1048684
+// BoS Veto. 
+//events BOS_skip 1.151	// Status of hardware veto unknown as of 09/12 => Keep software veto commented out.
+
+//selection trigger mask ffef		// Trigger selection (hexadecimal)
+//selection trigger strict
+
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+//reset random seed every new event
+
+DC 	make always two clusters	// Even if they coincide, so that their re-evaluation w/ an event time differing from the trigger might yield 2 distinct clusters
+DR 	make always two clusters
+DW 	make always two clusters
+MC 	make always two clusters
+ST 	make always two clusters
+
+pattern method 1        // not used yet
+tracking method 1       // not used yet
+
+// 					   ***** DECODING
+make decoding 	 	// <nothing>, MCExact
+
+//  	 	 	 	 	   ***** CLUSTERING
+make clustering 	// <nothing>, MCExact, MCSmeared, MCQuantized
+
+//					   ***** RECONSTRUCTION SCHEMA
+reconstruction schema 1
+
+//					   ***** TRACKING
+make tracking
+track prepattern method traffic
+track bridging   method traffic
+track fitting    method traffic
+
+
+
+//					   ***** Beam RECONSTRUCTION
+//make beam reconstruction	// In DY 2009 there were no BMS
+PID_doBeamID	selAllBeams	1	// Allow beams w/o BMS in the vertexing
+
+
+//					   ***** Vertex RECONSTRUCTION
+make	vertex	reconstruction
+vertex pattern method averaging
+vertex fitting method kalman
+include ${CORAL}/src/pkopt/vertex.2002.opt
+//                   Overwrite what's set in "vertex.opt"
+CsAverPattern  Hist	1	// 0 - Off, 1 - ON
+CsAverPattern  findSec	1	// 0 - Off, 1 - ON
+CsAverPattern  Print [ 0 ]	0	// Prefilter info.
+CsAverPattern  Print [ 1 ]	0	// Error info.
+// Track is considered as accepted if its momentum is smaller than "AcceptTill" percents of beam track
+CsAverPattern	AcceptTill	105	// in %
+// DY: TimePrimCut default was 10 --> increased to 40 sigmas
+CsAverPattern	TimePrimCut	40 	// in sigmas
+// 	 	 	Z Dist 	DCA(number of sigmas)
+// DY: Number of sigmas increased to 100
+CsAverPattern CUTS 	2550 	100 	// Z cut so that vertex search domain includes GP01.
+CsAverPattern	Refit		1	// 0 - Off, 1 - ON
+CsAverPattern	Retrack		2.5	// 0 - Off, !0 = cut on event time
+CsKalmanFitting Specials	0	// 0 - Off, 1 -  mu' takes precedence
+CsKalmanFitting	Hist		1	// 0 - Off, 1 - ON
+CsKalmanFitting	Print [ 0 ]	0	// Kalman filter info.
+CsKalmanFitting	Print [ 1 ]	0	// Global fit info.
+CsKalmanFitting	Print [ 2 ]	0	// IKF info.
+// DY: RefPlane changed from 500 --> 950 mm, corresponding to downstream of absorber
+CsKalmanFitting	RefPlane	950	// in mm
+// DY: RefBeam changed from -1500 --> -7600 mm, upstream the FI01
+CsKalmanFitting	RefBeam	-7600	// in mm
+CsKalmanFitting	RefMargin	500	// in mm
+// Chi2 increment cuts:		DirChi2Trk	InvChi2Trk
+CsKalmanFitting	CUTS		7		17
+// Vertex Chi2 cut:
+CsKalmanFitting	Chi2VCut	10.5
+CsKalmanFitting BeamP0		190	// Beam reference momentum (for histo purposes)
+
+//					   ***** RICH1
+make	rich1	reconstruction
+include ${CORAL}/src/pkopt/rich1.2008.opt
+CsRICH1UpGrade  CONFIG		// RICH upgrade: 12 APV 4 MAPMT
+RICHONE 	PrintDetMirr	0
+RICHONE 	AcknoMethods	0	// prints methods in use
+RICHONE 	PrintKeys	0	// 1 = print keys read,  0 = No print
+RICHONE 	PrintConsts	0	// 1 = print rec. constants read,  0 = No print
+RICHONE 	DoThetaLikeMax 	NO 	// Faster but "the output buffer of rich won't have the angle that maximizes the likelihood anymore" (according to Giulia, cf. mail from 2009/06/29)
+RICHONE   BackgrParam05    ${CORAL}/src/pkopt/rich1-back-para-81313hn2-2009.new-vector74
+
+//					   ***** CALORIMETERS
+make calorimeters reconstruction
+include ${CORAL}/src/pkopt/calorim_2009.opt
+// if for the period you are looking at no LED/Laser corrections are available,
+// uncomment the next two lines
+//EC01P1__ MoreRecoOptions USE_LED_REF_CALIB_CORRECTION=NO USE_LED_REF_CALIB_CORRECTION_IN_SPILLS=NO
+//EC02P1__ MoreRecoOptions USE_LED_REF_CALIB_CORRECTION=NO USE_LED_REF_CALIB_CORRECTION_IN_SPILLS=NO
+
+//CsBuildPart	Hist		5	// Calo histos. Disabled by default, because too big (several MB). But programmed to be enabled in mass production: cf. in fine.
+
+//					   ***** RICH WALL + CALORIMETER
+make	RW	charge reconstruction	// RW+calo charge reco
+include	${CORAL}/src/pkopt/rw_ch_2008.opt
+
+//					   ***** FLUX SCALERS
+include ${CORAL}/src/pkopt/trigger.2009.opt
+
+
+//  	 	 	 	 	   ***** GEOMETRICAL ZONES
+// DY: redefine target zone to include target and absorber
+define zone     -2400    3500   before M1
+define zone      3500   21000   between M1 and M2
+define zone     21000   32800   between M2 and Muon Wall
+define zone     32800   99999   after Muon Wall
+
+define zone     -8000   -2400   before the target
+
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+CsField SM1m_field_measured $COMPASS_FILES/maps/mag_fields/SM1m/SM1M.map.172.data
+CsField SM2_field	 $COMPASS_FILES/maps/mag_fields/SM2/FSM.map.5000.data
+
+//					   ***** MAGNETs INFO
+
+//CsMagInfo	MySQLDB
+CsMagInfo	File	/afs/cern.ch/compass/scratch/d17/objsrvvy/2009/W47/slot2/MagFile_W47
+
+
+
+CsMagInfo	SM2	0	// Disabled for who knows what reason...
+
+
+
+//					   ***** LOGGER
+error logger log level		error	// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level	none
+error logger verbosity		normal	// low, normal, high. 
+
+//	  	  	  	  	   ***** TraFDic (+DET OPTIONS+...)
+
+include ${CORAL}/src/pkopt/trafdic.2009.opt
+
+//		***** OVERWRITE WHAT'S SET IN "../pkopt/trafdic.2009.opt" *****
+
+// Specify the beam charge, ID and momentum (Will be X-checked against magnet polarities from the detector table).
+TraF	iCut	[15]	-1	// Beam charge.
+TraF	iCut	[30]	1	// Beam particle ID: 1=hadron (0=muon)
+TraF	dCut	[ 4]	190	// Beam momentum (GeV).
+//TraF	dCut	[ 5]	1.80e-4 	// Beam cop spread (c/GeV). Assigned to d(1/p). Here corresponds to the 6.5GeV/sqrt(12) of the 190 GeV beam.	(TEv::TracksFit2)
+
+
+// DY specifics in the track reconstruction scheme:
+// DY: dcut options modified. Generically less restrictive
+TraF	dCut	[ 3]	350
+TraF	dCut	[ 7]	90.
+TraF	dCut	[ 9]	80.
+// DY: enlarge the root for hit to track association:
+TraF	dPRpar [ 10 - 13 ]	10.  0.600 	0.150	0.100  //(region between SM1 and SM2)
+// - Bridging over target:
+Traf	ReMode	[26]	0	// No bridging over target
+// - Extend the updating the drift hits w/ event's time to trigger 0x400 (which
+//  is no longer a random trigger during the DY data taking.)
+TraF	ReMode	[35]	2047	// (Trigger pattern where) Update drift hits w/ event's (=beam-track's) time before track finding
+TraF	ReMode	[36]	2047	// (Trigger pattern where) Update drift hits w/ event's time in track finding and fitting
+TraF	ReMode	[37]	2047	// (Trigger pattern where) Update drift hits w/ event's time in post-vertexing tracks refit
+TraF	ReMode	[44]	0	// Disable SI disambiguation
+
+// Redefine the TBNAMES of DETECTORS to be EXCLUDED FROM PATTERN RECOGNITION:
+// (Caveat: one has to supply the full list of excluded detectors each time one re-specifies this "TraF DetNameOff" option.)
+// - In any case, some detectors ("VI/VO/DW02X2/Y1/HK/HI05/MP") have to be left turned off , cf. explanations in "../pkopt/trafdic.2009.opt".
+TraF	DetNameOff	VO	VI	DW02X2	DW02Y1	HK	HI05	MP
+
+//TraF	Graph	[0]	0	// coral's graphics switches off automatically under BATCH @ CERN, gridKa and Lyon. This option forces it to do so in any case.
+//TraF	iCut	[0]	7	// Trigger selection in TraFDic
+//TraF	Print	[0]	3	// Event-by-event numbering
+//TraF	Print	[8]	3	// EoE
+//TraF	Hist	[3]	1	// Smoothed Pulls		(TTrack::Refine)
+
+
+//			SMOOTHING POINTS
+// The points @ RICH (resp. Calos) are to used by RICH (resp. Calo) softwares.
+TraF	SmoothPos [0]	745.		// RICH
+// From: Vladimir Kolosov
+// Sent: Thu 2/28/2008 9:14 AM
+// Let's decide to calculate track position 10 cm upstream front surface of a calorimeter.
+// 2011-04-28: updated to match current detectors.dat
+// calo  EC01P1__  LG1V    1399.500 - 57./2 - 10. = 1361.0
+// calo  EC02P1__  LG2V    3325.200 - 45./2 - 10. = 3292.7
+// calo  HC01P1__  HC1V    1573.700 -100./2 - 10. = 1513.7
+// calo  HC02P1__  HC2V    3580.000 -120./2 - 10. = 3510.0
+TraF	SmoothPos [1]	1361.0	// Smooth track at ECAL1
+TraF	SmoothPos [2]	1513.7	// Smooth track at HCAL1
+TraF	SmoothPos [3]	3292.7	// Smooth track at ECAL2
+TraF	SmoothPos [4]	3510.0	// Smooth track at HCAL2
+
+
+//                 STRAW options: X-ray and signal propagation correction
+//  X-ray can only be enabled if alignment (cf. "detector table" entry supra)
+// did also take X-ray correction into account.
+//  And in any case, is incompatible w/ "VarPitch", cf. infra.
+// T0 per channel calib are available for 2009, cf. mail from J-F.:
+// ======================================================================
+// On Mon, 2009-06-22 at 16:45 +0200, Jean-Francois Rajotte wrote:
+// I have calibrated the T0s for 2009.  I have put the calibration to the
+// database and can be switched on with this line in coral opt file :
+// 
+// STRAW settings spacers=YES signal_propagation=YES T0=YES
+// 
+// The calibration changes the T0 by 3-4 ns on average, [...]
+// ======================================================================
+// NOTA BENE: A unique entry for all "STRAW settings".
+STRAW settings spacers=YES signal_propagation=YES T0=YES
+
+//                 Enabling variable pitch
+//  This can be enabled, for any given detector, only if alignment (cf.
+// "detector table" entry supra) takes VarPitch correction into account.
+//  And in any case, as far as straws are concerned, is incompatible w/ X-ray
+// correction, cf. supra.
+//VarPitch    DetOffVarP	DC	ST	DW	FI	GM
+//VarPitch	table	~corallib/public/PitchTable/PitchTable_FIGMDCSTDW_2003.dat
+
+
+
+//  ===== TEMPLATE FOR MASS PRODUCTION (uncomment, and modify if needed) =====
+
+//					***** PLACEHOLDERS for I/O
+// (Note: One has to uncomment next 6 entries.)
+//events to read 200000
+//Data		file	TMPRAWFILE
+//mDST		file	TMPMDSTFILE
+//histograms	home	TMPHISTFILE
+//CsKalmanFitting WriteBack	testevtdump.raw	Physics
+//TMPRICHFILE
+
+//					***** mDST OPTIONS
+// (Note: One has to systematically uncomment next 2 entries. For special MegaDST production, one has to uncomment also the 3rd one.)
+mDST	select	0	// 0: no selection
+//mDST	DAQdigits	RP CE
+
+//mDST	hits	ALL		// SPECIAL OPTION! for the production of MegaDST
+
+
+//					***** CDB OPTIONS
+// (Note: One has to freeze the CDB info accessible to the production, so that the latter be independent of CDB later developments, and hence stable. A reasonable choice for the "entrytime" is the date of the start of production. One may still want to be more restrictive on all of the CDB. Or on the part of it concerning a particular detector or set of detectors: in that case, use the option "<generic name> CDBentrytime" (cf. examples in the body of this options file).)
+//CDB	entrytime	2012-5-24-18:49:24	// TO BE MODIFIED!
+
+// (Note: One has also to enable the special, faster, connection to the MySQL server.)
+//CDB	server  	$CDBSERVER	// Share load between compass02 and compass22
+//CDB	username	anonbatch
+
+
+//					***** DETECTOR MONITORING
+// (Note: Have to uncomment next 4 entries.)
+//Monitoring	Directory	ON	// Paolo's data monitor graphs.
+//Monitoring	Residuals	ON	// Albert's monitoring histos.
+//Monitoring	Efficiency	ON
+//CsBuildPart	Hist		5	// Calorimeter
+
+
+//					***** SETUP FILES
+// (Note: One has to freeze the setup info accessible to the production, so that the latter be independent of the modifications later brought to the setup files, and hence stable. This is achieved by copying the setup files to sub-directories of the production directory. E.g. infra are listed what need be done for the production of 2009W47/slot2.) 
+//decoding	map	/afs/cern.ch/compass/scratch/d17/objsrvvy/2009/W47/slot2/maps
+//detector	table	/afs/cern.ch/compass/scratch/d17/objsrvvy/2009/W47/slot2/alignement/
+//TraF		Dicofit	/afs/cern.ch/compass/scratch/d17/objsrvvy/2009/W47/slot2/dico/
+//CsROOTGeometry  file	/afs/cern.ch/compass/scratch/d17/objsrvvy/2009/W47/slot2/ROOTGeometry/detectors.C
+
+//					***** DETECTORS EXCLUDED FROM TRACKING
+// (Note: The option "TraF DetNameOff" needs a priori no modification w.r.t. its setting in the body of this file. The option allows to exclude some detectors from the track reconstruction, had they been failing during a, large, part (then production gets more stable) or all (tracking performs better if it is told which are the bad guys and not to expect hits from them) of a particular period w/in the validity domain of this file. Over the course of 2009 DY, which covers only one period anyway, no remarkable accident occurred.)
+// (Caveat: one has to supply the full list of excluded detectors each time one re-specifies this "TraF DetNameOff" option.)
+// ===========================================================================
+//end

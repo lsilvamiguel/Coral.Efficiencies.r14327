@@ -1,0 +1,12 @@
+	SUBROUTINE OPPS(file)
+	IMPLICIT NONE
+	
+	INTEGER ist
+	CHARACTER file*(*)
+	OPEN(UNIT=10,FILE=file,FORM='FORMATTED',
+     +       STATUS='UNKNOWN',IOSTAT=ist)
+	IF(ist.NE.0)WRITE(*,*)'OPPS ==> Can not open PS file'
+	CALL IGMETA(10,-4112)
+
+	RETURN
+	END

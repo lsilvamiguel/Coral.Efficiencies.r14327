@@ -1,0 +1,103 @@
+// $Id: vertex.2002.opt,v 1.13 2010/11/11 02:48:25 ybedfer Exp $
+
+
+//+++++++++++++ definition of vertex finding parameters +++++++++++++++
+
+//+++++++++++++++++++++++++++ Pattern +++++++++++++++++++++++++++++++++
+
+CsAverPattern  Hist        1     // 0 - Off, 1 - ON
+
+CsAverPattern  NSpec       0     // 1 - skip event if mu' is not found.
+
+CsAverPattern  Mode        0     // 0 - standard
+                                 // !=0: Used for debugging purposes:
+                                 //     ==2 - all involved tracks are correct (for MC only)
+                                 //     ==3 - all tracks passed distance cut are correct.
+
+CsAverPattern  findPrim    1     // 0 - Off, 1 - ON
+CsAverPattern  findSec     1     // 0 - Off, 1 - ON
+
+// the number of rad. lengths permitted for tracks from V0 to pass
+CsAverPattern  SecXX0   999999
+
+// track is considered as accepted if its momentum is smaller
+// than "AcceptTill" percents of beam track
+CsAverPattern  AcceptTill      90     // in %
+
+// The track is accepted for prefilter if its momentum is larger then "MomCut".
+CsAverPattern  MomCut          0.1    // in GeV
+
+// If angle between beam and scattered muon is bigger than "AnglePrim"
+// than initial vertex position is intersection of primary & scattered muons.
+CsAverPattern  AnglePrim       0.1      // in Deg
+
+//Sqrt of diagonal elements of covariance matrix
+//                       _X_    _Y_    _Z_  
+CsAverPattern  CnSigmas   2      2     500      // in mm
+
+//                     Z Dist(from centre)  DCA(number of sigmas)
+CsAverPattern  CUTS          1000                    10
+
+// Distance between tracks of different sings in case of V0 finding.
+CsAverPattern  SecDist  10     // in mm
+
+CsAverPattern  Print [ 0 ]     0      // Prefilter info.
+CsAverPattern  Print [ 1 ]     1    // Error info. 
+
+//+++++++++++++++++++++++++++ Fitting +++++++++++++++++++++++++++++++++
+
+CsKalmanFitting  Hist        1     // 0 - Off, 1 - ON
+
+// Position of reference plane
+// (N.B.: Overwritten in ../user/trafdic.*.opt, as of 2004/09)
+CsKalmanFitting  RefPlane    500   // in mm
+
+// Track's error matrix augmenting
+CsKalmanFitting  Agm         1     // 0 - Off, 1 - ON
+
+// Check for special tracks ( mu' )
+CsKalmanFitting  Specials    1     // 0 - only beam is special,
+                                   // 1 - all specials are kept in fit
+				   
+// "DirChi2Trk" - chi2 of filter step (for tracks in DKF)
+// "InvChi2Trk" - smoothed chi2 of track (in IKF)
+// "Chi2Vrt" - cut for using of new values of Xn and Cn for next iteration (in IKF)
+//                     DirChi2Trk InvChi2Trk  Chi2Vrt
+CsKalmanFitting  CUTS      7          10         20
+
+// Vertices with Chi2 > "Chi2VCut" are canceled 
+CsKalmanFitting  Chi2VCut    10
+
+// If distance between initial and final vertex position is bigger
+// than "DistInit" Kalman fit must be redone.
+// (N.B.: No longer in use, as of 2004/09)
+CsKalmanFitting  DistInit    100     //in mm
+
+// Factor used to scale down a MS component of an error matrix 
+CsKalmanFitting  ScalMS		1
+
+CsKalmanFitting  Covar  	3	// 0 - covariance matrix are not filled
+					// 1 - only coordinate correlations are filled
+					// 2 - plus momentum correlations of every track
+					// 3 - plus correlation of momentum with coordinates
+					// 4 - plus mixed correlations of track momenta
+
+// If angle between beam and scattered muon is smaller than "AnglePrim"
+// than inverse KF is involved for primary vertex reconstruction
+CsKalmanFitting  AnglePrim       10.      // in Deg
+
+// factor for energy loss corrections
+CsKalmanFitting  ELcorr    1
+
+// To store raw data if primary vertex is found
+//CsKalmanFitting primary file     Primary.dat
+
+// To store raw data if secondary vertex is found
+//CsKalmanFitting secondary file     Second.dat
+
+CsKalmanFitting  Print [ 0 ]     0      // Kalman filter info.
+CsKalmanFitting  Print [ 1 ]     0      // Global fit info.
+CsKalmanFitting  Print [ 2 ]     0      // IKF info.
+
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+

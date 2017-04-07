@@ -1,0 +1,3 @@
+*-----X at target center..... Half length....
+      common/target0/xtarg0,hltarg,ytarg,ztarg
+*

@@ -1,0 +1,251 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT
+AC_CONFIG_HEADER(src/Reco_config.h)
+
+AC_MSG_NOTICE("****************")
+AC_MSG_NOTICE("Configuring Reco")
+AC_MSG_NOTICE("****************")
+
+dnl ****************************************************************************
+dnl Macros
+dnl ****************************************************************************
+
+dnl AC_SET_PACKAGE(package_name,env_variable,help_string,default_value)
+dnl On output:
+dnl variable USE_package_name will be set
+dnl variable DIR_package_name will be non-empty for particular check
+AC_DEFUN(AC_SET_PACKAGE,
+[
+  DIR_$1=
+  AC_ARG_WITH($1,[$3],,with_$1=$4)
+  if test "${with_$1}" = "no" || test "${with_$1}" = ""; then
+    # Package is disable
+    echo Package $1 is disable
+    USE_$1=no
+  else
+    # Package is enable
+    AC_CHECKING($1)
+    if test "${with_$1}" = "yes"; then
+      # Try to search in standard places.
+      # At first we check environment variable $2
+      AC_MSG_CHECKING(environment variable $2)
+      if test "$$2" = ""; then
+        AC_MSG_RESULT(variable was not set)
+        echo $1 library will not be used
+        USE_$1=no
+      else
+        # The enviaronment variable is defined. We shall use it.
+        AC_MSG_RESULT($$2)
+        with_$1=$$2
+        USE_$1=yes
+      fi
+    else
+      # Exact value was given: --with-package=/dir1/dir2/
+      true
+      USE_$1=yes
+    fi
+
+    if test "${USE_$1}" = "yes"; then
+      DIR_$1=${with_$1}
+      AC_DEFINE(USE_$1)
+    fi
+  fi
+  AC_SUBST(USE_$1)
+  AC_SUBST(DIR_$1)
+  AC_SUBST(LIB_$1)
+])
+
+dnl ****************************************************************************
+dnl Create shared or static library
+dnl ****************************************************************************
+
+AC_ARG_ENABLE(shared, AS_HELP_STRING([--enable-shared], [build shared library; default is static library]))
+if test "${enable_shared}" = "yes" ; then
+  LIB_TYPE=shared
+else
+  LIB_TYPE=static
+fi
+AC_SUBST(LIB_TYPE)
+
+dnl ****************************************************************************
+
+dnl Check for compilers
+
+AC_PROG_CXX
+AC_PROG_CXXCPP
+
+AC_PROG_F77
+if test "$F77" = "gfortran" ; then
+    LIBS="$LIBS -lgfortran"
+else
+    LIBS="$LIBS -lg2c"
+fi
+
+dnl This macro is for checking if some command line option of CXX is available
+dnl or not.
+AC_DEFUN([FLAGS_CXX_OPTION],[
+if echo $CXXFLAGS | grep -q -e "$1\($\|\s\)" ; then
+  AC_MSG_NOTICE([$1 already in \$CXXFLAGS])
+else
+  AC_MSG_CHECKING([whether $CXX accepts $1])
+  tmpfile=$(mktemp -t)
+  $CXX $1 -c -xc /dev/null -o $tmpfile >/dev/zero 2>/dev/zero
+  ac_status=$?
+  rm -f $tmpfile
+  if test $ac_status -eq 0; then
+    AC_MSG_RESULT([yes])
+    CXXFLAGS="$CXXFLAGS $1"
+  else
+    AC_MSG_RESULT([no])
+  fi
+fi
+])
+dnl This macro is for checking if some command line option of F77 is available
+dnl or not.
+AC_DEFUN([FLAGS_F77_OPTION],[
+if echo $FFLAGS | grep -q -e "$1\($\|\s\)" ; then
+  AC_MSG_NOTICE([$1 already in \$FFLAGS])
+else
+  AC_MSG_CHECKING([whether $F77 accepts $1])
+  tmpfile=$(mktemp -t)
+  $F77 $1 -c -xc /dev/null -o $tmpfile >/dev/zero 2>/dev/zero
+  ac_status=$?
+  rm -f $tmpfile
+  if test $ac_status -eq 0; then
+    AC_MSG_RESULT([yes])
+    FFLAGS="$FFLAGS $1"
+  else
+    AC_MSG_RESULT([no])
+  fi
+fi
+])
+
+dnl C++ specific compiler flags
+
+dnl make sure -Wall and -Wextra are amongst the CXXFLAGS
+dnl and the compiler understands those flags
+FLAGS_CXX_OPTION(-Wall)
+FLAGS_CXX_OPTION(-Wextra)
+
+dnl to not print warnings for unused variables
+FLAGS_CXX_OPTION(-Wno-unused)
+FLAGS_CXX_OPTION(-Wno-unused-parameter)
+
+dnl FORTRAN specific compiler flags
+
+dnl make sure -Wall and -Wextra are amongst the FFLAGS
+dnl and the compiler understands those flags
+FLAGS_F77_OPTION(-Wall)
+FLAGS_F77_OPTION(-Wextra)
+dnl to not print warnings for unused variables
+FLAGS_F77_OPTION(-Wno-unused)
+FLAGS_F77_OPTION(-Wno-unused-parameter)
+
+FLAGS_F77_OPTION(-fno-automatic)
+FLAGS_F77_OPTION(-ffixed-line-length-none)
+FLAGS_F77_OPTION(-fimplicit-none)
+
+dnl Do compilation using C++
+AC_LANG_CPLUSPLUS
+
+dnl ****************************************************************************
+dnl ROOT
+dnl ****************************************************************************
+
+AC_SET_PACKAGE(ROOT, ROOTSYS, AS_HELP_STRING([--with-ROOT], [enable on default]), "yes")
+if test "$USE_ROOT" = "yes"; then
+  if test "$DIR_ROOT" != "$ROOTSYS"; then
+    AC_WARN(Your environment variable ROOTSYS is incorrect (or it was not set))
+    AC_WARN(You MUST set it to $DIR_ROOT BEFORE running 'make' program)
+    AC_WARN(Script setup.csh/setup.sh will do this job for you)
+    AC_WARN(Type '. setup.sh' under bash/ksh or 'source setup.csh' under csh/tcsh)
+    warnings="$warnings ROOT"
+  fi
+  export ROOTSYS=$DIR_ROOT
+  AC_CHECK_FILE($DIR_ROOT,,exit 1)
+  AC_CHECK_FILE($DIR_ROOT/bin/rootcint,,exit 1)
+  AC_CHECK_FILE($DIR_ROOT/bin/root-config,,exit 1)
+  ROOTINC=`$DIR_ROOT/bin/root-config --incdir`
+  INCLUDES="$INCLUDES -I$ROOTINC"
+  LIB_ROOT=`$DIR_ROOT/bin/root-config --glibs`
+  LIBS="$LIBS $LIB_ROOT"
+else
+  AC_ERROR('ROOT is required!')
+fi
+
+dnl ****************************************************************************
+dnl Qt
+dnl ****************************************************************************
+
+AC_SET_PACKAGE(Qt, QTDIR, AS_HELP_STRING([--with-Qt], [enable on default]), "yes")
+if test "$USE_Qt" = "yes"; then
+  AC_CHECK_FILE($DIR_Qt,,exit 1)
+  AC_CHECK_FILE($DIR_Qt/lib/libQtGui.so,
+    AC_CHECK_FILE($DIR_Qt/lib/libQtCore.so,lqt="-lQtGui -lQtCore",
+      AC_ERROR("Could not find library lib/libQtCore.so")),
+    AC_ERROR("Could not find library lib/libQtGui.so"))
+  AC_MSG_NOTICE("using $lqt to link Qt")
+  LIB_Qt="-L$DIR_Qt/lib $lqt"
+  LIBS="$LIBS $LIB_Qt"
+
+  AC_CHECK_FILE($DIR_Qt/include/Qt/QtCore,Qt_INCLUDE="-I$DIR_Qt/include",
+    AC_CHECK_FILE($DIR_Qt/include/qt4/Qt/QtCore,Qt_INCLUDE="-I$DIR_Qt/include/qt4",
+      AC_ERROR("Could not find include file Qt/QtCore.")))
+  INCLUDES="$INCLUDES $Qt_INCLUDE"
+
+  AC_PATH_PROGS(Qt_MOC, moc-qt4 moc,, [$DIR_Qt/bin$PATH_SEPARATOR$PATH])
+  if test -z "$Qt_MOC" ; then
+    AC_ERROR("Could not find Qt moc program.")
+  fi
+  AC_SUBST(Qt_MOC)
+
+  AC_PATH_PROGS(Qt_UIC, uic-qt4 uic,, [$DIR_Qt/bin$PATH_SEPARATOR$PATH])
+  if test -z "$Qt_UIC" ; then
+    AC_ERROR("Could not find Qt uic program.")
+  fi
+  AC_SUBST(Qt_UIC)
+fi
+
+dnl ****************************************************************************
+dnl CERNLIB
+dnl ****************************************************************************
+
+AC_CHECKING(CERNLIB)
+AC_CHECK_PROG(USE_CERNLIB,cernlib,"yes","no")
+if test "$USE_CERNLIB" = "yes" ; then
+    LIB_CERNLIB=`cernlib packlib`
+    OLDLIBS="$LIBS"
+    LIBS="$LIBS $LIB_CERNLIB"
+    AC_LINK_IFELSE([AC_LANG_PROGRAM(#ifdef __cplusplus
+extern "C"
+#endif
+void cfput_();,cfput_())],,[LIBS="$LIBS -lshift"
+AC_LINK_IFELSE([AC_LANG_PROGRAM(#ifdef __cplusplus
+extern "C"
+#endif
+void cfput_();,cfput_())],,[LIBS="$OLDLIBS"
+USE_CERNLIB="no"
+LIB_CERNLIB=""]]))
+fi
+AC_SUBST(USE_CERNLIB)
+AC_SUBST(LIB_CERNLIB)
+
+dnl ****************************************************************************
+dnl ****************************************************************************
+dnl ****************************************************************************
+
+dnl Checks for libraries.
+
+dnl Checks for header files.
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+
+dnl Checks for library functions.
+
+AC_SUBST(INCLUDES)
+AC_SUBST(FINC)
+
+auto_config_files="Makefile.inc"
+AC_SUBST(auto_config_files)
+
+AC_OUTPUT($auto_config_files)

@@ -1,0 +1,19 @@
+Use tst.options to run test MC job
+Use rd.options to run the low intensity real data
+Use hi.options to run the high intensity real data
+(Do not forget to get a file with real data).
+For most of the real data runs calibrations in *.clb
+files are OK, except some of high intensity runs, where constants are
+shifted by ~25 counts.
+
+Because general calibration procedure in CORAL is not yet ready, 
+procedure use uncalibrated CsDigits and make calibration itself. 
+If procedure will ask Gerassimov's calibration files for ScFi (*.txt) 
+ - you have  to supplay it with 0 values  (contact to S.Gerassimov).
+You don't need to have a calibraion for MC job - default values will be used.  
+
+
+
+To run test program:
+1) make
+3)Linux/test tst.options

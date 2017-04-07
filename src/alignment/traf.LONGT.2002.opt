@@ -1,0 +1,240 @@
+// $Id: traf.LONGT.2002.opt,v 1.8 2006/06/16 15:21:49 conrad Exp $
+
+// coral options file 
+// for $CORAL/src/alignment/traf, run 2002, longitudinal
+
+// $Log: traf.LONGT.2002.opt,v $
+// Revision 1.8  2006/06/16 15:21:49  conrad
+// - Fixed ManyChunks so that it actually works not only compiles.
+// - Changed ManyChunks so that it can read option file from subdirectory.
+// - Added "-q <queue>" option to ManyChunks. Now user can specify queue name to use.
+// - CheckTracks::DrawDUvsU and CheckTracks::DrawDUvsV will plot TProfile plots instead of scatter plots.
+//   Scatter plots are still available via CheckTracks::FitDUvs*
+// - Fixed CheckTracks::FitDUvs*. With recent ROOTs only last fit was plotted.
+// - Added CheckTracks::DrawDUvsT, CheckTracks::FitDUvsT,
+//         CheckTracks::DrawDUvsT90, CheckTracks::FitDUvsT90 and CheckTracks::DrawDUvsP.
+//   Those methods plot residuals versus Theta angle or Momentum.
+// - Added CheckTracks::PrintDUvsP - slices sample of tracks in Momentum. And for each slice prints avarage residual with RMS.
+// - Added CheckTracks::PrintDUvsU - prints A and B parameters of line fitted to DUvsU data.
+//
+// Revision 1.7  2003/10/25 23:47:50  ybedfer
+//  Raw file as an alternative specification of input data (commented out).
+//
+// Revision 1.6  2003/10/25 23:35:07  ybedfer
+// ...
+//
+
+//					   ***** HISTOGRAMMING
+histograms package ROOT
+
+histograms home    ~/csub/traf.LONGT.root
+
+
+Data job				// ***** THIS IS A DATA RUN
+
+					// ***** INPUT DATA...
+
+					// ...either raw file
+//Data file    /grid/fzk.de/compass/compass1/data/raw/2002/P2D/cdr09004-22040.raw
+
+					// ...or retrieved from oracle DB
+Data type   raw
+Database select oracle
+
+Data year   2002
+Data period P2E
+Data run select 22385	// As of 03/02: have to unsetenv COMPASS_TESTDB in order to access some runs
+Data container cdr19006-22385
+
+
+// 					   ***** DETECTOR TABLE...
+
+detector table /afs/cern.ch/compass/detector/geometry/2002/detectors.22378.plus.dat
+
+// 					   ***** MATERIAL MAPS
+
+CsMaterialMap Zone_1 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.target.m2002.02.map
+CsMaterialMap Zone_2 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.saclay.m2002.02.map
+CsMaterialMap Zone_3 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.straw.m2002.02.map
+CsMaterialMap Zone_4 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf2.m2002.02.map
+CsMaterialMap Zone_5 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf3.m2002.02.map
+CsMaterialMap Zone_6 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.hcal1.m2002.02.map
+CsMaterialMap Zone_7 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf1.m2002.02.map
+CsMaterialMap Zone_8 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.rich.m2002.02.map
+CsMaterialMap ELossTarget /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.target_de.m2002.02.map
+
+use calibration 	 	 	// ***** CALIBRATION
+CDB use MySQLDB
+//CDB server pccoeb03 	// pccoeb03 is located in 888 (powercuts at times!..)
+CDB server tbed014d 	// tbed014d is in computer center (fewer powercuts)
+//CDB server ????????	// New server reachable outside Cern foreseen in april
+//CDB entrytime 2002-10-31-19:53:00	// Files registered before specif'd date
+
+
+decoding map /afs/cern.ch/compass/detector/maps/2002.xml	// ***** MAPPING
+
+
+events to read 26000			// ***** EVENT SELECTION
+//events to skip 843 //139 //705 //229 //843
+events BOS_skip 1.22			// skip first ~400(? cf. Jürgen) ms in spill
+//selection trigger mask f		// Trigger selection (hexadecimal)
+
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+//reset random seed every new event
+
+//#include ${CORAL}/src/pkopt/IS_MWPC.opt
+
+ST03U1da IS_MWPC
+ST03U1dc IS_MWPC
+ST03U1ua IS_MWPC
+ST03U1uc IS_MWPC
+ST03V1da IS_MWPC
+ST03V1dc IS_MWPC
+ST03V1ua IS_MWPC
+ST03V1uc IS_MWPC
+ST03X1da IS_MWPC
+ST03X1dc IS_MWPC
+ST03X1ua IS_MWPC
+ST03X1uc IS_MWPC
+ST03X2da IS_MWPC
+ST03X2dc IS_MWPC
+ST03X2ua IS_MWPC
+ST03X2uc IS_MWPC
+ST03Y1da IS_MWPC
+ST03Y1dc IS_MWPC
+ST03Y1ua IS_MWPC
+ST03Y1uc IS_MWPC
+ST03Y2da IS_MWPC
+ST03Y2dc IS_MWPC
+ST03Y2ua IS_MWPC
+ST03Y2uc IS_MWPC
+ST04V1da IS_MWPC
+ST04V1dc IS_MWPC
+ST04V1ua IS_MWPC
+ST04V1uc IS_MWPC
+ST04X1da IS_MWPC
+ST04X1dc IS_MWPC
+ST04X1ua IS_MWPC
+ST04X1uc IS_MWPC
+ST04Y1da IS_MWPC
+ST04Y1dc IS_MWPC
+ST04Y1ua IS_MWPC
+ST04Y1uc IS_MWPC
+MB IS_MWPC
+
+pattern method 1        // not used yet
+tracking method 1       // not used yet
+
+// 					   ***** DECODING
+make decoding 	 	// <nothing>, MCExact
+
+//  	 	 	 	 	   ***** CLUSTERING
+make clustering 	// <nothing>, MCExact, MCSmeared, MCQuantized
+
+reconstruction schema 1			// ***** RECONSTRUCTION SCHEMA
+
+make tracking				// ***** TRACKING
+track prepattern method traffic
+track bridging   method traffic
+track fitting    method traffic
+
+
+make beam reconstruction		// ***** Beam RECONSTRUCTION 
+include ${CORAL}/src/pkopt/beam_2002.opt
+//                   Overwrite what's set in "beam.opt"
+BeamRecons    useTRAFFIC  1    // >0: Traffic is used, =0: standalone beampackage is used
+
+
+make vertex reconstruction		// ***** Vertex RECONSTRUCTION
+vertex pattern method averaging
+vertex fitting method kalman
+include ${CORAL}/src/pkopt/vertex.2002.opt
+//                   Overwrite what's set in "vertex.opt"
+CsAverPattern  Hist	1	// 0 - Off, 1 - ON
+CsAverPattern  findSec	1	// 0 - Off, 1 - ON
+CsAverPattern  Print [ 0 ]	0	// Prefilter info.
+CsAverPattern  Print [ 1 ]	0	// Error info. 
+// track is considered as accepted if its momentum is smaller
+// than "AcceptTill" percents of beam track
+CsAverPattern	AcceptTill	105	// in %
+//                     Z Dist(from centre)  DCA(number of sigmas)
+CsAverPattern	CUTS		1600			10
+CsKalmanFitting  Hist	1	// 0 - Off, 1 - ON
+CsKalmanFitting  Print [ 0 ]	0	// Kalman filter info.
+CsKalmanFitting  Print [ 1 ]	0	// Global fit info.
+CsKalmanFitting  Print [ 2 ]	0	// IKF info.
+
+include ${CORAL}/src/pkopt/rich1.2002.opt	// ***** RICH1
+include ${CORAL}/src/pkopt/calorim.opt		// ***** CALORIMETERS
+include ${CORAL}/src/pkopt/trigger.2002.opt	// ***** MU' PID
+
+
+//  	 	 	 	 	   ***** GEOMETRICAL ZONES
+define zone 0 3500 before M1
+define zone 3500 17000 between M1 and M2
+define zone 17000 32500 between M2 and Muon Wall
+define zone 32500 99999 after Muon Wall
+
+define zone -8000 0 before the target
+
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+
+CsField SOL_field /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SOL/smctgt_solenoide.fieldmap
+
+CsField SM1m_field /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.01.data
+
+CsField SM1m_field_measured /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.172.data
+
+CsField SM2_field  /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM2/FSM.map.4000.data
+
+CsMagInfo Solenoid /afs/cern.ch/compass/detector/calibrations/2002/polarization.2002.list	// In order to get polarisation values and correct sol field
+
+//					   ***** LOGGER
+error logger log level   error		// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level none
+error logger verbosity   normal		// low, normal, high. 
+
+
+
+//	  	  	  	  	   ***** TraFDic (+DET OPTIONS+...)
+
+include ${CORAL}/src/pkopt/trafdic.2002.opt
+
+
+// ALIGNMENT
+main do alignment // when commented, alignment tree is neither booked nor filled
+main magnets on   // (on|off) default is off
+main chi2 cut 30  // cut on chi2/ndf
+main require cop // uncomment this if you want to keep only track with momentum
+selection trigger mask 7 // trigger selection
+
+
+// TRAFFIC OPTIONS
+//TraF iCut  [0]  7   // Trigger selection
+//TraF dCut  [22] 2.5 // tolerance (in deg) to consider planes like the same projection 
+
+// In the course of the alignment procedure, one might have to resort
+// to a non official (i.e. the one retrieved from official directory
+// by automatic search) dictionary
+TraF Dicofit /afs/cern.ch/user/y/ybedfer/w0/dico.22378
+
+TraF DetNameOff VO VI HI HL HM HO MB MA
+
+// SMOOTHED HELICES FOR EXTRAPOLATIONS  
+TraF	SmoothPos [0]	100.	
+TraF	SmoothPos [1]	230.
+TraF	SmoothPos [2]	450.	
+TraF	SmoothPos [3]	550.	
+TraF	SmoothPos [4]	920.	
+TraF	SmoothPos [5]	1550.	
+TraF	SmoothPos [6]	2030.	
+TraF	SmoothPos [7]	2300.	
+TraF	SmoothPos [8]	3900.	
+TraF	SmoothPos [9]	5000.	
+
+// end
+

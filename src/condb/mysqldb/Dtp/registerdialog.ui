@@ -1,0 +1,345 @@
+<!DOCTYPE UI><UI version="3.0" stdsetdef="1">
+<class>RegisterDialog</class>
+<author>Colin Bernet</author>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>RegisterDialog</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>553</width>
+            <height>393</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>DB registration</string>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>true</bool>
+    </property>
+    <vbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <property name="margin">
+            <number>11</number>
+        </property>
+        <property name="spacing">
+            <number>6</number>
+        </property>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>Layout16</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>0</number>
+                </property>
+                <property name="spacing">
+                    <number>6</number>
+                </property>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>GroupBox9</cstring>
+                    </property>
+                    <property name="title">
+                        <string>help</string>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="margin">
+                            <number>11</number>
+                        </property>
+                        <property name="spacing">
+                            <number>6</number>
+                        </property>
+                        <widget class="QTextEdit">
+                            <property name="name">
+                                <cstring>TextEdit1</cstring>
+                            </property>
+                            <property name="text">
+                                <string>This is the first time you connect to the database. 
+
+Please register. This allows us to track back who is the responsible person for a given calibration file.
+
+You will have to register only once</string>
+                            </property>
+                        </widget>
+                    </vbox>
+                </widget>
+                <widget class="QGroupBox">
+                    <property name="name">
+                        <cstring>GroupBox10</cstring>
+                    </property>
+                    <property name="title">
+                        <string>User Parameters</string>
+                    </property>
+                    <vbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <property name="margin">
+                            <number>11</number>
+                        </property>
+                        <property name="spacing">
+                            <number>6</number>
+                        </property>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>Layout14_2</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>6</number>
+                                </property>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>TextLabel2_2_2</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Username :</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>LineEdit8_2_2</cstring>
+                                    </property>
+                                </widget>
+                            </hbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>Layout14</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>6</number>
+                                </property>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>TextLabel2_2</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>First Name :</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>LineEdit8_2</cstring>
+                                    </property>
+                                </widget>
+                            </hbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>Layout13</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>6</number>
+                                </property>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>TextLabel2</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>Last Name :</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>LineEdit8</cstring>
+                                    </property>
+                                </widget>
+                            </hbox>
+                        </widget>
+                        <widget class="QLayoutWidget">
+                            <property name="name">
+                                <cstring>Layout15</cstring>
+                            </property>
+                            <hbox>
+                                <property name="name">
+                                    <cstring>unnamed</cstring>
+                                </property>
+                                <property name="margin">
+                                    <number>0</number>
+                                </property>
+                                <property name="spacing">
+                                    <number>6</number>
+                                </property>
+                                <widget class="QLabel">
+                                    <property name="name">
+                                        <cstring>TextLabel2_3</cstring>
+                                    </property>
+                                    <property name="text">
+                                        <string>email :</string>
+                                    </property>
+                                </widget>
+                                <widget class="QLineEdit">
+                                    <property name="name">
+                                        <cstring>LineEdit8_3</cstring>
+                                    </property>
+                                </widget>
+                            </hbox>
+                        </widget>
+                    </vbox>
+                </widget>
+            </hbox>
+        </widget>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>Layout1</cstring>
+            </property>
+            <hbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <property name="margin">
+                    <number>0</number>
+                </property>
+                <property name="spacing">
+                    <number>6</number>
+                </property>
+                <spacer>
+                    <property name="name" stdset="0">
+                        <cstring>Horizontal Spacing2</cstring>
+                    </property>
+                    <property name="orientation">
+                        <enum>Horizontal</enum>
+                    </property>
+                    <property name="sizeType">
+                        <enum>Expanding</enum>
+                    </property>
+                    <property name="sizeHint">
+                        <size>
+                            <width>20</width>
+                            <height>20</height>
+                        </size>
+                    </property>
+                </spacer>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>buttonOk</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Register</string>
+                    </property>
+                    <property name="accel">
+                        <number>0</number>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>true</bool>
+                    </property>
+                    <property name="default">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+                <widget class="QPushButton">
+                    <property name="name">
+                        <cstring>buttonCancel</cstring>
+                    </property>
+                    <property name="text">
+                        <string>Cancel</string>
+                    </property>
+                    <property name="accel">
+                        <number>0</number>
+                    </property>
+                    <property name="autoDefault">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+            </hbox>
+        </widget>
+    </vbox>
+</widget>
+<connections>
+    <connection>
+        <sender>buttonCancel</sender>
+        <signal>clicked()</signal>
+        <receiver>RegisterDialog</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>LineEdit8_2</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>RegisterDialog</receiver>
+        <slot>setFirstName(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>LineEdit8</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>RegisterDialog</receiver>
+        <slot>setLastName(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>LineEdit8_3</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>RegisterDialog</receiver>
+        <slot>setEmail(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>buttonOk</sender>
+        <signal>clicked()</signal>
+        <receiver>RegisterDialog</receiver>
+        <slot>acceptChecked()</slot>
+    </connection>
+    <connection>
+        <sender>LineEdit8_2_2</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>RegisterDialog</receiver>
+        <slot>setLogin(const QString&amp;)</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>LineEdit8_2_2</tabstop>
+    <tabstop>LineEdit8_2</tabstop>
+    <tabstop>LineEdit8</tabstop>
+    <tabstop>LineEdit8_3</tabstop>
+    <tabstop>buttonOk</tabstop>
+    <tabstop>buttonCancel</tabstop>
+    <tabstop>TextEdit1</tabstop>
+</tabstops>
+<includes>
+    <include location="local" impldecl="in implementation">registerdialog.ui.h</include>
+</includes>
+<variables>
+    <variable>QString login_;</variable>
+    <variable>QString lastName_;</variable>
+    <variable>QString firstName_;</variable>
+    <variable>QString email_;</variable>
+</variables>
+<slots>
+    <slot>setEmail(const QString &amp; email)</slot>
+    <slot>setFirstName(const QString &amp; firstname)</slot>
+    <slot>setLastName(const QString &amp; lastname)</slot>
+    <slot>parameters(QStringList &amp; parameters)</slot>
+    <slot>acceptChecked()</slot>
+    <slot>setLogin(const QString &amp; login)</slot>
+</slots>
+<layoutdefaults spacing="6" margin="11"/>
+</UI>

@@ -1,0 +1,82 @@
+
+    This directory CORAL/src/tests/calorimeters_led_laser is aimed to test
+    coral based software used for production of calorimeters LED/LASER calibrations.
+
+    Special optionss files specified for each/year and detector
+    like src/tests/calorimeters_led_laser/ecal1_fem_2009.opt
+
+// Option file for ECAL1 FEM monitoring
+EC01P1__ correct_leds_by_fem_signal
+EC01P1__ FEM_NAME EC01FEM
+EC01P1__ FEM_IS_IN_USE YES
+EC01P1__ FEM_AMOUNT 8
+EC01P1__ FEM_NORM_ID 3
+EC01P1__ FEM_RANGE_MIN 31.
+EC01P1__ FEM_RANGE_MAX 901.
+
+    With quite obvious meaning for the options.
+
+    In new version of software imortant FEM information propagated
+    to LED/LASER calibartions files.
+    Out put of LED/LASER - calibrations files is completed by the line
+    of comments kind of:
+### FEM EC01FEM configured NORM_ID = 3 FEM_REF = 394.340 FEM_ACTUAL = 421.733 
+    or
+ EC02P1__ COMPASS Calorimeter LEDs  ### No FEM corrections 
+    Information about FEM normalisation is complete. And all
+    information about LED/LASER amplitudes is transparent and self-consitent.
+    
+         Need to mention that decoding of a special calibration LED or LASER events
+    has some peculiarities.
+    This function is not called in CORAL decoding schema so in general we
+    can not trust in LED/LASER sadc amplitudes obtained in standard CORAL.
+    Actually there ia a way to obtain correct LED/LASER digitization in 
+    CORAL by replacing DecodeChipSADCDigit(d, false); in CsCalorimeter::DecodeChipDigit
+    by something like  DecodeChipSADCDigit(d, isLED); with correct isLED flag.
+    But probably speed of decoding will suffer a bit. Need to be measured.
+    On top of that DecodeChipDigitsLEDEvent perform decoding of
+    LED/LASER system monitoring devices like PINdiod in HCAL1 or 8 FEMs in ECAL1.
+
+    No FEM corrections was applied
+
+   To simplify testing procedurere one can get a set of test directories by typing
+>   ./make_test_dirs
+ One can see as of Jun 26 2012 
+ test_2008  test_2009 test_2010  test_2011   test_2012
+
+
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// What is CsEvent->getNextEvent() doing in my case ???
+// Just some memo for coral structure. Must be placed in some development README.
+CsEvent::_decodeRD
+  CsInit::Instance()->getDaqEventsManager().DecodeEvent();
+If this OK Next
+  // Make TCS Phase available to the decoding step of detector classes
+  setTCSPhaseTime( CsEvent::Instance()->getDaqEvent().GetTT().GetPhaseTCS() );
+
+  // get time in spill from libDDD
+  _recoEvent.setTimeInSpill( CsEvent::Instance()->getDaqEvent().GetTT().GetTimeInSpill() );
+
+  // store TCS phase and Time in Spill into Calorimeters classes
+  {
+    vector<CsCalorimeter*> &calos = CsGeom::Instance()->getCalorimeters();
+    const double tcsphase = getTCSPhaseTime();
+    const double tis      = getTimeInSpill();
+    for (vector<CsCalorimeter*>::iterator it = calos.begin(); it!=calos.end(); it++) {
+      (*it)->SetTCSPhase   ( tcsphase );
+      (*it)->SetTimeInSpill( tis );
+      (*it)->SetEventIDInfo();
+    }
+  }
+
+  //     *************** DECODE ALL DETECTORS ***************
+  
+  for( map<string,CsDet*>::iterator det=CsDet::GetAllDetectors().begin(); det!=CsDet::GetAllDetectors().end(); det++ ) {
+    // in case decoding for one detector fails, skip to the next detector
+    try {
+      det->second->DecodeChipDigits( getChipDigits() );
+    }
+// Next complicated year dependent code for flux? calculations
+

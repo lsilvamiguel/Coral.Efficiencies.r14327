@@ -1,0 +1,44 @@
+// $Id: trigger.2006.opt 13249 2012-02-13 14:15:19Z suhl $
+
+// scalers used for beam flux measurement
+FluxScalers SCFI02X1 SCFI02X2 SCFI02X3 SCFI02Y1 SCFI02Y2 SCFI02Y3
+
+// Options for mu'-ID (i.e. scattered mu ID) in 2007
+
+// List of detector planes in coincidence
+Trigger	det	HI04X1_d	HI05X1_d
+Trigger	det	HI04X1_u	HI05X1_u
+
+Trigger	det	HL04X1_m	HL05X1_m
+
+Trigger	det	HM04X1_d	HM05X1_d	HM04Y1_d	HM05Y1_d
+Trigger	det	HM04X1_u	HM05X1_u	HM04Y1_u	HM05Y1_u
+
+Trigger	det	HO03Y1_m	HO04Y1_m
+Trigger	det	HO03Y1_m	HO04Y2_m
+
+// List of triggers
+// Hodo triggers: Correspondance trigger mask <-> hodo: "char" matches det's name[1] supra) 
+//             char   mask
+Trigger mask	I	1
+Trigger mask	M	2
+Trigger mask	L	4
+Trigger mask	O	8
+Trigger mask	C	16
+Trigger mask	M	256
+
+Trigger MW1_ID	7fffff	// Hexa, all trigs = 23 possible triggers, dixit Juergen
+
+// If hodoscopes are used in tracking and last point of track is downstream of
+// triggering hodoscope: require a hit to be associated to the track
+Trigger	tracking	1	// 0-hodos not in tracking, 1-hodos in tracking
+
+// Time window for hodo hits
+Trigger	ClrTime	9	// In ns. If 0 - no check
+
+// If 'on' check on trigger matrix is performed.
+Trigger	Matix	1	// 0 - Off, 1 - ON
+
+Trigger	Print	0	// 0 - Off, 1 - ON
+
+Trigger	Hist	1	// 0 - Off, 1 - ON

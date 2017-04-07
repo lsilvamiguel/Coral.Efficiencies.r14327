@@ -1,0 +1,86 @@
+Dtp - Colin.Bernet@cern.ch
+
+File transfers to and from the calibration database. 
+
+
+to install :
+	source setup.csh
+	make
+
+to run 
+	Dtp
+
+
+
+1- The compass calibration DB
+2- The MySQL layer 
+3- Dtp
+
+The compass calibration DB 
+--------------------------
+
+The calibration DB consists of a set of files located in the directory 
+/afs/cern.ch/compass/detector/calibrations
+
+In this directory, filenames have this format :
+
+ST03Y2ub~~start-2001-09-10-00:00:00~~finish-2001-11-30-00:00:00
+
+ST03Y2ub is the Technical Board name of the detector.
+2001-09-10-00:00:00 is the start of the validity period
+2001-11-30-00:00:00 is the end of the validity period
+
+Right now, reading calibrations for the straw plane ST03Y2ub is done in the following way : 
+- start time of currently analysed run is decoded from the data. 
+- /afs/cern.ch/compass/detector/calibrations is scanned for all files stamped with the TBname ST03Y2ub
+- the latest file with start of validity range < start of run is chosen as the calibration file, and opened.
+
+This procedure has the following drawbacks : 
+
+- As the number of files in this directory grow, it will be more and more difficult to administrate the calibration DB.
+
+- People who add calibration files to the DB can make mistakes, such as creating files with a bad name format, and even worse : rm *
+
+
+MySQL layer
+-----------
+
+To avoid this, these files can be managed using MySQL, a free SQL database system. For now, the mysql database contains the following information for each file in the database directory : 
+ 
+start of validity
+end of validity
+detector type 
+tbname
+directory
+filename
+author information
+
+MySQL can then provide 
+- efficient lookup of a calibration file
+- handling of files located in several directories (eg one per detector type, and one per year)
+- author tagging : If somebody creates a calibration file, it is stamped with his name. This person can then be considered as the owner of the file, and will be contacted in case of problems. One can also enforce that this file cannot be removed or updated by other people.
+
+Dtp  
+----
+
+As you can see, the MySQL layer is just an addressbook for calibration files, which means the biggest problem is to keep its contents synchronized at all time with the physical files. That's why Dtp has been created : besides copying your file to the DB directory, Dtp will  also make an entry in the addressbook (the mysql db).
+
+Dtp provides an easy and secure way to input calibration files to the DB : 
+
+- format checking
+- filtering and displaying of files in the DB
+- files are tagged with the author information  
+	- you cannot removed files you don't own.
+	- you will be contacted in case of problems with your files.
+- warnings.
+
+
+
+ 
+ 
+
+
+
+
+
+

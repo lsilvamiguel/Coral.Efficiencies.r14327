@@ -1,0 +1,146 @@
+//++++++++++++++++Beam reconstruction procedure parameters for 2002+++++++++++++++++++++++++++++++
+//Currently there are various Rec-Methods available:
+//	*Using the beamPackage as standalone (not maintained any more)
+//      *Using Traffic for the Sifi-part (triggered via useTRAFFIC-option)
+//       For this mode there are two Methods, which differ from the point 
+//       where the cut on the absolute time is done:
+//	   	1) cut on digits-time from BMS/SF (RecMethod!=3)
+//              2) cut on final beam-track-time (RecMethod=3)
+//This option-file is tuned for the latter, the corresponding values for 1) are
+//in () !
+//MvH
+  
+// Beam Reconstruction flag
+beam reconstruction
+
+// beam reconstruction code
+// this selects the old reconstruction code
+beam        method  0 
+
+//global histogram-level:
+	// 0: no histograms
+	// 1: a few histograms for basic debugging 
+	// 2: all histograms
+BeamRecons  HistogramLevel 1
+	
+
+//                        CsBeamRecons:
+//			  -------------
+//	
+BeamRecons    BMSrec    1     // if=1, BMS reconsruction ON, 
+                              // If=0, BMS reconstruction OFF (for MC, hadrons)
+BeamRecons    useTRAFFIC 1    
+		// >0: Traffic is used, =0: standalone beampackage is used 
+BeamRecons  Debug 0
+BeamRecons  BmChrg      1     // Beam particle charge (with sign!)
+
+BeamRecons useMultiples 1
+BeamRecons doRescue 1
+
+//Comment: the value for the default reco is 0.005 (eqv dp=0.8) but sigma is 0.5 so a 
+//safety scaling of 1.6 is applied
+BeamRecons  BmResol_1-2  0.013 //sigma: 1.362
+BeamRecons  BmResol_1-3  0.01  //sigma: 1.046
+BeamRecons  BmResol_1-4  0.008 //sigma: 0.817
+BeamRecons  BmResol_2-3  0.014 //sigma: 1.429
+BeamRecons  BmResol_2-4  0.015 //sigma: 1.477
+
+BeamRecons	BmMoment	160.	// Momentum to which beam line is tuned, specified to the BMS reco.
+
+//BeamRecons  MxTmdiff    2.1    // Max. allowed time difference between BMS and FbHod tracks (ns)
+BeamRecons  MxTmdiff    1.2
+//BeamRecons  MxTmdiff    1.6
+BeamRecons  MaxSFHitTime 2.04   //cuts on indiv hit-times of SiFi-tracks
+	                       //if(RecMethod==3) autom set to 0! 	
+BeamRecons TotMeanCut=2.2 //cut around the track time of the {BMS/SF}-track
+BeamRecons  Printlev    0     // Print level (0 - no print; 1 - only coral.options parameters; 
+                                              2 - +  reconstructed events
+
+//                     BMSrecons parameters:
+//		       ---------------------
+//
+
+BMSreco RecMethod 3 //triggers rec with cuts on time-diff
+                    //for this TmWindow should be large (~10)
+                    //TmWindow is not left open aoutomaticalu due to performance reasons
+                    //For other methods one should set TmWindow to smaller value
+BMSreco     TmWindow  11.0   // Time Window for raw data - reduce combinatorics for method 3
+//BMSreco     TmWindow  1.82   // Time Window for raw data
+BMSreco     MxTmDiff  1.302   // (Rec0: 1.031)
+
+  // "MxTmDiff has two meanings:
+  //for RecMethod !=3 :Max. Hit Time Fluctuation from mean value for a track
+  //for RecMethod =3: Max time-diff between any pair of a 4hit-combination
+BMSreco     MxTmChi4   0.831    // Max. Time Chiq for 4 hit tracks
+BMSreco     MxSpChiq   30.      // Max. Space Chiq
+BMSreco     MxTmChi3   0.831    // Max. Time Chiq for 3 hit tracks
+BMSreco     MxNmbHit     60     // Max. number of hits/plane
+BMSreco     Printlev      0     // Print level (0 - no print; 1 - input parametrs, 2 - + calibrations,
+
+BMSreco doClustering 1
+BMSreco Cluster_ChnlLimit 10 //maximum channel range to be included (in mm)
+BMSreco Cluster_TmLimit 1.2 // maximum time range to be included in Cl (in ns)
+
+BeamRecons year 2002 //for checks, which need the trigger-mask
+
+//
+//                         CsBMSrecons::
+BMSHod0       Name    BMS1      // BMS Hodoscope1 name 
+BMSHod1       Name    BMS2      // BMS Hodoscope2 name 
+BMSHod2       Name    BMS3      // BMS Hodoscope3 name 
+BMSHod3       Name    BMS4      // BMS Hodoscope4 name
+
+//The rest if for standalone-mode...
+//     
+//                    CsBmFiHod::
+ScFbHod1X     Unit         1    // Unit number for ScFb1  (far from the target)
+ScFbHod1X     Name      VSA1    // Unit number for ScFb1  (far from the target)
+ScFbHod1Y     Unit         1    // Unit number for ScFb1  (far from the target)
+ScFbHod1Y     Name      VSA2    // Unit number for ScFb1  (far from the target)
+//
+ScFbHod2X     Unit         2    // Unit number for ScFb2  (near to the target)
+ScFbHod2X     Name      VSA1    // Unit number for ScFb2  (near to the target)
+ScFbHod2Y     Unit         2    // Unit number for ScFb2  (near to the target)
+ScFbHod2Y     Name      VSA2    // Unit number for ScFb2  (near to the target)
+
+//                  FbHod recons parameters
+BmFiHod     MinTmWin   -10.    // Low edge of Time Window for raw data selection
+BmFiHod     MaxTmWin    10.    // High edge of Time Window for raw data selection
+BmFiHod     MxTmDiff     1.5   // Max. Hit Time Fluctuation from mean value for a track
+BmFiHod     MxTmChiq     23.    // Max. Time Chiq
+BmFiHod     TrckDiff     13.    // Dead time (Min. Time between two hits in the same hod. element)
+BmFiHod     MxNmbHit     60     // Max. number of hits/plane
+BmFiHod     Mn2htWin    -5.2    // Low edge of Time Window for double hits
+BmFiHod     Mx2htWin     2.34   // High edge of Time Window for doule hits
+BmFiHod     MnTrgWin    -0.6     // Low edge of Trigger Window  
+BmFiHod     MxTrgWin     0.6     // High edge of Trigger Window 
+BmFiHod     Printlev      1      // Print level (0 - no print; 1 - rec. parameters, 
+                                                2 - + input and reconstructed event
+//
+BmFiHod       ReadCDB      NO   // if YES - read calibration CDB, if NO - calibration  files
+ScFbHod1X     T0calib      $CORAL/src/pkopt/ScHod1X.clb     // T0 calibration file name
+ScFbHod1Y     T0calib      $CORAL/src/pkopt/ScHod1Y.clb     // 
+ScFbHod2X     T0calib      $CORAL/src/pkopt/ScHod2X.clb     // 
+ScFbHod2Y     T0calib      $CORAL/src/pkopt/ScHod2Y.clb     // 
+BmFiHod       SlopeCalib   scfbslp.dat    // Slope calibration file name
+//
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

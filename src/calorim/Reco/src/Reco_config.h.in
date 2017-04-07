@@ -1,0 +1,6 @@
+#ifndef Reco_config______include
+#define Reco_config______include
+
+#undef USE_Qt
+
+#endif // Reco_config______include

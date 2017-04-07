@@ -1,0 +1,65 @@
+//$Id: align.LONGT.opt,v 1.4 2008/05/25 15:19:52 ybedfer Exp $
+
+//=== magnetic field switch. 
+//=== WARNING: This option must match the one in coral option file used to generate the tree.
+main magnets on    // (on|off) default (i.e. no option) is off.
+
+//=== parameters to align (comment the line if parameter is not to be fitted)
+align U          // Offset in U
+align T          // Angle perp to the beam
+align P          // Pitch <- u*=(1+pictch_offset)
+// align Z          // Position along the beam
+// align R          // R0, prop to T0 for drift like detectors
+// align L          // Lorentz angle R scaling for drift like detectors
+
+align nStdDev   3     // cut track selection
+align nTracks   0     // number of selected tracks (0 means all)
+align projRange 2     // minimum angle diff to distinguish orientations (deg)
+make iterations       // Millepede iterations
+
+//=== Debugging options
+debug dump dets
+debug dump millepede
+debug counter rate 5000
+
+//=== Detector to be considered/excluded 
+//=== (WARNING excluded takes precedence over used)
+//=== TBNames can be abreviated. symbol '*' can replace any _single_ character.
+align excludeDets FI01 FI02 FI15 SI MB*****c MB*****l
+align useDets DC MM GM FI SI PA PB PS ST DW
+//align OuterST YES	// Special option for outer straws
+
+//=== overwrites the det.dat resolutions
+//=== TBNames can be abreviated. symbol '*' can replace any _single_ character.
+align change resolution MA 2.89 
+align change resolution MB 9.67
+align change resolution DW 1.5
+
+//=== parameters to fix
+//=== TBNames can be abreviated
+fix U MM01X1 MM01Y1 GM09X1 GM09Y1
+fix T MM01X1 MM01Y1 GM09X1 GM09Y1
+fix P MM01X1 MM01Y1 GM09X1 GM09Y1 MA MB
+fix Z *
+
+// MA pitch has to be fixed as values in det.dat are anyhow 
+// ignored by sergei patch in CsMuonWall1Detector
+
+//=== bias (for debug only)
+//=== format is TBNAME dU(mm) dZ(mm) dT(deg) dP(no unit)
+//=== No abreviation in TBNAME
+// align add bias GM01X1__ 0 0 0 0 
+// align add bias GM01Y1__ 0 0 0 0 
+
+//=== Detector table
+detector table /afs/cern.ch/user/h/hpereira/public/detectors/detectors.22754.dat
+
+//=== Rootfiles
+//=== WildCards are accepted
+input tree traf.LONGT.root.22754
+
+//=== Output file
+output file align.22754.out
+
+//=== track selection cut 
+selection cut T_chi2/T_ndf<30&&T_cop!=0

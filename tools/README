@@ -1,0 +1,14 @@
+Please do NOT use these tools, they are meant for delivery maintenance!!!
+07/06/2000 Benigno
+
+findobjects (10-APR-2001 Massimo):
+This script walks through under all
+CORAL subdirs and looks for object files
+and other by-products of compilations
+(namely oddlx files, depend.mk, Dict files) 
+proposing the command lines to delete them
+(by piping the output into sh).
+Pipe the script into 
+grep -v grep | grep hand | awk '{print $5" "$6}'
+to remove the extra files, after having verified
+you really want to delete them

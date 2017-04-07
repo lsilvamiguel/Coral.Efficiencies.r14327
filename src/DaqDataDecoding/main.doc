@@ -1,0 +1,44 @@
+/*!
+\mainpage DaqDataDecoding - library for decoding COMPASS events
+\section intro Introduction
+  The purpose of this library is to provide a tool
+  that can be used to decode COMPASS events written in
+  DATE format.
+
+  This library can be used both in CORAL (events reconstruction) and in ONLINE.
+  It is very important to have a standard decoding library both for online
+  and offline groups.
+
+  Please read "Compass-Note 2000-8" about the structure of
+  COMPASS data
+  http://hpfr02.physik.uni-freiburg.de/projects/compass/electronics/notes/dataformat-2000-8/format.html
+
+\section requirements Requirements
+  \arg C++ compiler
+  
+
+    Optional.
+  
+  \arg DATE library
+  \arg RFIO
+  
+\section basic_idea Basic decoding idea
+\subsection Map files reading
+   - INPUT : XML map files
+   - OUTPUT: Internal map objects
+\subsection data_scanning Data scanning
+   - INPUT : RAW data files;
+           decoding options DaqOption
+   - OUTPUT: all recognized data words
+\subsection decoding Decoding
+   - INPUT : internal map objects (from the step 1);
+             data words to be decoded (from the step 2)
+   - OUTPUT: digits list Chip::Digit
+
+\section installation Installation
+  Please read file INSTALL from the source package.
+*/
+
+/*! \namespace CS
+    This is a namespace for COMPASS Software.
+*/

@@ -1,0 +1,18 @@
+/// **********  CsRICH1UpGrade  APV MC options
+
+MCSettingsCathodeAPV UseQuantEffCorrections Yes
+
+// MCSettingsAPV AddNoise No
+
+// MCSettingsCathodeAPV MultiGain 30000.
+// MCSettingsAPV UnitScale 640.
+// MCSettingsAPV PedestalsNoise 1360.
+// MCSettingsAPV SignalCut 3.
+
+MCSettingsCathodeAPV MultiGain 30000.
+MCSettingsAPV UnitScale 320.
+MCSettingsAPV PedestalsNoise 680.
+MCSettingsAPV SignalCut 3.
+
+/// ********** End of CsRICH1UpGrade APV MC options
+

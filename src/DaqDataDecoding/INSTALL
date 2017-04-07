@@ -1,0 +1,38 @@
+Installation can be done with 'configure+make' or with 'cmake'.
+
+------------------------------------------------
+
+Instalation with 'configure+make'
+
+1) Get source tree
+2) Run configuration:
+  $ ./configure
+3) compile the library
+  $ make
+4) That is all, you can use the library.
+   Go to directory examples/ and check it.
+   Good luck!
+
+If you have some complex enevironement, try
+  $ ./configure --help
+and read options list.
+
+
+------------------------------------------------
+
+Instalation with 'cmake'
+
+1. Get the source tree to some directory /..../ddd-source
+2. Create a directory where you will build the library:
+   Few examples:
+   $ mkdir /..../ddd-source/build
+   $ mkdir /tmp/build
+3. Run CMake:
+   $ cd <build-directory>
+   $ cmake <path-to-ddd>
+4. Compile it
+   $ make
+5. Create documentation (optional):
+   $ make doc
+6. Install it
+   $ make install

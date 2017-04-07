@@ -1,0 +1,55 @@
+//
+include ${CORAL}/src/tests/calorimeters_led_laser/coral_2012_general.opt
+// make calorimeters reconstruction
+include ${CORAL}/src/tests/calorimeters_led_laser/calorim_led_2012.opt 	 
+// 					   ***** DETECTOR TABLE...
+detector table $COMPASS_FILES/geometry/2012/detectors.102455.hadron.dat
+//					   ***** MAPPING
+decoding map $COMPASS_FILES/maps/2012.xml
+//					   ***** LOCAL CALIBRATION FILE DATA BASE
+calib_db_read path ${CORAL}/src/tests/calorimeters_led_laser/DB_COMPASS_2012
+//					   ***** INPUT DATA...
+
+//events to read 3			// # of events to read
+events to read 30000000			// # of events to read
+events print each  200
+// print event info 1
+
+// Data files /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb04-102675-t1ffef000.001.raw
+// Data files /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb05-102675-t1ffef000.001.raw
+
+// With LEDs in spill 
+//Data files /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb04-102911-t1ffef000.001.raw
+//Data files /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb05-102911-t1ffef000.001.raw
+
+// Data files /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb04-102985-t1ffef000.001.raw
+
+// Data files /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb04-102983-t1ffef000.001.raw
+
+// Normal data file to test decoding
+//Data files /castor/cern.ch/compass/data/2012/raw/W24/cdr03001-102830.raw
+
+// Bg run
+// Data files /castor/cern.ch/compass/data/2012/raw/W24/cdr03000-102971.raw
+// Data files /castor/cern.ch/compass/data/2012/raw/W24/cdr03000-102972.raw
+
+// Data files  /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb03-102983-t1ffef000.001.raw
+//Data files  /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb04-102983-t1ffef000.001.raw
+// Data files  /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb05-102983-t1ffef000.001.raw
+
+//Data files  /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb03-102983-t00000400.001.raw
+
+// 
+// Data files  /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb03-103671-t1ffef000.001.raw
+// Data files  /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb04-103671-t1ffef000.001.raw
+Data files  /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb05-103671-t1ffef000.001.raw
+// Data files  /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb06-103671-t1ffef000.001.raw
+// Data files  /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb07-103671-t1ffef000.001.raw
+
+// Back to serach TimeInSpill
+// Data files  /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb04-103671-t00000400.001.raw
+// Data files  /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb05-103671-t00000400.001.raw
+// Data files  /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb06-103671-t00000400.001.raw
+// Data files  /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb07-103671-t00000400.001.raw
+
+

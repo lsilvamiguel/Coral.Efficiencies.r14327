@@ -1,0 +1,121 @@
+#!/bin/csh -x
+#BSUB -L /bin/sh
+#BSUB -q prod200
+#BSUB -R "type=LINUX7 select[swp>400&&mem>100&&maxmem>500&&cpuf>1.5] order[swp:mem] rusage[swp=400:mem=100]"
+
+#
+# Following variables will be set up by prodPeriod program:
+# $CUR_DIR, $DST_RUN_NUMBER, $DST_CHUNK_NUMBER, $DST_SLOT_NUMBER, 
+# $DST_PERIOD, $ODD_EVEN and $DST_YEAR
+#
+
+
+#
+# Following variables should be changed by user (if it's necessary):
+#
+setenv MY_LOG_DIR	  /afs/cern.ch/compass/scratch/d17/objsrvvy/production/logs
+setenv MY_CORAL_DIR       ${CUR_DIR}/coral
+setenv PRODUCTION_PROGRAM ${CUR_DIR}/coral/src/tests/oracle/phast/coral/coral.exe
+setenv PHAST_VERSION      6
+setenv CONTROL_PROG       ${CUR_DIR}/prodControl
+#
+# Following variables cannot be changed by user:
+#
+
+if ( $USER == "na58dst1" ) then
+    setenv MDST_DIR       /shift/compass009d/data02/na58dst1
+else if ( $USER == "na58dst2" ) then
+    setenv MDST_DIR       /shift/compass009d/data03/na58dst2
+else
+    echo "Incorrect user name: $USER"
+    exit
+endif
+
+setenv MERGING_DIR    /afs/cern.ch/compass/scratch/mdst1
+setenv OPT_FILE       ${CUR_DIR}/Run_${DST_RUN_NUMBER}/${DST_CHUNK_NUMBER}-${DST_RUN_NUMBER}.opt
+setenv MDST_NAME      mDST-${DST_RUN_NUMBER}-${DST_CHUNK_NUMBER}-${DST_SLOT_NUMBER}-${PHAST_VERSION}.root
+setenv MDST_FILE      ${MDST_DIR}/${MDST_NAME}
+setenv GFILE_DIR      /castor/cern.ch/compass/data/${DST_YEAR}/oracle_dst/${DST_PERIOD}/RICH/
+setenv GFILE_NAME     histodst${DST_SLOT_NUMBER}-${DST_CHUNK_NUMBER}-${DST_RUN_NUMBER}.gfile
+setenv DST_INFO_FILE  ${CUR_DIR}/Run_${DST_RUN_NUMBER}/.info
+setenv MDST_EOR_PRG   ${CUR_DIR}/mDstInfo
+setenv CASTOR_DIR     /castor/cern.ch/compass/data/${DST_YEAR}/oracle_dst/${DST_PERIOD}
+setenv STAGE_HOST     stagecompass
+setenv STAGE_POOL_EXCLUDE /afs/cern.ch/user/o/objsrvvy/castor/.StageHelperPoolsExclude.inf
+
+setenv JOB_TEST `bjobs -w -u u_vy | grep ${DST_RUN_NUMBER} | grep ${DST_CHUNK_NUMBER} | wc -l`
+if !( ${JOB_TEST} == 1 ) then
+    echo "Job <${DST_RUN_NUMBER}-${DST_CHUNK_NUMBER}> is running already."
+    echo "This job will be stopped."
+    exit
+endif
+
+echo "Production user "${USER}" on host "${HOST}
+date
+
+# Load enviroment ($CORAL etc...)
+cd ${MY_CORAL_DIR}
+source ./setup.csh
+
+# Back to working area to run (important...) 
+cd ${WORKDIR}
+
+# select stage POOL:
+setenv STAGE_POOL `~objsrvvy/duicscripts/stagepool.pl ${STAGE_HOST}`
+
+# Run DST production program:
+(time ${PRODUCTION_PROGRAM} ${OPT_FILE} ; echo "CORAL RETURN CODE: $?") | ${CONTROL_PROG} ${MY_LOG_DIR}
+
+setenv RET_VAL $?
+
+# try second time if production crashed by GPF:
+if !( ${RET_VAL} == 0 ) then
+    rm core*
+    rm ${MDST_NAME}
+    rm myfile-data.gfile
+    rm trafdic.root
+    (time ${PRODUCTION_PROGRAM} ${OPT_FILE} ; echo "CORAL RETURN CODE: $?") | ${CONTROL_PROG} ${MY_LOG_DIR}
+    setenv RET_VAL $?
+endif 
+
+
+# if still problem then exit:
+if !( ${RET_VAL} == 0 ) then
+    rm core*
+    rm ${MDST_NAME}
+    rm myfile-data.gfile
+    echo ${MDST_FILE} 0 >> ${DST_INFO_FILE}
+    rm trafdic.root
+    exit
+endif
+
+#
+# $RET_VAL == 0 if DST production program finished without fatal errors.
+#
+
+rfcp trafdic.root ${MDST_DIR}/TRAFDIC/${DST_RUN_NUMBER}-${DST_CHUNK_NUMBER}-${DST_SLOT_NUMBER}.root
+rfcp ./${MDST_NAME} ${CASTOR_DIR}/mDST.chunks/
+rfcp ./${MDST_NAME} ${MDST_FILE}
+
+if !( $? == 0 ) then
+    echo "ERROR:   rfcp error mini-DST is missing."
+    echo ${MDST_FILE} 0 >> ${DST_INFO_FILE}
+else
+    echo ${MDST_FILE} 1 >> ${DST_INFO_FILE}
+endif
+rm  ./${MDST_NAME}
+
+${MDST_EOR_PRG} ${DST_INFO_FILE}
+if ( $? == 1 ) then
+   setenv STAGE_POOL compassmdst
+   rfcp ${MERGING_DIR}/mDST-${DST_RUN_NUMBER}-${DST_SLOT_NUMBER}-${PHAST_VERSION}.root ${CASTOR_DIR}/mDST/
+   if ( $? == 0 ) then
+     rm ${MERGING_DIR}/mDST-${DST_RUN_NUMBER}-*.root
+     ${CUR_DIR}/clear_compass009d.pl ${DST_RUN_NUMBER} ${DST_SLOT_NUMBER} ${PHAST_VERSION}
+   endif
+endif
+
+setenv STAGE_POOL compass004d
+rfcp myfile-data.gfile ${GFILE_DIR}/${GFILE_NAME}
+rm trafdic.root
+rm myfile-data.gfile

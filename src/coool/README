@@ -1,0 +1,121 @@
+************************************************************************
+*	coool - Compass Object Oriented OnLine                         *
+************************************************************************
+
+Provides 
+^^^^^^^^
+coool, the compass monitoring program
+bcoool, a batch version of coool
+
+Note
+^^^^
+coool resides inside the CORAL source tree mainly for historical reasons.
+It is not integrated with the CORAL build system.  Instead it needs to be
+configured and compiled seperately.
+
+Platforms 
+^^^^^^^^^
+Up to now, tested on RH 6.x, RH 7.x, SLC 3, Debian 3.1, ...
+
+ROOT
+^^^^
+this program is based on the ROOT libraries. Before doing anything, make 
+sure ROOT is installed on your system, and that your ROOTSYS is pointing to
+the root directory. 
+
+
+Compilation at cern
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+If you got the sources from the cvs repository, it should be painless to 
+compile and link the program with all optional modules :
+
+coral/src 
+	|
+	|___ DaqDataDecoding : COMPASS decoding library, MANDATORY
+	|
+	|___ condb/mysqldb/MyInterface : MySQLDB Calibration package
+	|
+	|___ coool : Monitoring program
+
+
+to build <package> :
+	cd <package>
+	./configure
+	make
+
+For MySQLDB do a configure in the coral main directory, and a make in
+condb/mysqldb/MyInterface
+
+
+1) Build DaqDataDecoding
+2) Build MySQLDB
+3) Build coool
+
+** On lxplus, these 3 steps will be performed automatically by using **
+** the CSH script cern_build.csh, located in coool/                  **
+
+
+
+Compilation outside CERN
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Access to AFS
+
+In this case, just follow the instructions for the compilation at 
+CERN, but do not use the script cern_build.csh
+
+
+
+* No access to AFS
+
+Most probably you do not need the calibration package, and you don't have 
+access to the date library.
+
+in this case, the easiest is to install DaqDataDecoding and coool in 
+the same directory.
+
+then execute the following commands.
+
+cd DaqDataDecoding
+./configure --without-DATE_LIB --without-RFIO
+make
+cd ../coool
+./configure --without-CALIB
+make
+
+Compilation for pccorcXX monitoring
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+author: jasinski@kph.uni-mainz.de 17.05.2009
+
+log in at pccogwXX and run the pccogwXX_build script
+
+
+
+Testing
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* If you have access to AFS, just do :
+src/coool
+
+* If you don't, you will need two things to test the program
+	- a sample of COMPASS data 
+	- the COMPASS mapping
+
+download data.tar.gz from the coool webpage
+tar -zxvf data.tar.gz
+the directory data contains datafile.dat, which is the raw data file, and
+Maps/ which contains the mapping for the COMPASS experiment. 
+
+You can now go back to the coool directory, and fo :
+src/cool -m<path to data directory>/Maps <path to data directory>/filename.dat
+
+
+
+
+
+
+
+
+
+

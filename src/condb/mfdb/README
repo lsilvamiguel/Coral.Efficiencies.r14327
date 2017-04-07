@@ -1,0 +1,20 @@
+<<Discription of coral.option file>>
+
+The key word is only one.
+
+=========================
+CsField From database
+=========================
+If you put these three words to option file,
+Field data will be read from database.
+If you comment out this line, field data is loaded from ascii file. 
+
+Data type for three magnets
+Solenoid : calculated value
+SM1      : select with detector.dat
+	   If flag2 is equal to 0, loaded calculated value.
+	   IF flag2 is equal to 1, loaded measured value.
+	   But pole distance is only 172cm for both.
+SM2	 : select with detector.dat
+	   current is current in SM2. 
+	   

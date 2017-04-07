@@ -1,0 +1,65 @@
+// $Id: spoint.2002.opt,v 1.1 2003/03/05 21:05:46 hpereira Exp $
+//
+// coral option file for space points 
+//
+
+include $CORAL/src/pkopt/leftright.opt     // LR CONFIG
+include $CORAL/src/pkopt/hist.opt 
+include $CORAL/src/pkopt/spacepoint.opt     // SPACE POINTS CONFIG 
+include $CORAL/src/tests/realdata/IS_MWPC.opt
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+
+//Histogramming
+histograms package ROOT
+histograms home spoint.root
+
+// Set some limits on number of events
+events to read 80000
+events refresh rate 100
+main do calibration
+
+// This is a Real run
+Data job
+Data file /castor/cern.ch/compass/data/2002/dump/cdr14002-20816.dmp
+
+detector table detectors.20816.dat
+
+// Calibrations
+use calibration
+CDB use FileDB
+DataBase /afs/cern.ch/compass/detector/calibrations/2002
+
+// DECODING. options: <nothing>, MCExact
+make decoding
+decoding map /afs/cern.ch/user/h/hpereira/public/maps.DC.2002
+
+// SCHEMA
+reconstruction schema 1     // at present only one schema available
+
+// CLUSTERING. options: <nothing>, MCExact, MCSmeared, MCQuantized
+make clustering
+
+// track prepattern method traffic
+// track bridging   method traffic
+// track fitting    method traffic
+
+// define geometrical zones
+define zone 0 3500 			before  M1
+define zone 3500 17000 	between M1 and M2
+define zone 17000 32000 between M2 and Muon Wall
+define zone 32000 99999 after Muon Wall
+
+// Magnetic field maps
+CsField SOL_field  /afs/cern.ch/compass/delivery/comgeant/0-0-6.06/data/mag_fields/SOL/smctgt_solenoide.fieldmap
+CsField SM1m_field /afs/cern.ch/compass/delivery/comgeant/0-0-6.06/data/mag_fields/SM1m/SM1M.map.01.data
+CsField SM2_field  /afs/cern.ch/compass/delivery/comgeant/0-0-6.06/data/mag_fields/SM2/SM2.map.4000.data
+CsField SM1m_field_measured /afs/cern.ch/compass/delivery/comgeant/0-0-6.06/data/mag_fields/SM1m/SM1M.map.172.data    
+
+//=== options for the logger
+error logger log level error		//debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level fatal	//debugging, verbose, info, anomaly, warning, error, fatal
+error logger verbosity low			//low, normal, high. 
+

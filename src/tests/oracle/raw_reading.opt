@@ -1,0 +1,340 @@
+// This is a Data run
+Data job
+Data container cdr11001-20300
+Data year   2002
+Data period P1C
+Data run select 20300
+
+Database select oracle
+Data type raw
+//Dst select slot 1
+
+// *** Event preselection criteria (only for reading DST):
+// Raw event selection criteria TRIGGER_MASK=8 and ERROR_CODE=0
+
+// *** The possible RAW EVENT selection parameters:
+// *** EVENT_NUMBER   - event number in run (EventHeader[1])
+// *** BURST          - burst number in run
+// *** EVENT_IN_BURST - event number in burst
+// *** TRIGGER_MASK
+// *** ERROR_CODE     - DAQ error code
+// *** EVENT_SIZE     - RAW event size (in bytes)
+//
+
+// DST event selection criteria EV.Q_2>0
+// *** The possible DST EVENT selection parameters:
+// *** EVENT_NUMBER   - event number in run (EventHeader[1])
+// *** DST_SIZE       - dst event size
+// *** TRIGGER_MASK
+// *** EV.Q_2         - external variable (Q^2 in that case)
+
+
+
+
+// $Id: raw_reading.opt,v 1.1 2003/01/23 21:38:54 frolov Exp $
+
+// Example coral options file for TraFDic on objectivised data.
+
+// This is to be completed by:
+//   I) Specifying input data one wants to process instead of the default
+//     run #22019
+//  II) Selecting accordingly the statement including options specific to
+//     trafdic (cf. in fine).
+//      There is at present the choice between 3 options:
+//      - 20079
+//      - 22018
+//      - 22754
+// III) Adding whatever options are needed to enable a given output, e.g.
+//     DST output or ROOT tree.
+//  IV) (Possibly) Trigger selection
+
+// $Log: raw_reading.opt,v $
+// Revision 1.1  2003/01/23 21:38:54  frolov
+// *** empty log message ***
+//
+// Revision 1.4  2003/01/22 15:30:16  frolov
+// histograms package uncommented.
+//
+// Revision 1.3  2003/01/21 18:16:51  frolov
+// Bug fix
+//
+// Revision 1.3  2002/12/19 17:09:05  ybedfer
+//  Cosmetics...
+//
+// Revision 1.2  2002/12/18 22:50:05  ybedfer
+//  - Default data run to process: 22019. And ``include'' file for that
+//   period is "hp.22019.opt".
+//  - Materials maps: "2002.02" (instead of "2002.01") (All geometry files
+//   updated correspondingly)
+//  - Outer straws "IS_MWPC" (in order to be able to opt in propagation
+//   correction).
+//
+// Revision 1.1  2002/10/30 11:35:30  ybedfer
+//  Options file for TraFDic on objectivised data.
+//
+// Revision 1.14  2002/08/05 02:16:49  ybedfer
+//  - New detector table: "detectors.20073.7.dat".
+//  - Official mapping directory.
+//  - CsMagInfo entry.
+//
+// Revision 1.13  2002/07/30 20:54:52  ybedfer
+//  New detector table: "20073.6.dat" w/ MW1s aligned.
+//
+// Revision 1.12  2002/07/23 20:31:33  korzenev
+// CsOutput option are added
+//
+// Revision 1.11  2002/07/23 13:15:27  ybedfer
+//  - New detectors table: "detectors.20073.5.dat" adjusted on low intensity
+//   physics data.
+//  - Non official CDB location: to avoid Martin new BMS/scifi calibs.
+//  - Still non official mapping directory: W45 named DW in accordance w/
+//   code, lr options, etc...
+//
+// Revision 1.10  2002/07/19 02:55:17  ybedfer
+//  - New det.dat: "detectors.20072.5.dat".
+//  - DW: MWPC, w/ non official mapping.
+//
+// Revision 1.9  2002/07/17 02:49:58  ybedfer
+//  - New det.dat.
+//  - DW (now WD!) enabled.
+//
+// Revision 1.8  2002/07/16 15:14:36  ybedfer
+//  Data file and detectors table: now #20079 and detectors.20072.dat.
+//
+// Revision 1.7  2002/07/13 18:55:21  ybedfer
+//  2 versions of TraFDic specific include files now available:
+// w/ or w/out SIs. (w/ being default).
+//
+// Revision 1.6  2002/07/12 19:18:23  ybedfer
+//  - New "detectors.dat" (= .19124.r5, optimised on a physics run).
+//
+// Revision 1.5  2002/07/10 12:54:41  ybedfer
+//   Cleaning...
+//
+// Revision 1.4  2002/06/30 16:52:31  ybedfer
+//  Cancel reference to Sasha's DB.
+//
+// Revision 1.3  2002/06/27 14:17:39  korzenev
+// trigger mask is changed for 2002
+//
+// Revision 1.2  2002/06/26 18:02:33  ybedfer
+//  Geometry = Hugo updated in MWPC's.
+//
+// Revision 1.1  2002/06/15 00:14:31  ybedfer
+//  Example on options file to run coral w/ TraFDic on 2002 data.
+//
+// Revision 1.12  2002/06/08 00:23:51  ybedfer
+//  Use "map4" where all symlinked to "~compass/detector/maps/2001.xml" except
+// STRAWS.
+//
+// Revision 1.11  2002/06/07 17:39:30  ybedfer
+//  ...
+//
+// Revision 1.10  2002/06/07 17:27:26  ybedfer
+//  New paging.
+//
+// Revision 1.9  2002/05/25 22:50:42  ybedfer
+//  Added options, commented out, for ROOT tree output.
+//
+// Revision 1.8  2002/05/08 15:02:02  korzenev
+// trigger: mu' ID
+//
+// Revision 1.7  2002/05/06 12:49:03  korzenev
+// new matireal map for H5 region
+//
+// Revision 1.6  2002/04/23 01:34:49  ybedfer
+//  Boundary between zones #2 and #3 moved behind HI04.
+//  ...and other minor changes.
+//
+// Revision 1.5  2002/04/23 01:16:03  ybedfer
+//  - Drift-like options moved out.
+//
+// Revision 1.4  2002/03/28 13:53:52  ybedfer
+//  ..
+//
+
+//selection trigger mask 15		// ***** TRIGGER SELECTION
+
+
+//			 		   ***** ROOT tree OUTPUT
+CsOutnt Print 	0      // 1 - On, 0 - Off
+//		MC track Rec track MC vert  Rec vert  Calor  Clusters  Digit
+//CsOutnt BLOCK	    0	     1         0	 1	 0	 0	  0
+//CsOutnt Cond	    0	     1	       0	 0	 0	 1	  0
+//CsOutnt Cluster  MM  GM  // define clusters of which detector to store
+//CsOutnt ChipF1  H	// define digits of which detector to store
+//CsOutnt CsOutnt trkMom  // store tracks with momentum only
+//CsOutnt MagField
+
+
+
+//					   ***** HISTOGRAMMING
+histograms package ROOT
+
+histograms home    ./trafdic.rd.2002.root
+
+
+// 					   ***** DETECTOR TABLE...
+
+//...is specified in the TraFDic include options file, cf. in fine.
+
+
+
+// 					   ***** MATERIAL MAPS
+
+CsMaterialMap Zone_1 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.target.m2002.02.map
+CsMaterialMap Zone_2 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.saclay.m2002.02.map
+CsMaterialMap Zone_3 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.straw.m2002.02.map
+CsMaterialMap Zone_4 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf2.m2002.02.map
+CsMaterialMap Zone_5 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf3.m2002.02.map
+CsMaterialMap Zone_6 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.hcal1.m2002.02.map
+CsMaterialMap Zone_7 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf1.m2002.02.map
+CsMaterialMap ELossTarget /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.target_de.m2002.02.map
+
+use calibration 	 	 	// ***** CALIBRATION
+CDB use FileDB
+
+//CDB location...
+//...is specified in the TraFDic include options file, cf. in fine.
+
+//CDB use ConditionsDB
+//CDB location P2B.2001.BOOT
+
+// DECODING MAPS
+
+decoding map /afs/cern.ch/compass/detector/maps 	// ***** MAPPING
+
+
+events to read 500000			// ***** NUMBER OF EVENTS
+//events to skip 126
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+//reset random seed every new event
+
+//ST IS_MWPC
+ST03U1da IS_MWPC
+ST03U1dc IS_MWPC
+ST03U1ua IS_MWPC
+ST03U1uc IS_MWPC
+ST03V1da IS_MWPC
+ST03V1dc IS_MWPC
+ST03V1ua IS_MWPC
+ST03V1uc IS_MWPC
+ST03X1da IS_MWPC
+ST03X1dc IS_MWPC
+ST03X1ua IS_MWPC
+ST03X1uc IS_MWPC
+ST03X2da IS_MWPC
+ST03X2dc IS_MWPC
+ST03X2ua IS_MWPC
+ST03X2uc IS_MWPC
+ST03Y1da IS_MWPC
+ST03Y1dc IS_MWPC
+ST03Y1ua IS_MWPC
+ST03Y1uc IS_MWPC
+ST03Y2da IS_MWPC
+ST03Y2dc IS_MWPC
+ST03Y2ua IS_MWPC
+ST03Y2uc IS_MWPC
+ST04V1da IS_MWPC
+ST04V1dc IS_MWPC
+ST04V1ua IS_MWPC
+ST04V1uc IS_MWPC
+ST04X1da IS_MWPC
+ST04X1dc IS_MWPC
+ST04X1ua IS_MWPC
+ST04X1uc IS_MWPC
+ST04Y1da IS_MWPC
+ST04Y1dc IS_MWPC
+ST04Y1ua IS_MWPC
+ST04Y1uc IS_MWPC
+MB IS_MWPC
+//DW IS_MWPC
+
+pattern method 1        // not used yet
+tracking method 1       // not used yet
+
+// 					   ***** DECODING
+make decoding 	 	// <nothing>, MCExact
+
+//  	 	 	 	 	   ***** CLUSTERING
+make clustering 	// <nothing>, MCExact, MCSmeared, MCQuantized
+
+reconstruction schema 1			// ***** RECONSTRUCTION SCHEMA
+
+make tracking				// ***** TRACKING
+track prepattern method traffic
+track bridging   method traffic
+track fitting    method traffic
+
+
+make beam reconstruction		// ***** Beam RECONSTRUCTION 
+include ${CORAL}/src/pkopt/beam_2002.opt
+//                   Overwrite what's set in "beam.opt"
+BeamRecons    useTRAFFIC  1    // >0: Traffic is used, =0: standalone beampackage is used
+
+
+make vertex reconstruction		// ***** Vertex RECONSTRUCTION
+vertex pattern method averaging
+vertex fitting method kalman
+include ${CORAL}/src/pkopt/vertex.2002.opt
+//                   Overwrite what's set in "vertex.opt"
+CsAverPattern  Hist        1     // 0 - Off, 1 - ON
+CsAverPattern  findSec     1     // 0 - Off, 1 - ON
+CsAverPattern  Print [ 0 ]     0      // Prefilter info.
+CsAverPattern  Print [ 1 ]     0      // Error info. 
+CsKalmanFitting  Hist        1     // 0 - Off, 1 - ON
+CsKalmanFitting  Print [ 0 ]     0      // Kalman filter info.
+CsKalmanFitting  Print [ 1 ]     0      // Global fit info.
+CsKalmanFitting  Print [ 2 ]     0      // IKF info.
+
+
+//make rich1 reconstruction			// ***** RICH1
+include ${CORAL}/src/pkopt/rich1.opt
+
+
+
+include ${CORAL}/src/pkopt/calorim.opt		// ***** CALORIMETERS
+
+include ${CORAL}/src/pkopt/trigger.2002.opt	// ***** MU' PID
+
+
+//  	 	 	 	 	   ***** GEOMETRICAL ZONES
+define zone 0 3500 before M1
+define zone 3500 17000 between M1 and M2
+define zone 17000 32500 between M2 and Muon Wall
+define zone 32500 99999 after Muon Wall
+
+define zone -8000 0 before the target
+
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+
+CsField SOL_field /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SOL/smctgt_solenoide.fieldmap
+
+
+CsField SM1m_field /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.01.data
+
+CsField SM1m_field_measured /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.172.data
+
+CsField SM2_field  /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM2/FSM.map.4000.data
+
+CsMagInfo Solenoid /afs/cern.ch/compass/detector/calibrations/2002/polarization.2002.list	// In order to get polarisation values and correct sol field
+
+//					   ***** LOGGER
+error logger log level   error		// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level none
+error logger verbosity   normal		// low, normal, high. 
+
+
+
+//	  	  	  	  	   ***** TraFDic (+DET OPTIONS+...)
+
+include /afs/cern.ch/compass/scratch/d17/objsrvvy/oracle.test/trafdic.dstProd.P1C.opt
+
+//Trafdic specific option:
+TraF    Dicofit         /afs/cern.ch/compass/scratch/d05/ybedfer/dicos/dico.20073.7.plus
+
+//end

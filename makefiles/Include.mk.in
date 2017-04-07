@@ -1,0 +1,247 @@
+ifndef Include_makefile
+Include_makefile = yes
+
+################################################################################
+# Configure values
+################################################################################
+
+OS              = @OS@
+
+VPATH           = @srcdir@
+prefix          = @prefix@
+exec_prefix     = @exec_prefix@
+
+bindir          = @bindir@
+sbindir         = @sbindir@
+libexecdir      = @libexecdir@
+datarootdir     = @datarootdir@
+datadir         = @datadir@
+sysconfdir      = @sysconfdir@
+sharedstatedir  = @sharedstatedir@
+localstatedir   = @localstatedir@
+libdir          = @libdir@
+infodir         = @infodir@
+mandir          = @mandir@
+includedir      = @includedir@
+
+INSTALL         = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@ $(AM_INSTALL_PROGRAM_FLAGS)
+INSTALL_DATA    = @INSTALL_DATA@
+INSTALL_SCRIPT  = @INSTALL_SCRIPT@
+transform       = @program_transform_name@
+
+F77             = @F77@
+CC              = @CC@
+CPP             = @CPP@
+CXX             = @CXX@
+CXXCPP          = @CXXCPP@
+
+GCC_VERSION     = @GCC_VERSION@
+GCC_MODE        = @GCC_MODE@
+
+C_INCLUDES              = @C_INCLUDES@
+CFLAGS                  = @CFLAGS@
+FFLAGS                  = @FFLAGS@
+LDFLAGS                 = @LDFLAGS@
+C_FLAGS                 = $(CFLAGS)
+
+USE_ORACLE              = @USE_ORACLE@
+DIR_ORACLE              = @DIR_ORACLE@
+LIB_ORACLE              = @LIB_ORACLE@
+
+USE_COMPASS_Date        = @USE_COMPASS_Date@
+DIR_COMPASS_Date        = @DIR_COMPASS_Date@
+LIB_COMPASS_Date        = @LIB_COMPASS_Date@
+
+USE_MySQL               = @USE_MySQL@
+DIR_MySQL               = @DIR_MySQL@
+LIB_MySQL               = @LIB_MySQL@
+
+DIR_ROOT                = @DIR_ROOT@
+LIB_ROOT                = @LIB_ROOT@
+
+USE_RFIO                = @USE_RFIO@
+DIR_RFIO                = @DIR_RFIO@
+LIB_RFIO                = @LIB_RFIO@
+
+USE_Qt                  = @USE_Qt@
+DIR_Qt                  = @DIR_Qt@
+LIB_Qt                  = @LIB_Qt@
+Qt_MOC                  = @Qt_MOC@
+Qt_UIC                  = @Qt_UIC@
+
+USE_CERN_LIBRARY        = @USE_CERN_LIBRARY@
+DIR_CERN_LIBRARY        = @DIR_CERN_LIBRARY@
+LIB_CERN_LIBRARY        = @LIB_CERN_LIBRARY@
+
+LIB_XPM_LIBRARY         = @LIB_XPM_LIBRARY@
+
+USE_HIGZ                = @USE_HIGZ@
+DIR_HIGZ                = @DIR_HIGZ@
+LIB_HIGZ                = @LIB_HIGZ@
+
+USE_HBOOK               = @USE_HBOOK@
+DIR_HBOOK               = @DIR_HBOOK@
+LIB_HBOOK               = @LIB_HBOOK@
+
+USE_ZEBRA               = @USE_ZEBRA@
+DIR_ZEBRA               = @DIR_ZEBRA@
+LIB_ZEBRA               = @LIB_ZEBRA@
+
+USE_CLHEP               = @USE_CLHEP@
+DIR_CLHEP               = @DIR_CLHEP@
+LIB_CLHEP               = @LIB_CLHEP@
+
+USE_EXPAT               = @USE_EXPAT@
+DIR_EXPAT               = @DIR_EXPAT@
+LIB_EXPAT               = @LIB_EXPAT@
+
+USE_NewEDIS             = @USE_NewEDIS@
+USE_TGEANT		= @USE_TGEANT@
+
+ObjectFilesDeletion     = @ObjectFilesDeletion@
+
+# Library type - static or shared
+ifndef CORAL_LOCATION
+LIB_TYPE                = @LIB_TYPE@
+else
+ifndef LIB_TYPE
+LIB_TYPE                = @LIB_TYPE@
+endif
+endif
+
+################################################################################
+################################################################################
+################################################################################
+
+# Sources extension characters
+SRC_EXT         = cc
+F77_EXT         = F
+
+DEPEND_FILE     = depend.mk 
+
+
+ifndef top_srcdir
+  MSG:=$(shell echo ERROR: top_srcdir is not defined\! >& 2 )
+  exit
+endif
+
+################################################################################
+################################################################################
+################################################################################
+
+# From file unix_defaults.mk
+
+OBJ_EXT      =o
+ARCH_EXT     =a
+ARCH_PREFIX  =lib
+SHLIB_EXT    =so
+SHLIB_PREFIX =lib
+MKARCHLIB    =ar crv # need the trailing blank
+C_OUTPUT_TO  = -o 
+
+################################################################################
+################################################################################
+################################################################################
+
+C++   = $(CXX)
+
+# in case of gfortran is used as fortran compiler define gFortran
+# for cfortran.h include
+ifeq "$(F77)" "gfortran"
+    C_FLAGS += -DgFortran
+else
+    C_FLAGS += -Df2cFortran
+endif
+
+C_FLAGS += -Dlinux
+
+# dynamic loading
+MKSHLIB         = $(C++) -shared -Wl,-symbolic -o #need the trailing space
+SHLIB_FLAGS     = -fPIC -shared -Wl,-symbolic
+
+################################################################################
+################################################################################
+################################################################################
+
+CS_LIB = -L$(top_srcdir)/lib/$(OS)
+
+ifeq "$(LIB_TYPE)" "static"
+  CS_LIB += -Wl,-Bstatic
+endif
+
+CS_LIB += -lCsBase -lCsEvent -lCsGeom -lCsGEM -lCsRich1         \
+          -lCsRCEvdis -lCsMumega -lCsEvmc -lCsCalorim -lReco    \
+          -lCsBeam -lCsVertex -lVrtKalman -lVrtRoland -lCsTrack \
+          -lCsSpacePoint -lTrafdic -lFileDB -lCsObjStore        \
+          -lDaqDataDecoding -lCsHist
+
+ifeq "$(USE_MySQL)" "yes"
+  CS_LIB += -lMySQLDB -lCsPPI
+endif
+
+ifeq "$(USE_NewEDIS)" "yes"
+  CS_LIB += -lCsEvdis
+endif
+
+
+ifeq "$(USE_ORACLE)" "yes" 
+  CS_LIB += -lCsOraStore
+endif
+
+CS_LIB += -lCsUtils
+
+################################################################################
+################################################################################
+################################################################################
+
+C_INCLUDES += -I$(top_srcdir)/include
+
+ifeq "$(USE_ORACLE)" "yes" 
+  C_INCLUDES += -I${DIR_ORACLE}/rdbms/demo -I${DIR_ORACLE}/rdbms/public -I$(top_srcdir)/src/oracle -I${DIR_ORACLE}/include
+  C_FLAGS += -DUSE_Oracle
+endif
+
+ifeq "$(GCC_MODE)" "64"
+  FFLAGS += -fPIC
+  C_FLAGS += -fPIC
+endif
+
+################################################################################
+################################################################################
+################################################################################
+
+LIBS += $(LDFLAGS) $(CS_LIB)
+
+ifeq "$(LIB_TYPE)" "static"
+  LIBS += -Wl,-Bdynamic
+endif
+
+ifeq "$(GCC_MODE)" "64"
+  LIBS += -L/usr/X11R6/lib64 -lX11 $(LIB_XPM_LIBRARY) -lXpm $(LIB_RFIO) $(LIB_EXPAT)
+else
+  LIBS += -L/usr/X11R6/lib -lX11 $(LIB_XPM_LIBRARY) -lXpm $(LIB_RFIO) $(LIB_EXPAT)
+endif
+
+
+ifeq "$(USE_TGEANT)" "yes"
+  LIBS += -L${TGEANT}/lib -lT4Event -lT4Settings
+endif
+
+
+ifeq "$(USE_ORACLE)" "yes" 
+  LIBS += -L${DIR_ORACLE}/lib -locci -lclntsh
+endif
+
+ifeq "$(USE_MySQL)" "yes"
+  LIBS += $(LIB_MySQL) -lz
+endif
+
+LIBS += $(LIB_COMPASS_Date) $(LIB_HepODBMS) $(LIB_CondDB) $(LIB_HepUtilities) \
+        $(LIB_CERN_LIBRARY) $(LIB_CLHEP) $(LIB_ROOT) $(LIB_Qt) $(LIB_RFIO) -lpthread -ldl
+
+ifeq "$(OS)" "Linux" 
+  LIBS += -lnsl
+endif
+
+endif

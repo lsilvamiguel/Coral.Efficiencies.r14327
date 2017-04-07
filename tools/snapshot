@@ -1,0 +1,155 @@
+#!/usr/bin/perl -w
+# author: Alexander Zvyagin  (Alexander.Zviagine@cern.ch)
+
+use Env;
+
+sub coral_set_setup;
+sub coral_cvs;
+sub coral_compile;
+#sub coral_run;
+#sub calorim_test;
+
+print "Starting to make the coral snapshot\n";
+$log_file="log";
+$outlog=" 2>&1 | tee --append $log_file";
+#system("rm -rf $log_file")==0 or die "Can not remove the log file";
+coral_set_setup();
+coral_cvs();
+
+$setROOT="--with-ROOT=/afs/cern.ch/na49/library.4/ROOT/v3.00/i386_linux22/root";
+$setCLHEP="--with-CLHEP=/afs/cern.ch/sw/lhcxx/specific/redhat61/CLHEP/1.4";
+$setCERN="--with-CERN_LIBRARY=/cern/pro";
+$setDATE="--with-COMPASS_Date=/afs/cern.ch/compass/online/daq/dateV37";
+#$setALL=$setROOT . " " . $setCLHEP . " " . $setCERN . " " . $setDATE;
+
+@options =
+(
+  '--enable-shared    --with-CFLAGS=\'-Wall    \'  $setROOT $setCLHEP $setCERN $setDATE --without-Objectivity',
+  '--enable-shared=no --with-CFLAGS=\'-Wall -O2\'  $setROOT $setCLHEP $setCERN $setDATE --without-Objectivity',
+);
+
+foreach $opt (@options)
+{
+  coral_compile($opt);
+  
+  system(". setup.sh && make check $outlog") == 0
+    or print "FAILED: $_[1]\n";
+
+  system("make distclean $outlog") == 0
+    or die "Can not clean the directory with 'make distclean'";
+}
+
+@troubles=`cat $log_file | sort | uniq`;
+
+print "Warnings:\n";
+for(@troubles) { /warning/ && print "$_\n"; }
+
+print "Failed tests:\n";
+for(@troubles) { /FAILED/ && print "$_\n"; }
+
+if( `grep --quiet FAILED $log_file` )
+{
+  print "Bad coral snapshot. I am removing it.";
+  system("rm -rf /afs/cern.ch/compass/delivery/coral/tar/$coral_name.tgz")==0
+    or die "Can not remove a file...";
+}
+else
+{
+  print "This is good CORAL snapshot.\n";
+  print "Tag it with $coral_name in the CVS repository.\n";
+  system("cvs tag $coral_name");
+}
+
+#coral_compile('--without-Objectivity --enable-shared --with-CFLAGS=\'-Wall\'');
+#system(". setup.sh && make check ") == 0
+#  or print "FAILED: $_[1]\n";
+#
+#system("make distclean") == 0
+#  or die "Can not clean the directory with 'make distclean'";
+
+
+
+#coral_run("src/calorim","Linux/calorim test.1.opt");
+#coral_run("src/user","Linux/myprogram coral.options_TrafficRecon");
+
+#coral_run("src/calorim","Linux/calorim /afs/cern.ch/compass/scratch/d09/zvyagin/CORAL.calorim-test/opt.hadron.ms");
+#calorim_test();
+
+#system("make distclean") == 0
+#  or die "Can not clean the direcory";
+
+exit;
+
+################################################################################
+
+#sub coral_run
+#{
+#  system(". setup.sh && cd $_[0] &&  make && $_[1]") == 0
+#    or print "FAILED: $_[1]\n";
+#}
+
+################################################################################
+
+#sub calorim_test
+#{
+#  system(". setup.sh && cd src/calorim &&  make && Linux/calorim /afs/cern.ch/compass/scratch/d09/zvyagin/CORAL.calorim-test/opt.hadron.ms") == 0
+#    or print "FAILED: calorim_test\n";
+#}
+
+################################################################################
+
+sub coral_set_setup
+{
+  my @a =  split /\//, $SHELL;
+  my $shell= $a[$a-1];
+  #print $shell . "\n";
+
+  if( $shell=="csh" || $shell=="tcsh" )
+    {$coral_setup="source setup.csh";}
+  elsif( $shell=="sh" || $shell=="bash" )
+    {$coral_setup=". setup.csh";}
+  else
+    {die "Can not determinate your shell $SHELL";}
+}
+
+################################################################################
+
+sub coral_cvs
+{
+  my @a = ($sec,$min,$hour,$mday,$mon,$year,$wday,$isdst) = localtime(time);
+  $year += 1900;
+  $mon  += 1;
+  $coral_name = sprintf "coral-%4.4d%2.2d%2.2d", $year, $mon, $mday;
+
+  foreach $d ("coral",$coral_name)
+  {
+    !chdir $d or die "Directory $d alredy exist!\n";
+  }
+
+  system("cvs co coral $outlog") == 0
+    or die "Can not do cvs checkout";
+
+  system("mv coral $coral_name $outlog") == 0
+    or die "Can not move directory";
+  
+  system("tar czf /afs/cern.ch/compass/delivery/coral/tar/$coral_name.tgz $coral_name $outlog") == 0
+    or die "Can not create tgz file";
+
+  chdir $coral_name or die "I can not change directory to $coral_name!\n";
+}
+
+################################################################################
+
+sub coral_compile
+{
+  system("./configure $_[0] $outlog") == 0
+    or die "configure failed.";
+
+  system(". setup.sh && make depend && make -j3 MAKE='make -j3' $outlog") == 0
+    or die "Make failed";
+
+  system(". setup.sh && make -C src/user $outlog") == 0
+    or die "Make failed src/user";
+}
+
+################################################################################

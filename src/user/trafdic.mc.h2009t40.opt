@@ -1,0 +1,110 @@
+// $Id: trafdic.mc.h2009t40.opt,v 1.6 2010/12/20 16:32:02 tnagel Exp $
+
+//
+// MONTE-CARLO FOR HADRON2009T40 PRODUCTION
+//
+// CAVEAT!: WORKS ONLY W/ CVS HEAD of 2010/12/20 or later
+// alternatively, it is sufficient to update these files:
+// src/geom/CsZone.h r1.5
+// src/geom/CsGeom.cc r1.135
+
+// $Log: trafdic.mc.h2009t40.opt,v $
+// Revision 1.6  2010/12/20 16:32:02  tnagel
+// added/updated comments only
+//
+// Revision 1.5  2010/12/20 00:01:40  ybedfer
+//  Augmented and commented version. Caveat: works only w/ CVS head.
+//
+// Revision 1.4  2010/12/17 17:44:33  tnagel
+// more fixes, still not working, though
+//
+// Revision 1.3  2010/12/17 16:58:27  tnagel
+// use material maps identical to RD production
+//
+// Revision 1.2  2010/12/17 16:49:27  tnagel
+// added the correct mDST options
+//
+// Revision 1.1  2010/12/17 15:23:33  tnagel
+// added dedicated file for simulation of t40 production
+//
+
+// use trafdic.mc.h2009.opt as basis, this must be CVS revision 1.3!
+include ${CORAL}/src/user/trafdic.mc.h2009.opt
+
+//  ATTENTION!  hadron2009t40 template.opt contained a wrong setting, so we
+// have to do the same for MC, the following two lines must be changed
+// directly in trafdic.mc.h2009.opt!
+//  Unfortunately the "define zone" option is of the recursive type, and cannot
+// be overridden. => Three solutions:
+// - Use the patch added to CsGeom.cc,v1.135 and CsZone.h,v1.5,
+//  which allows a re-specification of a zone to overwrite previous one,
+//  provided its name argument is the same.
+//  Could be introduced in a CVS branch?
+//  (Best solution, for consistency sake).
+// - Edit "./user/trafdic.mc.h2009.opt".
+// - Leave things as is: it most probably would not matter.
+define zone 21000 32500 between M2 and Muon Wall
+define zone 32500 99999 after Muon Wall
+
+//  Seems to be required for DetNameOff line below, but why is it never enabled
+// in RD productions??
+//LR DetNameOff
+//  In fact, one has rather to include the 2009 version of the LR options file
+// in "./pkopt/trafdic.mc.h2009;opt".
+//  - As was done, in the "./pkopt/trafdic.2009.opt" of the mass prod. 
+//  - As is done in CVS head.
+//  - To be introduced in a CVS branch?
+
+// REDEFINE the list of TBNAMES to be EXCLUDED FROM PATTERN RECOGNITION
+// (Caveat: one has to supply the full list of excluded detectors each time one re-specifies this "TraF DetNameOff" option.)
+// - In any case, some detectors ("VO/VI/DW02X2/Y1/RP") have to be left excluded, cf. explanations in "../pkopt/trafdic.mc.h2009.opt".
+// - "SI02X1": Was excluded in mass prod. (not sure it had to be, cf. ".:trafdic.2009.opt").
+// - "HI05":
+//   - Was not activated during the Primakoff data taking.
+//   - (It should have been. HI05 does not only serve trigger purposes. It's also a tracking detector, useful to ID some muons, including some medium Q2 one, typically triggering HL or HM.
+//   => It WILL HAVE TO BE ACTIVATED in 2012 Primakoff (if indeed programmed).)
+//   - Yet is described in the MC setup.
+// => Therefore, the MC "Det2Ignore" differs from its mass prod. counterpart.
+TraF	DetNameOff	VO	VI	DW02X2	DW02Y1	SI02X1	HI05
+// REDEFINE the list of TBNAMES to be IGNORED ALTOGETHER
+// (Caveat: one has to supply the full list of ignored detectors each time one re-specifies this "TraF Det2ignore" option.)
+// - In any case, some detectors ("BM/HH") have to be left ignored, cf. explanations in "../pkopt/trafdic.mc.h2009.opt".
+// - "HK" (beam killers) were absent from the det.dat used in mass prod. Have to be ignored also in MC.
+//  (Note: HK, and hence HK02X1, ignored, as opposed to excluded, allows to set the zone boundaries as in the mass prod. (cf. supra).)
+// - "RP". Was not in mass prod. det.dat. The impact of its presence in the mass prod. coral is not clear: better discard it.
+// => Therefore, the MC "Det2Ignore" differs from its mass prod. counterpart.
+TraF	Det2Ignore	BM	HH	HK	RP
+
+// copied from template.opt
+mDST select 0  // 0: no selection
+mDST hits HO04Y1
+
+//					***** SETUP FILES
+
+// for the moment we cannot use RD detectors.dat and dico files because of
+// incompatibilities (detector number mismatches), hopefully this issue will
+// be resolved at some point in the future.
+//  And also, it can be done only if the offsets (and other alignment par's) in
+// .ffr cards defining the COMGeant setup match exactly the RD detectors.dat's.
+//  - Which is not straightforward: would necessitate a set of .ffr per period
+//   of data taking (offsets in RD detectors.dat's fluctuate over time).
+//  - Which is not that useful (compared to magnitude of the task and procided
+//   .ffr contain average offsets reasonably approaching RD ones): the residual,
+//   small diffs in offset between MC and RD (corresponding to the fluctuations
+// mentioned supra) won't affect much the setup acceptance.
+// Note: decoding maps are not used in MC
+
+//decoding	map	/afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t40/maps
+//detector	table	/afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t40/alignement/new/
+//TraF		Dicofit	/afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t40/dico/new/
+
+CsMaterialMap Zone_1 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t40/material/material.target.ni2009.00.dat
+CsMaterialMap Zone_2 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t40/material/material.saclay.h2009.00.map
+CsMaterialMap Zone_3 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t40/material/material.straw.h2009.00.map
+CsMaterialMap Zone_4 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t40/material/material.rich.h2009.00.map
+CsMaterialMap Zone_5 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t40/material/material.hcal1.h2009.00.dat
+CsMaterialMap Zone_6 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t40/material/material.muf1.h2009.00.dat
+CsMaterialMap Zone_7 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t40/material/material.muf2.h2009.00.map
+CsMaterialMap Zone_8 /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t40/material/material.muf3.h2009.00.map
+CsMaterialMap ELossTarget /afs/cern.ch/compass/scratch/d17/objsrvvy/generalprod/testcoral/hadron2009t40/material/material.target_de.ni2009.00.dat
+

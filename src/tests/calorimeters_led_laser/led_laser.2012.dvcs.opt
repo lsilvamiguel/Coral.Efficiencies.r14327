@@ -1,0 +1,25 @@
+//
+include ${CORAL}/src/tests/calorimeters_led_laser/coral_2012_dvcs_general.opt
+// make calorimeters reconstruction
+include ${CORAL}/src/tests/calorimeters_led_laser/calorim_led_2012_dvcs.opt 	 
+// 					   ***** DETECTOR TABLE...
+// Not correct ECAL2 description
+// detector table $COMPASS_FILES/geometry/DVCS.2012/detectors.107464.mu+.dat
+
+detector table ${CORAL}/src/tests/calorimeters_led_laser/detectors.107464.mu+.dat
+
+//					   ***** MAPPING
+decoding map $COMPASS_FILES/maps/2012.xml
+//					   ***** LOCAL CALIBRATION FILE DATA BASE
+calib_db_read path ${CORAL}/src/tests/calorimeters_led_laser/DB_COMPASS_2012
+//					   ***** INPUT DATA...
+
+//events to read 3			// # of events to read
+events to read 30000000			// # of events to read
+events print each  200
+// print event info 1
+
+Data files /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb05-107563-t1ffef000.001.raw
+Data files /castor/cern.ch/compass/data/2012/raw/calib_data/cdrpccoeb06-107563-t1ffef000.001.raw
+
+

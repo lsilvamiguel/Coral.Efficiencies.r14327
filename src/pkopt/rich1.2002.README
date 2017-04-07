@@ -1,0 +1,34 @@
+
+
+
+
+      To run RICHONE at production                    November 5,   2002
+      ----------------------------
+
+
+ ---  include ${CORAL}/src/pkopt/rich1.2002.opt
+
+      will ask for:
+      include ${CORAL}/src/pkopt/mirr-corr02-up.inc
+      include ${CORAL}/src/pkopt/mirr-corr02-down.inc
+      will read:
+      ${CORAL}/src/pkopt/padtabl1.8250
+
+
+ ---  use for histo booking in coral.options:   RI hist level normal //RICH1 
+      to get at least 'n-1' histo (and others)
+      this will overwrite histo booking in rich1.2002.opt (default level 0)
+
+
+ ---  use in TRAFFIC/TRAFDIC options:   TraF   SmoothPos[0]   745.1
+      to get track smoothing at RICH entrance window
+
+
+ ---  Refractive Index and Global Threshold will be read from DataBase
+      INPORTANT : check the DataBase directory
+
+
+ ---  Produce 'gfile' (RICH1 special file) for one (full) run over 20(?)
+      To do, put 'YES' instead of 'NO' in  rich1.2002.opt at 
+      RICHONE   writeMyFile        NO
+      and copy   'myfile-data.gfile'   to castor

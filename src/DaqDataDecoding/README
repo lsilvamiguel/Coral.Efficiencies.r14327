@@ -1,0 +1,7 @@
+This is COMPASS DAQ decoding library.
+This library may be used seperatly from CORAL.
+
+If you modified this library.
+1) Change date in footer.html file
+2) Add list of your modifications in ChangeLog file
+3) Do not forget to commit your changes to the CVS repository!

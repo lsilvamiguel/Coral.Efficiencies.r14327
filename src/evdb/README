@@ -1,0 +1,682 @@
+
+1. Package description
+2. Test data
+3. Set up the Federated Data Base enviroment
+   (needed for compilation)
+4. Test of the package (Objectivity part)
+
+
+
+1. Package description
+----------------------------------------------------
+
+CsObjStore is the Coral class which should
+insulate the rest of the program from the
+details of the data store (only for events!)
+in the case of Objectivity/DB stored data.
+
+It assumes the structure with a top level
+container of run objects of class
+CsObjSOREvent (created from
+Start Of Run DATE events). Each SOR
+point to the set of containers (one per
+DATE data file) containing the event
+headers (9 int32, with quantities like
+time, trigger...). Each header points
+to its RawEvent (and DST and more...)
+but they are retrieved only on request
+(i.e. if you ask the buffer).
+
+CsObjStore implements the singleton
+pattern, therefore ensures that the current
+event is always in scope.
+
+Basic methods are:
+
+bool init(void): Initialise Objectivity
+                 Reads parameters (e.g. run to be scanned)
+bool scan(void): Verify the query (false if the query cannot be fulfilled)
+                 Init CsHeaderIterator
+bool next(void): Point to the next header (false if query fulfilled)
+
+----------------------------------------------------------
+
+Ancillary classes are:
+CsDateReader: to read DATE events from file 
+              - rfio supported (v2/v3 hardwired)
+              - big/small endian supported
+              - not optimised (check/swap event event basis)
+CsObj...: persistent objects (Objectivity/DB objects)
+
+----------------------------------------------------------
+
+The GNUmakefile steers a set of programs:
+
+dateReader: to test CsDateReader. It reads date.dat: provide a link
+            (it uses CsDateHeader from Coral for dump)
+mute:       to be run before and create the mutex for DB creation 
+setup:      to be run before and create Run and Header database
+stage1:     not-optimised version of data conversion (stage1)
+            creates database for the next programs using
+            the test files (see below). Requires mute and setup
+            to be run beforehand.
+objScan:    test of CsObj... event persistent structure.
+            watchout db names hardwired inside.
+storeTest:  test of CsObjStore + related coral stuff 
+            (example program: you need a coral option file: 
+            see coral.option.example)
+
+----------------------------------------------------------
+
+Dump
+
+If you set the variable CSOBJSTORE_DUMP, this will switch
+on a number of (useful) dump messages in the package.
+It is foreseen that a CS_DUMP variable will allow selective
+compilation (i.e. the dump will be inserted in 
+a #ifdef CS_DUMP block), but it is not implemented yet.
+
+
+
+2. Test data
+----------------------------------------------------
+
+Some mock data and test beam data are provided to 
+test the programs. They are in AFS and in future
+it should be shipped with the Coral CDs.
+
+The next lines are in a form similar to a script: 
+the # in first column is used for comments, whilst
+#OUT: in first column tells you the print out you should get.
+
+# This is needed for all tests...
+
+cd $CORAL/src/evdb
+ln -s /afs/cern.ch/compass/scratch/d04/laman/CsObjStore/test1/cdr12019001 cdr12019001.x5t
+ln -s /afs/cern.ch/compass/scratch/d04/laman/CsObjStore/test1/cdr12019002 cdr12019002.x5t
+ln -s /afs/cern.ch/compass/scratch/d04/laman/CsObjStore/test1/cdr12019003 cdr12019003.x5t
+ln -s /afs/cern.ch/compass/scratch/d04/laman/CsObjStore/test1/cdr12029002 cdr12029002.x5t
+ln -s /afs/cern.ch/compass/scratch/d04/laman/CsObjStore/test1/cdr12029003 cdr12029003.x5t
+ln -s /afs/cern.ch/compass/scratch/d04/laman/CsObjStore/test1/cdr12039003 cdr12039003.x5t
+
+#
+# Test of dateReader
+#
+# The CsDateReader class should be able to read
+# date buffers in both endian flavours.
+# Link it to date.dat, for example:
+#
+# ln -s shd04:/shift/shd04/data05/objsrvvy/cdr/cdr90004957.x5t date.dat
+#
+# or to any file contained in 
+# ls -l /afs/cern.ch/compass/scratch/d04/benigno/piccoloIndiano
+# or
+# ls -l /afs/cern.ch/compass/scratch/d04/laman/CsObjStore/test1
+#
+# for instance:
+#
+# ln -s /afs/cern.ch/compass/scratch/d04/benigno/piccoloIndiano/cdr12019003 date.dat
+# $OS/dateReader -silent
+# rm date.dat
+
+----------------
+
+# Scan of the test files
+
+#
+ln -s cdr12019001.x5t date.dat
+Linux/dateReader -summary
+#
+#OUT01: dateReader Linux_egcs version
+#OUT01: dateReader: 101 events read
+#OUT01: dateReader: Event summary 
+#OUT01: Not implemented (should be 0) = 0
+#OUT01: Start Of Run = 1
+#OUT01: End Of Run = 0
+#OUT01: Type 3 = 0
+#OUT01: Type 4 = 0
+#OUT01: Start Of Burst = 0
+#OUT01: End Of Burst = 0
+#OUT01: Physics Event = 100
+#OUT01: Type 8 = 0
+#OUT01: Type 9 = 0
+#OUT01: Date Error = 0
+#OUT01: Not Implemented (should be 0) = 0
+#
+rm date.dat
+#
+ln -s cdr12019002.x5t date.dat
+Linux/dateReader -summary
+#
+#OUT: dateReader Linux_egcs version
+#OUT: dateReader: 201 events read
+#OUT: dateReader: Event summary 
+#OUT: Not implemented (should be 0) = 0
+#OUT: Start Of Run = 0
+#OUT: End Of Run = 0
+#OUT: Type 3 = 0
+#OUT: Type 4 = 0
+#OUT: Start Of Burst = 0
+#OUT: End Of Burst = 0
+#OUT: Physics Event = 201
+#OUT: Type 8 = 0
+#OUT: Type 9 = 0
+#OUT: Date Error = 0
+#OUT: Not Implemented (should be 0) = 0
+#
+rm date.dat
+#
+ln -s cdr12029002.x5t date.dat
+Linux/dateReader -summary
+#
+#OUT: dateReader Linux_egcs version
+#OUT: dateReader: 301 events read
+#OUT: dateReader: Event summary 
+#OUT: Not implemented (should be 0) = 0
+#OUT: Start Of Run = 1
+#OUT: End Of Run = 0
+#OUT: Type 3 = 0
+#OUT: Type 4 = 0
+#OUT: Start Of Burst = 0
+#OUT: End Of Burst = 0
+#OUT: Physics Event = 300
+#OUT: Type 8 = 0
+#OUT: Type 9 = 0
+#OUT: Date Error = 0
+#OUT: Not Implemented (should be 0) = 0
+#
+rm date.dat
+#
+ln -s cdr12019003.x5t date.dat
+Linux/dateReader -summary
+#
+#OUT: dateReader Linux_egcs version
+#OUT: dateReader: 401 events read
+#OUT: dateReader: Event summary 
+#OUT: Not implemented (should be 0) = 0
+#OUT: Start Of Run = 0
+#OUT: End Of Run = 0
+#OUT: Type 3 = 0
+#OUT: Type 4 = 0
+#OUT: Start Of Burst = 0
+#OUT: End Of Burst = 0
+#OUT: Physics Event = 401
+#OUT: Type 8 = 0
+#OUT: Type 9 = 0
+#OUT: Date Error = 0
+#OUT: Not Implemented (should be 0) = 0
+#
+rm date.dat
+#
+ln -s cdr12029003.x5t date.dat
+Linux/dateReader -summary
+#
+#OUT: dateReader Linux_egcs version
+#OUT: dateReader: 1 events read
+#OUT: dateReader: Event summary 
+#OUT: Not implemented (should be 0) = 0
+#OUT: Start Of Run = 1
+#OUT: End Of Run = 0
+#OUT: Type 3 = 0
+#OUT: Type 4 = 0
+#OUT: Start Of Burst = 0
+#OUT: End Of Burst = 0
+#OUT: Physics Event = 0
+#OUT: Type 8 = 0
+#OUT: Type 9 = 0
+#OUT: Date Error = 0
+#OUT: Not Implemented (should be 0) = 0
+#
+rm date.dat
+#
+ln -s cdr12039003.x5t date.dat
+Linux/dateReader -summary
+#
+#OUT: dateReader Linux_egcs version
+#OUT: dateReader: 501 events read
+#OUT: dateReader: Event summary 
+#OUT: Not implemented (should be 0) = 0
+#OUT: Start Of Run = 0
+#OUT: End Of Run = 0
+#OUT: Type 3 = 0
+#OUT: Type 4 = 0
+#OUT: Start Of Burst = 0
+#OUT: End Of Burst = 0
+#OUT: Physics Event = 501
+#OUT: Type 8 = 0
+#OUT: Type 9 = 0
+#OUT: Date Error = 0
+#OUT: Not Implemented (should be 0) = 0
+#
+rm date.dat
+
+#
+# In summary,
+# run 1 100 events (1 container)
+# run 2 501 events (2 containers)
+# run 4 902 events (3 containers; 1 is empty)
+# all  1503 events
+
+----
+
+ln -s bigEndian/cdr12019001 date.dat
+$OS/dateReader -silent
+rm date.dat
+
+
+
+3. Set up the Federated Data Base enviroment
+----------------------------------------------------
+
+A possible set of commands to test the package
+starting from an empty Federated Data Base (FDB)
+is described here.
+
+The next lines are in a form similar to a script: 
+the # in first column is used for comments, whilst
+#OUT: in first column tells you the print out you should get.
+
+#
+# This can be done... Do not do it if do not know what you are doing...
+# A /usr/objy/noperiod.2000 directory should exist beforehand with
+# appropriate permissions (lockserver and ams should run 
+# on the machine where the federation file is created; here it is lockcomp).
+# The same for the journal directory
+# (/usr/objy/noperiod.2000/journal)
+#
+cd ${CORAL}/src/evdb
+oonewfd -fdfilehost lockcomp -fdfilepath /usr/objy/noperiod.2000/noperiod.2000.FDB -lockserver lockcomp -jnldirhost lockcomp -jnldirpath /usr/objy/noperiod.2000/journal -fdnumber 5605 -pagesize 4096 noperiod.2000.BOOT
+#
+# Upgrade the schema (i.e. load HepODBMS class definitions)
+#
+ooschemaupgrade -infile ${HEP_ODBMS_DIR}/schema/HepODBMS.schema noperiod.2000.BOOT 
+# or maybe depending on enviroment...
+ooschemaupgrade -infile ${HEP_ODBMS_DIR}/schema/HepODBMS.schema noperiod.2000.BOOT 
+#
+# Get from Massimo Lamanna the appropriate boot file if applicable
+#
+cat noperiod.2000.BOOT 
+ooFDNumber=5605
+ooLFDNumber=65535
+ooPageSize=4096
+ooLockServerName=lockcomp
+ooFDDBHost=lockcomp
+ooFDDBFileName=/usr/objy/noperiod.2000/noperiod.2000.FDB
+ooJNLHost=lockcomp
+ooJNLPath=/usr/objy/noperiod.2000/journal
+
+
+4. Test of the package (Objectivity part)
+----------------------------------------------------
+
+Test of stage1/2 and storeTest:
+Stage1 and stage2 are the programs to input data
+into the data bases (actually stage1 input events
+and stage2 cleans up the access pointer to scan
+multiple data bases attached to a single run).
+storeTest emulates Coral in accessing the data bases.
+
+Here it is assumed that the installation described in
+the previous section has been successfully performed.
+
+The next lines are in a form similar to a script: 
+the # in first column is used for comments, whilst
+#OUT: in first column tells you the print out you should get.
+
+#Verify FDB it is empty... (oodumpcatalog should look like this...)
+
+oodumpcatalog noperiod.2000.BOOT 
+
+#OUT:
+#OUT:Ojectivity/DB (TM) List Database Files Utility, Version 5.2.0        
+#OUT:Copyright (c) Objectivity, Inc 1990, 1999. All rights reserved.
+#OUT:
+#OUT:FD Name   = noperiod.2000
+#OUT:FD ID     = 5605
+#OUT:FD File   = lockcomp::/usr/objy/noperiod.2000/noperiod.2000.FDB
+#OUT:Boot File = pcpdp02::/afs/cern.ch/user/l/laman/CsObj/CsObjStore/noperiod.2000.BOOT
+#OUT:Jnl Dir   = lockcomp::/usr/objy/noperiod.2000/journal
+#OUT:Lock Host = lockcomp
+
+#Create Mute database
+
+$OS/mute noperiod.2000.BOOT
+
+#Verify mute has run... (oodumpcatalog should look like this...)
+
+oodumpcatalog noperiod.2000.BOOT
+
+#OUT:
+#OUT:Objectivity/DB (TM) List Database Files Utility, Version 5.2.0        
+#OUT:Copyright (c) Objectivity, Inc 1990, 1999. All rights reserved.
+#OUT:
+#OUT:FD Name   = noperiod.2000
+#OUT:FD ID     = 5605
+#OUT:FD File   = lockcomp::/usr/objy/noperiod.2000/noperiod.2000.FDB
+#OUT:Boot File = pcpdp02::/afs/cern.ch/user/l/laman/CsObj/CsObjStore/noperiod.2000.BOOT
+#OUT:Jnl Dir   = lockcomp::/usr/objy/noperiod.2000/journal
+#OUT:Lock Host = lockcomp
+#OUT:
+#OUT:DB Name   = mute
+#OUT:DB ID     = 2
+#OUT:DB Image  = lockcomp::/usr/objy/noperiod.2000/mute.noperiod.2000.DB
+#OUT:
+
+#Some extra setup (this creates run DB, event directory DB...)
+
+$OS/setup ccf010 noperiod.2000.BOOT 
+#OUT:Use federation boot file noperiod.2000.BOOT
+#OUT:Create RUN DB
+#OUT:Create RUN CT
+#OUT:Create HDR DB
+#OUT:Set association to DB runDB00
+#OUT:Set association to DB hdrDB00
+#OUT:Pointer object in container RunRoadMap
+#OUT:Pointer object in container HDRRoadMap
+
+#Verify mute has run... (oodumpcatalog should look like this...)
+oodumpcatalog noperiod.2000.BOOT
+#OUT:
+#OUT:Objectivity/DB (TM) List Database Files Utility, Version 5.2.0        
+#OUT:Copyright (c) Objectivity, Inc 1990, 1999. All rights reserved.
+#OUT:
+#OUT:FD Name   = noperiod.2000
+#OUT:FD ID     = 5605
+#OUT:FD File   = lockcomp::/usr/objy/noperiod.2000/noperiod.2000.FDB
+#OUT:Boot File = pcpdp02::/afs/cern.ch/user/l/laman/CsObj/CsObjStore/noperiod.2000.BOOT
+#OUT:Jnl Dir   = lockcomp::/usr/objy/noperiod.2000/journal
+#OUT:Lock Host = lockcomp
+#OUT:
+#OUT:DB Name   = mute
+#OUT:DB ID     = 2
+#OUT:DB Image  = lockcomp::/usr/objy/noperiod.2000/mute.noperiod.2000.DB
+#OUT:
+#OUT:DB Name   = directory
+#OUT:DB ID     = 3
+#OUT:DB Image  = ccf010::/shift/ccf010/data01/objsrvvy/na58/directory.noperiod.2000.DB
+#OUT:
+#OUT:DB Name   = runDB00
+#OUT:DB ID     = 4
+#OUT:DB Image  = ccf010::/shift/ccf010/data01/objsrvvy/na58/runDB00.noperiod.2000.DB
+
+# If you do everything in one go... 
+oodeletedb -all -force noperiod.2000.BOOT
+$OS/mute noperiod.2000.BOOT
+$OS/setup ccf010d noperiod.2000.BOOT
+
+# Create DBs
+
+setenv DBSERVER ccf008
+
+$OS/stage1 cdr12019001.x5t cdr12019001 /shift/$DBSERVER/data01/objsrvvy/na58 noperiod.2000.BOOT $DBSERVER
+$OS/stage1 cdr12019002.x5t cdr12019002 /shift/$DBSERVER/data01/objsrvvy/na58 noperiod.2000.BOOT $DBSERVER
+$OS/stage1 cdr12029002.x5t cdr12029002 /shift/$DBSERVER/data01/objsrvvy/na58 noperiod.2000.BOOT $DBSERVER
+$OS/stage1 cdr12019003.x5t cdr12019003 /shift/$DBSERVER/data01/objsrvvy/na58 noperiod.2000.BOOT $DBSERVER
+$OS/stage1 cdr12029003.x5t cdr12029003 /shift/$DBSERVER/data01/objsrvvy/na58 noperiod.2000.BOOT $DBSERVER
+$OS/stage1 cdr12039003.x5t cdr12039003 /shift/$DBSERVER/data01/objsrvvy/na58 noperiod.2000.BOOT $DBSERVER
+
+# Create DB links
+
+$OS/stage2 cdr12019001                         noperiod.2000.BOOT
+$OS/stage2 cdr12019002 cdr12029002             noperiod.2000.BOOT
+$OS/stage2 cdr12019003 cdr12029003 cdr12039003 noperiod.2000.BOOT
+
+# Remove the links
+
+rm cdr12019001.x5t cdr12019002.x5t cdr12029002.x5t cdr12019003.x5t cdr12029003.x5t cdr12039003.x5t
+
+# First tests of the package
+
+#
+# Should read 100 events and quit
+# (read run 1, 1 container)
+#
+$OS/storeTest coral.option.test1
+
+#
+# Should read 501 events and quit
+# (read run 2, 2 containers)
+#
+$OS/storeTest coral.option.test2
+
+#
+# Should read 0 events because
+# run 3 does not exist
+#
+$OS/storeTest coral.option.test3
+
+#
+# Should read 902 events and quit
+# (read run 4, 3 containers; 1 empty)
+#
+$OS/storeTest coral.option.test4
+
+#
+# Should read 1503 events and quit
+# (read run 1,2,4)
+#
+$OS/storeTest coral.option.test5
+
+----------------------------------------------------------
+
+Correspondance between DATE and CsObjStore classes:
+
+ Description        DATE     CsObjAbstractEvent
+
+ Start Of Run       1        CsObjSOREvent
+ End Of Run         2        CsObjEOREvent
+ Start Of Run File  3
+ End Of Run File    4
+ Start Of Burst     5        CsObjSOBEvent
+ End Of Burst       6        CsObjEOBEvent
+ Event              7        CsObjRAWEvent
+ Calibration        8        CsObjMonitor
+ End of Link        9
+ Error in format   10
+                             CsObjHeader
+                             CsHeaderIterator 
+
+----------------------------------------------------------
+
+ A set of file has been provided to 
+ test stage1 and stage2 steps. They exist
+ in big-endian and small-endian versions.
+ The former under the subdir bigEndian,
+ the latter under smallEndian.
+
+  DATE file     Run    SOR  nEvent 
+ 
+ cdr12019001    Run 1   *    100
+ cdr12019002    Run 2        200
+ cdr12029002    Run 2   *    300
+ cdr12019003    Run 4        400
+ cdr12029003    Run 4   *      0
+ cdr12039003    Run 4        500
+
+----------------------------------------------------------
+
+#
+#-rwxr-xr--   1 laman    vy       27024912 Mar 20 17:52 cdr90000941.x5t
+#-rwxr-xr--   1 laman    vy       96134328 Mar 20 17:53 cdr90000565.x5t
+#
+# ccf004:/shift/ccf004/data01/objsrvvy/tmp/cdr90000565.x5t
+# ccf004:/shift/ccf004/data01/objsrvvy/tmp/cdr90000941.x5t
+#
+ln -s  ccf022d:/shift/ccf022d/data01/objsrvvy/tmp/cdr90000565.x5t
+ln -s ccf022d:/shift/ccf022d/data01/objsrvvy/tmp/cdr90000941.x5t
+
+
+rm date.dat
+ln -s ccf004:/shift/ccf004/data01/objsrvvy/tmp/cdr90000565.x5t date.dat
+$OS/dateReader -summary
+#OUT: dateReader Linux_egcs version
+#OUT: dateReader: 78576 events read
+#OUT: dateReader: Event summary 
+#OUT: Not implemented (should be 0) = 0
+#OUT: Start Of Run = 3
+#OUT: End Of Run = 3
+#OUT: Type 3 = 6
+#OUT: Type 4 = 6
+#OUT: Start Of Burst = 165
+#OUT: End Of Burst = 165
+#OUT: Physics Event = 78225
+#OUT: Type 8 = 0
+#OUT: Type 9 = 3
+#OUT: Date Error = 0
+#OUT: Not Implemented (should be 0) = 0
+rm -f date.dat
+ln -s ccf004:/shift/ccf004/data01/objsrvvy/tmp/cdr90000941.x5t date.dat
+$OS/dateReader -summary
+#OUT: dateReader Linux_egcs version
+#OUT: dateReader: 11237 events read
+#OUT: dateReader: Event summary 
+#OUT: Not implemented (should be 0) = 0
+#OUT: Start Of Run = 2
+#OUT: End Of Run = 2
+#OUT: Type 3 = 4
+#OUT: Type 4 = 4
+#OUT: Start Of Burst = 52
+#OUT: End Of Burst = 52
+#OUT: Physics Event = 11119
+#OUT: Type 8 = 0
+#OUT: Type 9 = 2
+#OUT: Date Error = 0
+#OUT: Not Implemented (should be 0) = 0
+ln -s ccf004:/shift/ccf004/data01/objsrvvy/tmp/cdr90000565.x5t cdr90000565.x5t
+ln -s ccf004:/shift/ccf004/data01/objsrvvy/tmp/cdr90000941.x5t cdr90000941.x5t
+setenv DBSERVER ccf008
+$OS/stage1 cdr90000565.x5t cdr90000565 /shift/$DBSERVER/data01/objsrvvy/na58 noperiod.2000.BOOT $DBSERVER
+$OS/stage1 cdr90000941.x5t cdr90000941 /shift/$DBSERVER/data01/objsrvvy/na58 noperiod.2000.BOOT $DBSERVER
+
+# COMMON ERROR CONDITION TO CLEANUP AUTOMATICALLY!!!
+$OS/stage1 cdr90000565.x5t cdr90000565 /shift/$DBSERVER/data01/objsrvvy/na58 noperiod.2000.BOOT $DBSERVER
+stage1 Linux_egcs version
+dt file cdr90000565.x5t
+db file cdr90000565
+onlineFileID 565
+onlineComputerID 90
+Container cdr90000565 already present in database hdrDB00
+
+
+
+-----
+
+If something strange happens (and you have compiled
+the package with the CS_DUMP key set), you can trigger 
+a lot of dumps by setting some enviroment variables
+like this (in csh or tcsh)
+setenv CSDATEREADER_DUMP 1
+and then run the program.
+
+CSDATEREADER_DUMP
+CSOBJHEADERITERATOR_DUMP
+CSOBJSTORE_DUMP
+
+*********
+
+Full-scale federation setup
+
+P1A.2001
+
+on nobj01 and nobj06 (BOTH)
+
+
+# here being root
+
+cd /usr/objy
+mkdir /usr/objy
+mkdir P2A.2002
+mkdir P2A.2002/journals
+chown objsrvvy:vy P2A.2002
+chown objsrvvy:vy P2A.2002/journals
+ls -ld P2A.2002/
+#drwxr-xr-x   3 objsrvvy vy           512 May  8 09:08 P2B.2001/
+ls -ld P2A.2002/journals/
+#drwxr-xr-x   6 objsrvvy vy         22016 May 31 12:56 P2B.2001/journals/
+
+#check ams permission
+
+#choose one lock (nobj06)
+
+
+less /usr/local/Objectivity/AMS/uid_list
+
+
+oonewfd -lockserverhost nobj06 -fdfilehost nobj06 -fdfilepath /usr/objy/P1A.2002/P1A.2002.FDB -jnldirhost nobj06 -jnldirpath /usr/objy/P1A.2002/journals -fdnumber 5011 -pagesize 8192 P1A.2002.BOOT
+
+oonewfd -lockserverhost nobj06 -fdfilehost nobj06 -fdfilepath /usr/objy/P1B.2002/P1B.2002.FDB -jnldirhost nobj06 -jnldirpath /usr/objy/P1B.2002/journals -fdnumber 5012 -pagesize 8192 P1B.2002.BOOT
+
+oonewfd -lockserverhost nobj01 -fdfilehost nobj01 -fdfilepath /usr/objy/P1C.2002/P1C.2002.FDB -jnldirhost nobj01 -jnldirpath /usr/objy/P1C.2002/journals -fdnumber 5013 -pagesize 8192 P1C.2002.BOOT
+
+oonewfd -lockserverhost nobj01 -fdfilehost nobj01 -fdfilepath /usr/objy/P2A.2002/P2A.2002.FDB -jnldirhost nobj01 -jnldirpath /usr/objy/P2A.2002/journals -fdnumber 5014 -pagesize 8192 P2A.2002.BOOT
+
+oonewfd -lockserverhost nobj06 -fdfilehost nobj06 -fdfilepath /usr/objy/P2B.2002/P2B.2002.FDB -jnldirhost nobj06 -jnldirpath /usr/objy/P2B.2002/journals -fdnumber 5015 -pagesize 8192 P2B.2002.BOOT
+
+oonewfd -lockserverhost nobj06 -fdfilehost nobj06 -fdfilepath /usr/objy/P2C.2002/P2C.2002.FDB -jnldirhost nobj06 -jnldirpath /usr/objy/P2C.2002/journals -fdnumber 5016 -pagesize 8192 P2C.2002.BOOT
+
+oonewfd -lockserverhost nobj01 -fdfilehost nobj01 -fdfilepath /usr/objy/P2D.2002/P2D.2002.FDB -jnldirhost nobj01 -jnldirpath /usr/objy/P2D.2002/journals -fdnumber 5017 -pagesize 8192 P2D.2002.BOOT
+
+oonewdb -db runDB01 -host compass002d -filepath /shift/compass002d/data01/objsrvvy/sdb/runDB01.P1C.2001.DB P1C.2002.BOOT
+oonewdb -db runDB00 -host compass002d -filepath /shift/compass002d/data02/objsrvvy/sdb/runDB00.P1C.2001.DB P1C.2002.BOOT
+
+oonewdb -db runDB01 -host compass002d -filepath /shift/compass002d/data01/objsrvvy/sdb/runDB01.P2A.2002.DB P2A.2002.BOOT
+oonewdb -db runDB00 -host compass002d -filepath /shift/compass002d/data02/objsrvvy/sdb/runDB00.P2A.2002.DB P2A.2002.BOOT
+
+#Create HDR
+~/coral/src/evdb > ./createHDR.pl <BOOTFILE>
+
+# inject the schema (see createHDR.pl commented)
+
+tbed013d] ~/coral/src/evdb > ooschemaupgrade -infile schema.P1B.2002 ../../P1C.2002.BOOT
+
+oonewdb -db runDB00   -host compass001d -filepath /shift/compass001d/data03/objsrvvy/sdb/runDB00.P1A.2002.DB
+oonewdb -db directory -host compass001d -filepath /shift/compass001d/data03/objsrvvy/sdb/directory.P1A.2002.DB
+
+[lxplus071] ~ > nschmod 771  /castor/cern.ch/compass/data/2002/dump
+[lxplus071] ~ > nsls -l /castor/cern.ch/compass/data/2002
+drwxrwx--x   3 objsrvvy vy                        0 May 28 19:56 dump
+-rwxr-x---   1 objsrvvy vy                        0 May 24 19:34 dumpcdr01004-12947.dat
+
+#catalog
+#edit and ~objsrvvy/catalog_backup.pl
+# nsls -l /castor/cern.ch/compass/data/2002/raw/$newperiod and dst
+#castorFileCacheUpdate and castorFile
+#boot in castorFile/2002
+#check and fill /usr/local/compass/$period
+#test/exe_
+#
+
+
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/raw
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/raw/P1A
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/raw/P1B
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/raw/P2A
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/raw/P2B
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/dst
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/dst/P1A
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/dst/P1B
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/dst/P2A
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/dst/P2B
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/sdb
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/sdb/P1A
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/sdb/P2A
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/sdb/P1B
+[lxplus071] ~ > rfmkdir /castor/cern.ch/compass/data/2002/sdb/P2B
+
+Where to put *.BOOT?
+
+CDB2001!!! FDB=5002!!!
+
+
+
+on compass008d
+
+mkdir /usr/local/compass/P1A
+mkdir /usr/local/compass/P2A
+mkdir /usr/local/compass/P1B
+mkdir /usr/local/compass/P2B
+
+cp ~laman/coral/src/evdb/P1A.2002.BOOT /usr/local/compass/P1A
+cp ~laman/coral/src/evdb/Linux/stage1  /usr/local/compass/P1A
+
+Linux/mute P1A.2002.BOOT

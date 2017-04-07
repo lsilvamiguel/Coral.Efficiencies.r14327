@@ -1,0 +1,64 @@
+// $Id: trafdic.addendum.fieldoff.opt,v 1.4 2009/09/01 15:28:12 ybedfer Exp $
+
+// Addendum to "trafdic" options files, special for field OFF single zone reco.
+
+// - It is meant to overwrite some of the options specified by the standard,
+//  magnets ON, "./pkopt/trafdic.*.opt" files and therefore has to be included
+//  *AFTER* them in the  user's main options file.
+// - It covers only the most general aspects of field OFF reconstruction, mainly
+//  turning off those special features that have been designed specifically for
+//  the standard reconstruction and never checked in other contexts. For more
+//  specific applications, like, e.g., the reconstruction of field OFF data for
+//  alignment purposes, one has to overwrite yet other options.
+
+
+
+		// VARIOUS CUTS AND PARAMETERS
+TraF	dCut	[67]	0	// No foretracking to RichWall.		(TEv::ForeTrack2RICHWall)
+
+TraF	iCut	[ 5]	0	// No extra # Hits required for bridging over RICH	(Talgo::FinProj,FindSpace)
+
+TraF	iCut	[16]	1	// Pattern of zones where scifis enhanced.	(TEv::PrePattern,TAlgo::FindSpace)
+
+TraF	iCut	[29]	0	// Pattern of zones where special pixelGEM projection	(TEv::ImportClusters,PrePattern2)
+
+		// CUTS and PARAMETERS for PATTERN RECOGNITION (TEv::PrePattern;TAlgo::FindProj,FindSpace)
+				// Hit search window in term of sigmas of resolution
+                        	     // Max. track slope (tan(alpha))
+						// Extra width to accomodate curvature and MS in X, and in Y
+TraF	dPRpar	[  0-  3]	6.   0.1	0.1	0.04
+
+
+				// MIN. # OF HITS for PROJ. TRACKS
+				    // MAX. # OF COMMON HITS for 2 SPACE TRACKS
+				        // MIN. # OF HITS FOR SPACE TRACK
+						// SUBSEQUENT ITERATIONS
+								// MAX. # OF COMMON HITS for 2 PROJ. TRACKS (iter. 1 and 2 sqq, for short and long segments)
+TraF	iPRpar	[  0-  9]	4   0   20	3  0  16	0 0	2 1
+
+TraF	iPRpar	[ 90]	0	// Turn off PR for low momentum forward tracks
+TraF	iPRpar	[100]	0	// Turn off PR w/ 2-zone proj search in Z
+
+		// MODE SWITCHES
+TraF	ReMode	[ 3 ]	1	// > 0 <-> Track bridging is OFF 			(TEv::BridgeSegments)
+
+TraF	ReMode	[14]	0	// == 0 <-> No track cleaning based on dico fit		(TEv::PrePattern2)
+
+
+TraF	ReMode	[17]	0	// No GEM correlations			(TEv::PrePattern2)
+TraF	ReMode	[18]	0	// No backtracking			(TEv::BridgeSegments2)
+
+TraF	ReMode	[20]	0	// == 0 <-> Do not use (hence require) material maps
+
+TraF	ReMode	[24]	0	// == 0 <-> FullKF even for tracks w/o momentum	(TEv::TracksFit2)
+
+TraF	ReMode	[26]	0	// == 0 <-> No bridging over target.	(TEv:;BridgeSegments2)
+
+TraF	ReMode	[32]	0	// No foretracking to MAs		(TEv::TracksFit2)
+TraF	ReMode	[33]	0	// No foretrack to Hs			(TEv::TracksFit2,ForeTrack2Hs)
+
+	// TBNAMES of DETECTORS which DEAD ZONE is to be ACTIVATED SOFTWARE-WISE
+	// (Max 20., can be abbreviated, caveat: underscores are not recognised)
+TraF    DZisActive	GM	DC
+
+//end

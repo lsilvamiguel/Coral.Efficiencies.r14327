@@ -1,0 +1,6 @@
+echo "usage: source submit <exec> <coral_option_file>"
+echo Starting batch job $1 whith option file $2
+
+set Log=$HOME/coral.`date +%d_%m_%Y.%H_%M_%S`.log
+bsub -q8nh -R "select[cpuf>=2]" -J $2.`date +%d_%m_%Y.%H_%M_%S`  -o $Log `pwd`/$1 `pwd`/$2 
+

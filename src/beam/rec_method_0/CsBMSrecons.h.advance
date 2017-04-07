@@ -1,0 +1,110 @@
+// $Id: CsBMSrecons.h.advance,v 1.1 2000/08/13 10:57:03 khaustov Exp $
+
+/*!
+   \file CsBMSrecons.h
+   \brief Compass BMS reconstruction Class.
+   \author  G. Khaustov
+   \version $Revision: 1.1 $
+   \date    $Date: 2000/08/13 10:57:03 $
+*/
+#include<string>
+#ifndef CsBMSrecons_h
+#define CsBMSrecons_h
+#include "CsBMSconstants.h"
+#include "CsHistograms.h"
+#include "CsDetector.h"
+//
+#define NTRACKMX 300                              // Max. number of BMS tracks
+#define BMSBUFSIZE 64                            // Input buffer size
+#define NBMSHODS    4                            // Number of Hodoscope planes
+//
+class CsBMSrecons : private CsBMSconstants {
+public:
+        ifstream input_file;      // for TEST only !!!!!!!!!!!
+         CsBMSrecons();
+	 void test(void);
+         void rawevprint(ostream &out) const;
+         void prntclb(ostream &out, double calib[][NBMSHODS]) const;
+         void bmsprnt(ostream &out) const;
+         void getBMStrack(const int n, double &pmom, double &pchiq, 
+                          double &mntime, double &tmchiq, 
+                          int &nhit, int& nhttot ) const;
+         inline int getBMSnmb(void) {return ntrack;};
+         inline double getBMStm(const int n) {
+                      if((n<0)||(n>=ntrack)) return(0);
+                      return (TRKtime[n]); };
+         void getBMSmoments(const int n, double& m0, double& m1) const;
+         double getNewChi2(const int n, const double nmtime) const;
+	 void bmsrec(void);
+private:
+//
+//      constants and calibrations
+//
+        int Printlev;
+        int itrg16;
+        int mxnmbhit;                           //  mx.number of hits/plane
+        double TMt0[64][NBMSHODS];
+        double TDCSLP[64][NBMSHODS];                   // TDC calibration (time slopes)  
+        double BMSMN1[10]; 
+        double BMSpar[10];                      // Selection parameters
+        double tmresol[NBMSHODS];                      // BMS time resolution
+        double disp[NBMSHODS];
+//         
+//       BMS description          
+//
+        int nhod;                               // Number of the BMS hodoscopes 
+        double BMStable[64][NBMSHODS];                 // BMS hodoscope decoding table
+        CsDetector*  Id[NBMSHODS];                  // IDs for BMS Hods 0-3
+        string hodnames[NBMSHODS];                  // names for BMS Hods 0-3
+        int   hodsize[NBMSHODS];                    // Number of elements in the BMS hodoscopes
+        int  Idpln0, Idpln1, Idpln2, Idpln3;    // IDs for BMS Hods 0-3
+        string nmhod0, nmhod1, nmhod2, nmhod3;  // names for BMS Hods 0-3
+//
+//      beam track parameters
+//
+        int ntrackmx;
+        int ntrack;
+        int nhittotal; 
+        double TRKp[NTRACKMX]; 
+        double TMchiq[NTRACKMX];
+        double SPchiq[NTRACKMX];
+        int    TRKhit[NTRACKMX];
+        double TRKtime[NTRACKMX];
+        double TRKy[NTRACKMX][NBMSHODS];
+//
+//       common working arrays
+//
+        int nfired;                            // Number of BMS planes fired 
+        int khit16[NBMSHODS];                         // Number hits in hodoskope
+        int ibmz16[BMSBUFSIZE][NBMSHODS];                   // hit cell numbers 
+        int iflc16[BMSBUFSIZE][NBMSHODS];
+        double tbmz16[BMSBUFSIZE][NBMSHODS];
+        double zhit16[BMSBUFSIZE][NBMSHODS];                   // decoded hit coordinates
+        int TRKindx[NTRACKMX][NBMSHODS]; 
+        long int nrunold;
+//
+        void bookhist(void);   
+	void moment3(double *, double *, double *);
+	void moment4(double *, double *, double *);
+	int decode(void);
+	void tstdecode(void);
+	void track(void);
+	void BMStbl(void);
+        bool readcalib(void);
+        bool init(void);
+        int compress(int start);
+//
+        CsHist1D *HiNhit[NBMSHODS], *HiFired[NBMSHODS], *HiProf[NBMSHODS];
+        CsHist1D *HiHtime[NBMSHODS],*HiHtime1[NBMSHODS],*HiHtime2[NBMSHODS];
+        CsHist1D *HiHpro4[NBMSHODS],*HiHpro3[NBMSHODS], *HiHpro1[NBMSHODS];
+        CsHist1D *HiYpro4[NBMSHODS];
+        CsHist1D *HiNTrack,  *HiBmom4,    *HiBmom3;
+        CsHist1D *HiTMchi4,  *HiTMchi3,   *HiSPchi4, *HiSPchi3;      
+        CsHist1D *HiTime4,   *HiTime3,    *HiNhtev;
+        CsHist1D *HiBmom1,   *HiTMchi1,   *HiSPchi1, *HiTime1;
+        CsHist1D *Hit0t1dif, *Hit0t2dif,  *Hit0t3dif;
+        CsHist2D *Hit0t1,    *Hit0t2,     *Hit0t3;
+        CsHist2D *HiTmVsHt[NBMSHODS],  *HiN4h3h;
+};
+//
+#endif // CsBMSrecons

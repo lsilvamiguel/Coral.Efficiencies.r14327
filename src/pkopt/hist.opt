@@ -1,0 +1,36 @@
+// $Id: hist.opt 14070 2015-09-20 01:36:58Z lsilva $
+
+// ======================================
+// Switches for detector basic histograms
+// <TBName> hist level none|normal|high 
+// <TB> hist level none|normal|high  
+//
+// by default (that is: detector not found in following list)
+// hist level is none
+//
+// ======================================
+
+BM hist level none	//BMS
+DC hist level none	//Drift Chambers
+DR hist level none	//Drift Chambers
+DW hist level none	//``W45''
+FI hist level none	//Sci Fi's (German and Japan)
+GM hist level none	//GEM
+GP hist level none	//PixelGEM
+HI hist level none	//TrigHodoscope Inner
+HL hist level none	//TrigHodoscope Ladder
+HM hist level none	//TrigHodoscope Middle
+HH hist level none	//Hodoscope ?
+HO hist level none	//TrigHodoscope Outer
+HG hist level none	//TrigHodoscope LAS
+MA hist level none	//Muon Wall 1
+MB hist level none	//Muon Wall 2
+MM hist level none	//Micromegas
+MP hist level none	//PixelMicromegas
+PS hist level none	//MWPC-A*
+PA hist level none	//MWPC-A
+PB hist level none	//MWPC-B
+SI hist level none	//Silicons
+ST hist level none	//Straw Tubes
+VI hist level none	//InnerVeto
+VO hist level none	//OuterVeto

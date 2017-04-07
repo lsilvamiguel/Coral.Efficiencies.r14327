@@ -1,0 +1,133 @@
+// $Id: traf.LONGT.2002.opt,v 1.2 2003/03/06 09:27:28 hpereira Exp $
+//
+// coral option file 
+// for trafdic, run 2002, longitudinal
+//
+
+// SEED FOR RANDOM NUMBER GENERATIONS:
+random number engine JamesEngine
+random number seed 19990102
+
+// DECODING MAPS
+decoding map /afs/cern.ch/compass/detector/maps
+
+// RECONSTRUCTION SCHEMA
+reconstruction schema 1			// RECONSTRUCTION SCHEMA
+make decoding
+make clustering
+make tracking
+make tracking				// TRACKING
+track prepattern method traffic
+track bridging   method traffic
+track fitting    method traffic
+
+// DEFINE GEOMETRICAL ZONES
+define zone 0 3500 before M1
+define zone 3500 17000 between M1 and M2
+define zone 17000 32500 between M2 and Muon Wall
+define zone 32500 99999 after Muon Wall
+define zone -8000 0 before the target
+
+// MAGNETIC FIELD MAPS
+CsField SOL_field /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SOL/smctgt_solenoide.fieldmap
+CsField SM1m_field /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.01.data
+CsField SM1m_field_measured /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.172.data
+CsField SM2_field  /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM2/FSM.map.4000.data
+CsMagInfo Solenoid /afs/cern.ch/compass/detector/calibrations/2002/polarization.2002.list
+
+// MATERIAL MAPS
+CsMaterialMap Zone_1 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.target.m2002.01.map
+CsMaterialMap Zone_2 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.saclay.m2002.01.map
+CsMaterialMap Zone_3 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.straw.m2002.01.map
+CsMaterialMap Zone_4 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf2.m2002.01.map
+CsMaterialMap Zone_5 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf3.m2002.01.map
+CsMaterialMap Zone_6 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.hcal1.m2002.01.map
+CsMaterialMap Zone_7 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf1.m2002.01.map
+CsMaterialMap ELossTarget /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.target_de.m2002.01.map
+
+#include ${CORAL}/src/pkopt/IS_MWPC.opt
+
+make beam reconstruction		// Beam RECONSTRUCTION 
+include ${CORAL}/src/pkopt/beam_2002.opt
+
+// Overwrite what's set in "beam.opt"
+BeamRecons useTRAFFIC  1      // >0: Traffic is used, =0: standalone beampackage is used
+make vertex reconstruction		// Vertex RECONSTRUCTION
+vertex pattern method averaging
+vertex fitting method kalman
+include ${CORAL}/src/pkopt/vertex.2002.opt
+
+// Overwrite what's set in "vertex.opt"
+CsAverPattern  Hist        1     // 0 - Off, 1 - ON
+CsAverPattern  findSec     1     // 0 - Off, 1 - ON
+CsAverPattern  Print [ 0 ] 0     // Prefilter info.
+CsAverPattern  Print [ 1 ] 0      // Error info. 
+CsKalmanFitting  Hist      1     // 0 - Off, 1 - ON
+
+include ${CORAL}/src/pkopt/rich1.opt	      // RICH1
+include ${CORAL}/src/pkopt/calorim.opt	    // CALORIMETERS
+include ${CORAL}/src/pkopt/trigger.2002.opt	// MU' PID
+
+
+// OPTIONS FOR THE LOGGER: debugging, verbose, info, anomaly, warning, error, fatal
+error logger log level   error
+error logger store level none
+error logger verbosity   low	//low, normal, high. 
+
+// TraFDic
+include ${CORAL}/src/pkopt/trafdic.22754.opt
+
+//=== Override what's in TraFDic file
+// HISTOGRAMMING
+histograms package ROOT
+histograms home traf.LONGT.root.22019
+
+// RUN
+Data job				
+Data type   raw
+Database select oracle
+Data year   2002
+Data period P2D
+Data run select 22019	
+Data container cdr19006-22019
+
+// DETECTOR TABLE
+detector table /afs/cern.ch/user/h/hpereira/public/detectors/detectors.22019.dat
+
+// NUMBER OF EVENTS
+events to read 10000			
+events refresh rate 100
+
+// DETECTORS TO BE CALIBRATED. 
+// WARNING: THEY ALSO MUST BE OFF FOR TRAFFIC 
+main do calibration MA MB  
+main chi2 cut 30  // cut on chi2/ndf
+main require cop  // uncomment this if you want to keep only track with momentum
+selection trigger mask 7 // trigger selection
+
+// CALIBRATIONS
+use calibration				
+CDB use FileDB
+CDB location /afs/cern.ch/compass/detector/calibrations/2002
+
+// TRAFDIC OPTIONS
+TraF Graph [0]	0 // main graphics switch ( 0 == "Event display is OFF") 
+TraF Hist	 [0]	1	// if == 0, all Traffic histograms are OFF
+TraF iCut  [0] 	7	// Trigger selection
+TraF Dicofit /afs/cern.ch/compass/scratch/d05/ybedfer/dicos/dico.22019.minus	// .plus or .minus depending upon solenoid sign
+TraF DetNameOff VO VI HI HL HM HO MB MA
+
+//=== Smoothed helices for extrapolations  
+TraF	SmoothPos [0]	100.	
+TraF	SmoothPos [1]	230.
+TraF	SmoothPos [2]	450.	
+TraF	SmoothPos [3]	550.	
+TraF	SmoothPos [4]	920.	
+TraF	SmoothPos [5]	1550.	
+TraF	SmoothPos [6]	2030.	
+TraF	SmoothPos [7]	2300.	
+TraF	SmoothPos [8]	3900.	
+TraF	SmoothPos [9]	5000.	
+
+// end
+

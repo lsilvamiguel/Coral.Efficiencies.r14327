@@ -1,0 +1,145 @@
+
+CC              = gcc
+CXX             = c++
+LIBRARY=CondDB
+
+OBJS = CondDbHandler.o
+LHCTOP = /afs/cern.ch/sw/lhcxx/specific/redhat61/gcc-2.95.2
+
+C_INCLUDES =-I$(LHCTOP)/Objectivity/6.1/include
+C_INCLUDES +=-I$(LHCTOP)/HepODBMS/0.3.2.9/include
+C_INCLUDES +=-I$(LHCTOP)/ConditionsDB/0.2.1.0/include
+C_INCLUDES +=-I$(LHCTOP)/HepUtilities/0.5.0.0/include 
+
+LIBS =-L$(LHCTOP)/Objectivity/6.1/lib -loo -loo_co -looseccl
+LIBS +=-L$(LHCTOP)/HepODBMS/0.3.2.9/lib -lHepODBMS
+LIBS +=-L$(LHCTOP)/ConditionsDB/0.2.1.0/implementationObjy/lib -lConditionsDB
+LIBS +=-L$(LHCTOP)/HepUtilities/0.5.0.0/lib -lHepUtilities 
+LIBS += -rdynamic -lpthread -ldl
+
+CXXFLAGS = -ansi -DLinux -Dlong32=int -Dlong64="long long" -fnonnull-objects $(C_INCLUDES)
+
+#
+#DB parameters
+#private
+FDBHOST    = lockcomp #Lock Server
+FDBPATH    = /usr/objy/na58fd
+FDBFILE    = $(FDBPATH)/cdb.$(USER).2001.FDB
+BOOTFILE   = cdb.2001.BOOT
+FDNUMBER   = 1
+DBSERVER   = compass001d
+DBNAME     = CDB.$(USER)
+DBFILEPATH = /shift/compass001d/data01/objsrvvy/cdb
+SCHEMA     = schema.dmp.20010529
+CDBGENERAL = conditionsDBGeneral.$(USER)
+
+#TEST
+AZDB      = /afs/cern.ch/compass/scratch/d01/DB
+INPUTFILE = SiFi_1011~~start-2000-09-06-05:08:26~~finish-2000-09-06-05:09:45
+TESTFOLDER=/compass/FI01X1__/t0  
+BTIME     = 2648
+ETIME     = 2649
+#
+
+#TOOLS
+MKFOLDER   = mkFolder
+MKFOLDERSET= mkFolderSet
+TOOLS      = $(MKFOLDER) $(MKFOLDERSET)
+#APP
+STORER     = storeCDB
+READER     = readCDB
+APPS	   = $(STORER) $(READER)
+#
+
+#Handler
+LIBHAND    = -L./ -lCondDB
+#
+
+.cc.o:
+	$(CXX) $(CXXFLAGS) -c $*.cc -o $*.o  
+
+all: lib tools app
+
+lib : libCondDB.so
+
+libCondDB.so : $(OBJS)
+	$(CXX) -shared -o $@ $(OBJS)
+
+#required tools
+tools: mkFolderSet mkFolder
+
+#examples
+app: storeCDB readCDB
+
+#make Federation Database and Conditions Database
+cdb: fdb db folderset folder
+
+#Store/Read test
+test: store_test read_test
+
+mkFolderSet : mkFolderSet.cc
+	$(CXX) $(CXXFLAGS) $(C_INCLUDES) -o mkFolderSet mkFolderSet.cc $(LIBS)
+
+mkFolder : mkFolder.cc
+	$(CXX) $(CXXFLAGS) $(C_INCLUDES) -o mkFolder mkFolder.cc $(LIBS)
+
+storeCDB : storeCDB.cc
+	$(CXX) $(C_FLAGS) $(C_INCLUDES) -o storeCDB storeCDB.cc $(LIBS) $(LIBHAND)
+
+readCDB : readCDB.cc
+	$(CXX) $(C_FLAGS) $(C_INCLUDES) -o readCDB readCDB.cc $(LIBS) $(LIBHAND)
+
+
+store_test:
+	$(STORER) $(BOOTFILE) $(TESTFOLDER) $(AZDB)/$(INPUTFILE) $(BTIME) $(ETIME)
+
+read_test:
+	$(READER) $(BOOTFILE) $(BTIME) $(ETIME)
+
+clean:
+	rm -fr *.o $(MKFOLDER) $(TOOLS) $(APPS)
+
+
+#
+#Objectivity
+#
+
+fdb: $(BOOTFILE)
+
+$(BOOTFILE):
+	oonewfd  -fdfilehost $(FDBHOST) -fdfilepath $(FDBFILE) \
+	-fdnumber $(FDNUMBER) -lockserverhost $(FDBHOST) $(BOOTFILE)
+	ooschemaupgrade -infile $(SCHEMA) $(BOOTFILE)
+
+db: fdb
+	oonewdb -db $(DBNAME) -host $(DBSERVER)\
+	 -filepath /shift/compass001d/data01/objsrvvy/cdb $(BOOTFILE)
+
+folderset: 
+	$(MKFOLDERSET) $(BOOTFILE)
+	oochangedb -db conditionsDBGeneral -host $(DBSERVER)\
+	 -filepath $(DBFILEPATH)/$(CDBGENERAL).$(BOOTFILE) $(BOOTFILE)
+
+folder: 
+	$(MKFOLDER) $(BOOTFILE)
+
+delete_fdb:
+	oodeletefd -force $(BOOTFILE)
+
+delete_db:
+	oodeletedb -all -force $(BOOTFILE)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

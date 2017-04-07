@@ -1,0 +1,299 @@
+// $Id: trafdic.SAT.opt,v 1.2 2004/01/04 01:24:53 ybedfer Exp $
+
+// Example coral options file for TraFDic on magnets OFF data:
+//  - To be used for alignment purposes (SAT backbone TTree based alignment) or
+//   serve as a basis for running the reco for SAT detector studies.
+//  - W/ a master zone spanning target<->GM09
+//   and 2 zones up/downstream for extrapolating from SAT backbone
+//  - 2003 compatibility not yet checked.
+
+// This is to be completed by:
+//   I) Specifying input data one wants to process instead of the default
+//     run #22751
+//  II) Adding whatever options are needed to enable a given output, e.g.
+//     DST output or ROOT tree.
+// III) (Possibly) Trigger selection
+
+// $Log: trafdic.SAT.opt,v $
+// Revision 1.2  2004/01/04 01:24:53  ybedfer
+//  - Have TraFDic (and detectors) options specific to the magnets OFF case
+//   specified in this header file.
+//  - Align with "./trafdic.2002.opt" for the rest of the options.
+//
+// Revision 1.1  2003/01/30 13:49:28  ybedfer
+//  Example options file for magnets off.
+//
+// Revision 1.1  2002/06/15 00:14:31  ybedfer
+//  Example on options file to run coral w/ TraFDic on 2002 data.
+//
+// Revision 1.12  2002/06/08 00:23:51  ybedfer
+//  Use "map4" where all symlinked to "~compass/detector/maps/2001.xml" except
+// STRAWS.
+//
+// Revision 1.11  2002/06/07 17:39:30  ybedfer
+//  ...
+//
+// Revision 1.10  2002/06/07 17:27:26  ybedfer
+//  New paging.
+//
+// Revision 1.9  2002/05/25 22:50:42  ybedfer
+//  Added options, commented out, for ROOT tree output.
+//
+// Revision 1.8  2002/05/08 15:02:02  korzenev
+// trigger: mu' ID
+//
+// Revision 1.7  2002/05/06 12:49:03  korzenev
+// new matireal map for H5 region
+//
+// Revision 1.6  2002/04/23 01:34:49  ybedfer
+//  Boundary between zones #2 and #3 moved behind HI04.
+//  ...and other minor changes.
+//
+// Revision 1.5  2002/04/23 01:16:03  ybedfer
+//  - Drift-like options moved out.
+//
+// Revision 1.4  2002/03/28 13:53:52  ybedfer
+//  ..
+//
+
+//			 		   ***** ROOT tree OUTPUT
+CsOutnt Print 	0      // 1 - On, 0 - Off
+//		MC track Rec track MC vert  Rec vert  Calor  Clusters  Digit
+//CsOutnt BLOCK	    0	     1         0	 1	 1	 0	  0
+//CsOutnt Cond	    0	     1	       0	 0	 0	 1	  0
+//CsOutnt Cluster  MM  GM  // define clusters of which detector to store
+//CsOutnt ChipF1  H	// define digits of which detector to store
+//CsOutnt CsOutnt trkMom  // store tracks with momentum only
+//CsOutnt MagField
+
+//make DST 4				// ***** DST OUTPUT
+
+
+//					   ***** HISTOGRAMMING
+histograms package ROOT
+
+histograms home		${HOME}/trafdic.SAT.root
+
+Data job				// ***** THIS IS A DATA RUN
+
+					// ***** INPUT DATA...
+
+					// ...either raw file
+//Data file	/castor/cern.ch/compass/data/2002/dump/cdr14002-22016.dmp
+Data file	/shift/pccoeb15/data01/objsrvvy/cdr/cdr15001-22751.dat
+
+					// ...or retrieved from oracle DB
+//Data type   raw
+//Database select oracle
+
+//Data year   2002
+//Data period P2D
+//Data run select 22019
+//Data container cdr19006-22019
+
+
+
+// 					   ***** DETECTOR TABLE...
+detector table	/afs/cern.ch/user/y/ybedfer/public/maps2002/detectors.22751.dat
+
+// 					   ***** MATERIAL MAPS
+
+CsMaterialMap Zone_1 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.target.m2002.02.map
+CsMaterialMap Zone_2 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.saclay.m2002.02.map
+CsMaterialMap Zone_3 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.straw.m2002.02.map
+CsMaterialMap Zone_4 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf2.m2002.02.map
+CsMaterialMap Zone_5 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf3.m2002.02.map
+CsMaterialMap Zone_6 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.hcal1.m2002.02.map
+CsMaterialMap Zone_7 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.muf1.m2002.02.map
+CsMaterialMap Zone_8 /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.rich.m2002.02.map
+CsMaterialMap ELossTarget /afs/cern.ch/compass/delivery/comgeant/0-0-6.09/data/material/material.target_de.m2002.02.map
+
+use calibration 	 	 	// ***** CALIBRATION
+CDB use MySQLDB
+//CDB server pccoeb03 	// pccoeb03 is located in 888 (powercuts at times!..)
+CDB server tbed014d 	// tbed014d is in computer center (fewer powercuts)
+//CDB server ????????	// New server reachable outside Cern foreseen in april
+
+//CDB entrytime 2003-12-04-18:00:00	// Uncommented implies: NO trigger matrix check for mu ID
+// With MySQLDB entrytime can affect now only a TBName or a set of TBNames:
+// "TBname(or TB) CDBentrytime(sic!)"
+//ST CDBentrytime 2003-10-01-00:00:00	// Files registered before specif'd date
+
+
+decoding map	/afs/cern.ch/compass/detector/maps/2002.xml	// ***** MAPPING
+
+
+events to read 26000			// ***** EVENT SELECTION
+//events to skip 843 //139 //705 //229 //843
+//events BOS_skip 1.22			// skip first ~400(? cf. Jürgen) ms in spill (disabled)
+//selection trigger mask f		// Trigger selection (hexadecimal)
+
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+//reset random seed every new event
+
+//ST IS_MWPC
+ST03U1da IS_MWPC
+ST03U1dc IS_MWPC
+ST03U1ua IS_MWPC
+ST03U1uc IS_MWPC
+ST03V1da IS_MWPC
+ST03V1dc IS_MWPC
+ST03V1ua IS_MWPC
+ST03V1uc IS_MWPC
+ST03X1da IS_MWPC
+ST03X1dc IS_MWPC
+ST03X1ua IS_MWPC
+ST03X1uc IS_MWPC
+ST03X2da IS_MWPC
+ST03X2dc IS_MWPC
+ST03X2ua IS_MWPC
+ST03X2uc IS_MWPC
+ST03Y1da IS_MWPC
+ST03Y1dc IS_MWPC
+ST03Y1ua IS_MWPC
+ST03Y1uc IS_MWPC
+ST03Y2da IS_MWPC
+ST03Y2dc IS_MWPC
+ST03Y2ua IS_MWPC
+ST03Y2uc IS_MWPC
+ST04V1da IS_MWPC
+ST04V1dc IS_MWPC
+ST04V1ua IS_MWPC
+ST04V1uc IS_MWPC
+ST04X1da IS_MWPC
+ST04X1dc IS_MWPC
+ST04X1ua IS_MWPC
+ST04X1uc IS_MWPC
+ST04Y1da IS_MWPC
+ST04Y1dc IS_MWPC
+ST04Y1ua IS_MWPC
+ST04Y1uc IS_MWPC
+MB IS_MWPC
+//DW IS_MWPC
+
+pattern method 1        // not used yet
+tracking method 1       // not used yet
+
+// 					   ***** DECODING
+make decoding 	 	// <nothing>, MCExact
+
+//  	 	 	 	 	   ***** CLUSTERING
+make clustering 	// <nothing>, MCExact, MCSmeared, MCQuantized
+
+reconstruction schema 1			// ***** RECONSTRUCTION SCHEMA
+
+make tracking				// ***** TRACKING
+track prepattern method traffic
+track bridging   method traffic
+track fitting    method traffic
+
+
+//make beam reconstruction		// ***** Beam RECONSTRUCTION 
+include ${CORAL}/src/pkopt/beam_2002.opt
+//                   Overwrite what's set in "beam.opt"
+BeamRecons    useTRAFFIC  1    // >0: Traffic is used, =0: standalone beampackage is used
+BeamRecons AllowMultCand  2
+
+//make vertex reconstruction		// ***** Vertex RECONSTRUCTION
+vertex pattern method averaging
+vertex fitting method kalman
+include ${CORAL}/src/pkopt/vertex.2002.opt
+//                   Overwrite what's set in "vertex.opt"
+CsAverPattern  Hist	1	// 0 - Off, 1 - ON
+CsAverPattern  findSec	1	// 0 - Off, 1 - ON
+CsAverPattern  Print [ 0 ]	0	// Prefilter info.
+CsAverPattern  Print [ 1 ]	0	// Error info. 
+// track is considered as accepted if its momentum is smaller
+// than "AcceptTill" percents of beam track
+CsAverPattern	AcceptTill	90	// in %
+//                     Z Dist(from centre)  DCA(number of sigmas)
+CsAverPattern	CUTS		1600			10
+CsKalmanFitting  Hist	1	// 0 - Off, 1 - ON
+CsKalmanFitting  Print [ 0 ]	0	// Kalman filter info.
+CsKalmanFitting  Print [ 1 ]	0	// Global fit info.
+CsKalmanFitting  Print [ 2 ]	0	// IKF info.
+
+
+//make rich1 reconstruction			// ***** RICH1
+include ${CORAL}/src/pkopt/rich1.2003.opt
+
+
+
+//make calorimeters reconstruction		// ***** CALORIMETERS
+include ${CORAL}/src/pkopt/calorim.opt
+
+//include ${CORAL}/src/pkopt/trigger.opt	// ***** MU' PID
+
+
+//  	 	 	 	 	   ***** GEOMETRICAL ZONES
+define zone 0 25000 before M1
+//define zone 0 32000 before M1
+//define zone 17000 17100 between M1 and M2
+define zone 25100 99999 between M2 and Muon Wall
+//define zone 32100 99999 between M2 and Muon Wall
+//define zone 32500 99999 after Muon Wall
+
+define zone -8000 0 before the target
+
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+
+CsField SOL_field	 /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SOL/smctgt_solenoide.fieldmap
+//CsField SOL_field	 /afs/cern.ch/compass/delivery/comgeant/0-0-6.08/data/mag_fields/SOL/smctgt_dipole.fieldmap
+
+CsField SM1m_field	 /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.01.data
+
+CsField SM1m_field_measured /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.172.data
+
+CsField SM2_field	 /afs/cern.ch/compass/mc/comgeant/data/mag_fields/SM2/FSM.map.4000.data
+
+CsMagInfo	MySQLDB			// ***** MAGNETs INFO
+//CsMagInfo	File	~ybedfer/public/magInfo.2003.txt	// ...if MySQL not avail
+CsMagInfo	SM2	0		// ==0: Do NOT use NMR, !=0: Rescaling factor (applied to NMR corrected map)
+
+//					   ***** LOGGER
+error logger log level   error		// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level none
+error logger verbosity   normal		// low, normal, high. 
+
+
+
+//	  	  	  	  	   ***** TraFDic (+DET OPTIONS+...)
+
+include ${CORAL}/src/pkopt/trafdic.2002.opt
+
+//                   Overwrite what's set in "../pkopt/trafdic.2003.opt"
+//TraF	SmoothPos [0]	745.1		// Smooth track at Rich entrance
+//TraF	Graph	[6]	1		// For interactive coral w/o graphics
+//TraF	iCut	[0]	7		// Trigger selection in TraFDic
+//TraF	Print	[8]	1		// EoE
+
+no associated MWPC digits
+
+TraF	iCut [ 5 ] 	0	// Extra # Hits for bridging over RICH
+TraF	iCut [ 7-10 ] 	9 9 9 9	// Alig TTree
+
+TraF	dPRpar [  0 -  3 ]	2.5  0.080	0.115	0.015
+TraF	dPRpar [ 10 - 13 ]	5.  0.500 	0.100	0.060
+TraF	dPRpar [ 20 - 23 ]	3.   0.03	0.	0.
+
+TraF	iPRpar [  0 -  5 ]      9   2  31	8  2 26
+TraF	iPRpar [ 10 - 15 ]	4   2  15	4  2 13
+TraF	iPRpar [ 20 - 25 ]	2   4  11       3  2 11		// W/ Si
+
+TraF	ReMode [ 3 ]	1	// if > 0 - track bridging is OFF 				(TEv::BridgeSegments)
+TraF    ReMode [14]     0       // != 0 <-> Quasi-Newton fit enabled ...
+				// ... &2: using dico, &4: using fast fit
+TraF	ReMode [18]	0	// Backtrack. &0x1: Zone 1 (&0x2: even w/out P). &0x4: Zone 2
+TraF	ReMode [24]	0	// > 0 - no FullKF for tracks without momentum
+
+	// TBNAMES of DETECTORS to be EXCLUDED FROM PATTERN RECOGNITION
+	// (Max 20., can be abbreviated, caveat: underscores are not recognised)
+TraF	DetNameOff	VO	VI	BM	FI	PS	PA	PB	DC	ST	DW	MA	MB	SI	GM10	H
+
+TraF    DZisActive	GM	DC
+
+//end

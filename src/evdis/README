@@ -1,0 +1,26 @@
+COMPASS Event Display based one ROOT's TEve
+===========================================
+
+Enable it by configuring CORAL with the "--enable-NewEDIS" options.
+
+Unfortunately the standard ROOT geometry cannot be used, as the axis from that
+geometry created from COMGeant are not correct. The geometry required for the
+event display needs to adhere to the standard CORAL conventions (X: from
+Saleve to Jura, Y: from bottom to top, Z along the beam axis). The
+"convert.pl" script does that. Also the geometry has to be saved in a ROOT
+file, not as a macro.
+
+Example how to create a suitable geometry:
+./convert $COMPASS_FILES/geometry/2012/ROOTGeometry/detectors.primakoff.r371.C
+root detectors.C
+[0] gGeoManager->SetTitle("COMPASS geometry for the event display")
+[1] gGeoManager->Export("detectors.root", "evdisgeo")
+
+The event display can be controlled by two options:
+
+* The tag "event display" switches the event display on.
+* The geometry has to be defined by the "event display geometry" option.
+
+Example (append to the CORAL options file):
+event display
+event display   geometry    [path to special geometry from above]

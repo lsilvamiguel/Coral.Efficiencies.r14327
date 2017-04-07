@@ -1,0 +1,46 @@
+// $Id: calorim.opt 13185 2012-01-10 09:58:21Z suhl $
+
+
+// CALORIMETERS
+
+// EC01P1__ MC response MCSmeared
+// EC02P1__ MC response MCSmeared
+// HC01P1__ MC response MCSmeared
+// HC02P1__ MC response MCSmeared
+
+// EC01P1__ MC response MCExact
+// EC02P1__ MC response MCExact
+// HC01P1__ MC response MCExact
+// HC02P1__ MC response MCExact
+
+EC01P1__ BookHistograms
+EC02P1__ BookHistograms
+HC01P1__ BookHistograms
+HC02P1__ BookHistograms
+
+//      Possible RecoOptions:
+//      ---------------------
+// Option                               Possible values         Defaulf value
+// ------                               ---------------         -------------
+// DEBUG                                some integer            -1
+// PARTICLE_DEFAULT                     some integer            Particle::GAMMA
+// CALIB                                YES, NO                 NO
+// CALIB_ENERGY                         some float              0
+// ENABLE_TIME_CALIB                    YES, NO                 NO
+// TIME_GATE_CALIB                      some float              5.0
+// CLUSTER_SEARCH                       YES, NO                 NO
+// CLUSTER_SEARCH_ONLY                  YES, NO                 NO
+// USE_HINT_PARTICLES                   YES, NO                 NO
+// FIT                                  SIMPLE, NORMAL          SIMPLE
+// HIST                                 YES, NO                 YES
+// HIST_ENERGY_MAX                      some float              200.
+// PARTICLE_ENERGY_THRESHOLD            some float              0.3
+// CELL_ENERGY_THRESHOLD                some float              0.1
+// CLUSTER_SEARCH_CELL_ENERGY_THRESHOLD some float              0.02
+// CLUSTER_SEARCH_CELL_AMPL_DEVIATION   some float              2
+
+EC01P1__ RecoOptions HIST=YES FIT=SIMPLE DEFAULT_CALIBRATION=0.03 PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1 TOLERANCE_FOR_NEARBY_CELLS=15.0 PROB_CELL_NOISE=0.0005 
+EC02P1__ RecoOptions HIST=YES FIT=SIMPLE DEFAULT_CALIBRATION=0.03 PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1 PROB_CELL_NOISE=0.0001 
+
+HC01P1__ RecoOptions HIST=YES FIT=SIMPLE DEFAULT_CALIBRATION=0.03 PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1 PROB_CELL_NOISE=0.001 
+HC02P1__ RecoOptions HIST=YES FIT=SIMPLE DEFAULT_CALIBRATION=0.05 PARTICLE_ENERGY_THRESHOLD=0.2 CELL_ENERGY_THRESHOLD=0.1 PROB_CELL_NOISE=0.001  

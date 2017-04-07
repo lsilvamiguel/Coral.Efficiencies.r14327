@@ -1,0 +1,56 @@
+#!/bin/csh
+
+if ( $?CDB_TOOLS ) then
+  echo 'The setup script has been run in this environment already'
+else
+  setenv CDB_TOOLS /afs/cern.ch/compass/scratch/d01/cdb_tools
+  setenv OO_FD_BOOT /afs/cern.ch/compass/scratch/d01/cdb_tools/cdb.2001.BOOT
+
+  setenv DIR_Objectivity  @DIR_Objectivity@
+  setenv DIR_ConditionsDB @DIR_ConditionsDB@
+  setenv DIR_HepUtilities @DIR_HepUtilities@
+  setenv DIR_HepODBMS     @DIR_HepODBMS@
+
+  # Create (if it does not exist) variable LD_LIBRARY_PATH
+  if !( $?LD_LIBRARY_PATH ) then
+    setenv LD_LIBRARY_PATH
+  endif
+
+  if !( $?XFILESEARCHPATH ) then
+    setenv XFILESEARCHPATH
+  endif
+
+  if !( $?XBMLANGPATH ) then
+    setenv XBMLANGPATH
+  endif
+
+  if !( "$DIR_Objectivity" == "" ) then
+    setenv LD_LIBRARY_PATH ${DIR_Objectivity}/lib:${LD_LIBRARY_PATH}
+    setenv PATH $DIR_Objectivity/bin:$PATH
+    setenv XFILESEARCHPATH  $DIR_Objectivity/etc/app-defaults/%N:$XFILESEARCHPATH
+    setenv XBMLANGPATH      $DIR_Objectivity/etc/bitmaps/%N/%B:$XBMLANGPATH
+  else
+    unsetenv OO_FD_BOOT
+  endif
+
+  if !( "$DIR_ConditionsDB" == "" ) then
+    setenv LD_LIBRARY_PATH ${DIR_ConditionsDB}/implementationObjy/lib:${LD_LIBRARY_PATH}
+  endif
+
+  if !( "$DIR_HepODBMS" == "" ) then
+    setenv LD_LIBRARY_PATH ${DIR_HepODBMS}/lib:${LD_LIBRARY_PATH}
+  endif
+
+  if !( "$DIR_HepUtilities" == "" ) then
+    setenv LD_LIBRARY_PATH ${DIR_HepUtilities}/lib:${LD_LIBRARY_PATH}
+  endif
+
+  setenv LD_LIBRARY_PATH ${PWD}/lib/Linux:${LD_LIBRARY_PATH}
+
+  # CORAL libraries
+
+  unsetenv DIR_Objectivity
+  unsetenv DIR_ConditionsDB
+  unsetenv DIR_HepODBMS
+  unsetenv DIR_HepUtilities
+endif

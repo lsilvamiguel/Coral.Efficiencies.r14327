@@ -1,0 +1,11 @@
+
+This directory does not contain the latest version of
+the raytracing routines!
+
+The latest versions of RayTrace.cc and RayTrace.h
+are located one level above to simplify
+the make procedure.
+
+At some point maybe the raytracing software will
+be packed into a separate library...
+

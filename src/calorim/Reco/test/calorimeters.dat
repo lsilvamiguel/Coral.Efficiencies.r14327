@@ -1,0 +1,26 @@
+# Parameters of the calorimeters cell types (class CellType)
+# ===============================================================
+# cell  name   Xsize   Ysize   Zsize   RadLen  NuclLen  DispPhE 
+# ---------------------------------------------------------------
+
+  cell  cell1  3.840   3.840  45.000   1.00    1.00     1
+  cell  cell2 14.300  14.300  65.000   1.00    1.00     1
+  cell  cell3  3.830   3.830  45.000   1.00    1.00     1
+  cell  cell4 15.000  15.000 100.000   2.00    2.00     1
+  cell  cell5 20.000  20.000 108.000   2.00    2.00     1
+  cell  cell6 20.000  20.000 120.000   2.00    2.00     1
+
+#         Parameters of the calorimeter LG1A
+# ============================================================
+# calo  name   Xcenter  Ycenter   Zcenter
+# -----------------------------------------------------------
+  calo  LG1A    7.00    -7.00    1026.00
+
+# calm  CaloName CellType  Nhoriz Nvert  Xcenter  Ycenter  Zcenter
+  calm  LG1A     cell1       8      74     69.120   0.000    0.000
+  calm  LG1A     cell1       8      74    -69.120   0.000    0.000
+  calm  LG1A     cell1      28      30      0.000  84.480    0.000
+  calm  LG1A     cell1      28      30      0.000 -84.480    0.000
+  calm  LG1A     cell2       8      20    141.680   0.000   10.000
+  calm  LG1A     cell2       8      20   -141.680   0.000   10.000
+

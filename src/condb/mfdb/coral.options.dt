@@ -1,0 +1,67 @@
+//
+// coral option file
+//
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+
+// pattern method:
+pattern method 1
+
+// tracking method:
+tracking method 1
+
+// This is an MC run
+//Monte Carlo job
+//Monte Carlo file /afs/cern.ch/compass/scratch/d04/benigno/sample/sample.1.out
+
+// This is a Data run
+Data job
+Data year   2000
+Data period noperiod
+Data type   raw
+//Data run    select 12 - 89 77 120 
+//Data run    skip   15 - 21 34 
+//Data run    select 565
+//Data file /afs/cern.ch/compass/scratch/d01/heinsius/cdr90000941.x5t
+// OO settings
+ooInit nFiles 12 
+ooInit nPages 10
+ooInit nMaxPages 10
+
+// Decoding and Clustering
+//make decoding
+//make clustering
+
+//Histogramming
+histograms package ROOT
+histograms home    coral.root
+
+//Compass event display
+//event display
+
+// detector table
+detector table detectors.dat
+
+// Magnetic field maps
+//CsField From database
+CsField SOL_field  /afs/cern.ch/exp/compass/mc/comgeant/data/mag_fields/SOL/OXFORD.map.01.data
+CsField SM1m_field /afs/cern.ch/exp/compass/mc/comgeant/data/mag_fields/SM1m/SM1M.map.01.data
+CsField SM1m_field_measured /afs/cern.ch/user/k/korzenev/public/mag_fields/SM1m/SM1M.map.172.data
+CsField SM2_field  /afs/cern.ch/exp/compass/mc/comgeant/data/mag_fields/SM2/FSM.map.2000.data
+
+
+//Condition DB configuration
+CDB mag /home/eda/offline/coral0/coral/src/condb/config/MAG.conf
+
+// options for the logger
+error logger log level 0
+error logger verbosity 1
+
+// end
+
+
+
+
+

@@ -1,0 +1,261 @@
+// $Id: trafdic.mc.m2012.opt 14069 2015-09-17 20:44:46Z lsilva $
+
+// Options file for TraFDic on 2012 DVCS MC 
+
+// - Default options settings are for mu+.
+// - For mu-, alternative entries are supplied, commented out by default.
+// - For pi-, some of the alternatives are recalled, also as commented out
+//  entries. The rest being expected to be settled by the user.
+
+
+//  This file sums up the main options. Other options are specified elsewhere
+// and referenced here by "include <path_to_2ndary_options_file>" statements.
+// All options can be entered several times, whether in main or secondary files.
+// The last one, in the stream of entries and "include" statements, always wins.
+
+//  For any particular application, this file has to be edited or, better,
+// ``included and overwritten''. Cf. the TWiki page:
+// "wwwcompass.cern.ch/twiki/bin/view/DataReconstruction/CoralSoftware#Options_files"
+
+// Originally copied from "./trafdic.m2012.opt,r13683"
+// Modified: cf. commit log of initial version. 
+
+//                                         ***** PHAST OUTPUT
+// - Active only if used on a PHAST-compatible executable, cf. "./README"
+// - Cf. "$PHAST/coral/README" for the details of the options
+mDST file		phast.mc.root
+// - Information reduction bit pattern: "mDST select".
+//  (No event selection is requested, because no discarding of events allowed
+//  for unbiased estimate of reconstruction efficiency.)
+mDST	select		8	// 8: Only first and last helix of every track is stored.
+// - One may want to output more info, as exemplified in commented out entries infra:
+//mDST hits		HL	// MegaDST...
+//mDST	MCgen		0	// MC generator info
+// MC hits: Select a set of det's covering all of acceptance, outside magnetic field
+//mDST	MChits		FI04X	MM01X	DC01X	FI05X	GM03X	ST03X	FI06X	GM09X	ST04X
+
+
+
+//					   ***** HISTOGRAMMING
+histograms package	ROOT
+histograms home		trafdic.mc.root
+
+
+
+Monte Carlo job				// ***** THIS IS AN MC RUN
+
+
+//					   ***** INPUT DATA...
+// None available yet...
+
+// 					   ***** DETECTOR TABLE...
+// 					   ***** DICO FILE...
+//  The following defaults may need be overwritten, if the zebra data to be
+// processed have been generated based upon a different version of COMGeant.
+//  However, in doing so, one has to keep in mind that we want to also
+// simulate the mistakes and imperfections of our description of the setup at
+// the time of the mass production, cf.:
+//  wwwcompass.cern.ch/twiki/bin/view/DataReconstruction/CoralDetectorsDat#Monte_Carlo_MC_files
+detector table   	$COMPASS_FILES/geometry/mc/detectors.m2012.r392.dat
+TraF	Dicofit		$COMPASS_FILES/geometry/mc/dico/dico.m2012.r392
+
+// 					   ***** ROOTGeometry
+// - The ROOT Geometry should in principle stay as in the mass production. The user
+//  has to be aware though, that some real incompatibilities, leading to double
+//  counting some material, may show up.
+CsROOTGeometry file	$COMPASS_FILES/geometry/DVCS.2012/ROOTGeometry/detectors_2012_DVCS_prel_v2.C
+//CsROOTGeometry file	/afs/cern.ch/compass/dvcs/2012-test/tmp/test_prod_2012/detectors.dvcs.ECAL0.C
+
+
+//					   ***** EVENT SELECTION
+events to read 40000			// # of events to read
+//events to skip 7
+//  Trigger selection: The entry infra would reject events w/ trigger mask == 0,
+// which exist if CG's option "OMTRIG 2" is booked.
+// => Not recommended: the rejection is better to be performed in PHAST.
+//selection trigger mask	7fffff
+
+
+// seed for random number generations:
+random number	engine	JamesEngine	// JamesEngine, DRand48Engine, etc...
+random number	seed	19990102	// Special seed 0: following general convention, truely random seed is chosen, read from Linux kernel entropy source
+//reset random seed every new event	// For debugging purposes
+
+DC 	make always two clusters	// Even if they coincide, so that their re-evaluation w/ an event time differing from the trigger might yield 2 distinct clusters
+DR 	make always two clusters
+DW 	make always two clusters
+MC 	make always two clusters
+ST 	make always two clusters
+
+pattern  method 1 	// not used yet
+tracking method 1 	// not used yet
+
+// 					   ***** DECODING
+make decoding 	 	// <nothing>, MCExact
+
+//  	 	 	 	 	   ***** CLUSTERING
+make clustering 	// <nothing>, MCExact, MCSmeared, MCQuantized
+
+//					   ***** RECONSTRUCTION SCHEMA
+reconstruction schema 1
+
+//					   ***** TRACKING
+make tracking
+track prepattern method traffic
+track bridging   method traffic
+track fitting    method traffic
+
+
+//					   ***** Beam RECONSTRUCTION
+make beam reconstruction
+include ${CORAL}/src/pkopt/beam_2004.opt
+beam_backprop  ReadFromAligFile  0	//No bpp in MC det.dat
+//                   Overwrite what's set in "beam_2004.opt"
+BeamRecons	useTRAFFIC	1	// >0: Traffic is used for the beam telescope
+BeamRecons	doRescue	0	// Rescue cancelled, 'cause it makes coral abort. It's useless so far in MC, anyway.
+BeamRecons	MxTmdiff	10	// Max. allowed BMS-scifiSi time diff. In MC, BMS is a dummy w/ time = 0. While scifiSi can be != 0, due to trigger jitter => Open a large enough time diff window. 
+
+//					   ***** Vertex RECONSTRUCTION
+make	vertex	reconstruction
+vertex	pattern method averaging
+vertex	fitting method kalman
+include ${CORAL}/src/pkopt/vertex.2002.opt	// No change w.r.t. 2002
+//                   Overwrite what's set in "vertex.opt"
+CsAverPattern	Hist		1	// 0 - Off, 1 - ON
+CsAverPattern	findSec   	1	// 0 - Off, 1 - ON
+CsAverPattern	Print [ 0 ]	0	// Prefilter info.
+CsAverPattern	Print [ 1 ]	0	// Error info. 
+// Track is considered as accepted if its momentum is smaller
+// than "AcceptTill" percents of beam track
+CsAverPattern	AcceptTill	105	// in %
+CsAverPattern	TimePrimCut	10 	// in sigmas
+// 	 	 	 	Z Dist  	DCA(number of sigmas)
+CsAverPattern	CUTS		1600		10
+CsAverPattern	Refit		1 	// 0 - Off, 1 - ON
+CsAverPattern	Retrack		3 	// 0 - Off, !0 = cut on event time
+CsKalmanFitting  Hist		1	// 0 - Off, 1 - ON
+CsKalmanFitting  Print [ 0 ]	0	// Kalman filter info.
+CsKalmanFitting  Print [ 1 ]	0	// Global fit info.
+CsKalmanFitting  Print [ 2 ]	0	// IKF info.
+CsKalmanFitting  RefPlane	500	// in mm
+CsKalmanFitting	RefBeam 	-4000	// in mm
+CsKalmanFitting	RefMargin	500	// in mm
+// Chi2 increment cuts:		DirChi2Trk	InvChi2Trk
+CsKalmanFitting  CUTS		7		10.5
+// Vertex Chi2 cut:
+CsKalmanFitting	Chi2VCut	10
+CsKalmanFitting BeamP0		160	// Beam reference momentum (for histo purposes)
+
+
+//					   ***** RICH1
+make rich1 reconstruction
+// TO BE CHECKED AND UPDATED
+include ${CORAL}/src/pkopt/rich1.mc.2006.01.opt	// No 2012 update available yet	
+CsRICH1UpGrade  CONFIG		// RICH upgrade: 12 APV 4 MAPMT
+RICHONE 	BackgrParam05    ${CORAL}/src/pkopt/back-para-52613lon-2006.new-vector74	// Not sure this is the most appropriate background file...
+// Have RICH somewhat less vebose than what's set in "rich1.2006.opt"
+RICHONE 	PrintDetMirr	0
+RICHONE 	AcknoMethods	0	// prints methods in use
+RICHONE 	PrintKeys	0	// 1 = print keys read,  0 = No print
+RICHONE 	PrintConsts	0	// 1 = print rec. constants read,  0 = No print
+RICHONE 	DoThetaLikeMax 	NO 	// Faster but "the output buffer of rich won't have the angle that maximizes the likelihood anymore" (according to Giulia, cf. mail from 2009/06/29)
+
+//					   ***** CALORIMETERS
+make	calorimeters	reconstruction
+// TO BE CHECKED AND UPDATED
+include ${CORAL}/src/pkopt/calorim_mc.2008.opt
+
+// TO BE CHECKED AND UPDATED
+//include ${CORAL}/src/pkopt/ecal0_2012_mc.opt
+
+//					   ***** MU' ID
+include ${CORAL}/src/pkopt/trigger.m2012.opt
+
+
+//  	 	 	 	 	   ***** GEOMETRICAL ZONES
+define zone 0 3500 before M1
+define zone 3500 17000 between M1 and M2
+define zone 17000 32500 between M2 and Muon Wall
+define zone 32500 99999 after Muon Wall
+
+define zone -8000 0 before the target
+
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+CsField SM1m_field_measured $COMPASS_FILES/maps/mag_fields/SM1m/SM1M.map.172.data
+CsField SM2_field	 $COMPASS_FILES/maps/mag_fields/SM2/FSM.map.4000.data
+
+
+//					   ***** LOGGER
+error logger log level		error	// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level	none
+error logger verbosity		normal	// low, normal, high. 
+
+//	  	  	  	  	   ***** TraFDic (+DET OPTIONS+...)
+
+// TO BE CHECKED AND UPDATED
+include ${CORAL}/src/pkopt/trafdic.mc.m2012.opt
+
+//		***** OVERWRITE WHAT'S SET IN "../pkopt/trafdic.mc.m2012.opt" *****
+
+// SPECIAL TEMPORARY SETTING for MPs
+// (Enabled here as long as they are so in mass production.)
+TraF	dCut	[98]	.1	// Enlarge search road along v (MPs not yet v-aligned)
+TraF	ReMode	[48]	2	// Strict angle cut in proj. search (MPs still noisy or not yet time-cut)
+
+// SPECIAL SETTINGS FOR MU-
+//TraF	iCut	[15]	-1	// Beam charge.
+
+// SPECIAL SETTINGS FOR PI-
+//TraF	iCut	[15]	-1	// Beam charge.
+//TraF	iCut	[30]	1	// Beam particle iD: 1=hadron
+//TraF	dCut	[ 4]	190	// Beam momentum (GeV).
+//TraF	dCut	[ 5]	1.80e-4 // Beam cop spread (c/GeV). Assigned to d(1/p). Here corresponds to the 6.5GeV/sqrt(12) of the 190 Gev beam.
+
+// Redefine the TBNAMES of DETECTORS to be EXCLUDED FROM PATTERN RECOGNITION:
+// - In any case, some detectors ("VI/VO/DW02X2/DW02Y1/DW03Y2") have to be left turned off , cf. explanations in "../pkopt/trafdic.m2012.opt".
+// - But one may want, or may have, to turn off some more: e.g. "MP00" (a prototye), "HH" (don't even know what it is).
+//  Also, when simulating a particular period of RD, check first the "DetNameOff" entry in its "template.opt".
+TraF	DetNameOff	VO	VI	DW02Y1	DW02X2	DW03Y2	MP00	HH
+
+//		==> ==> IMPLICATIONS:
+// DETECTORS being EXCLUDED may imply updating some PATTERN RECOGNITION options:
+//TraF	ReMode	[17]	0	// Disable GEM amplitude correlations, if any GEM is among the turned-off detectors.
+
+//TraF	Graph	[0]	0	// coral's graphics switches off automatically under BATCH @ CERN, gridKa and Lyon. This option forces it to do so in any case.
+//TraF	iCut	[0]	7	// Trigger selection in TraFDic
+//TraF	Print	[0]	3	// Event-by-event numbering
+//TraF	Print	[1]	1	// MC info
+//TraF	Print	[8]	3	// EoE
+
+
+//			SMOOTHING POINTS
+// The points @ RICH (resp. Calos) are to be used by RICH (resp. Calo) softwares.
+TraF	SmoothPos [0]	745.		// RICH
+// From: Vladimir Kolosov
+// Sent: Thu 2/28/2008 9:14 AM
+// Let's decide to calculate track position 10 cm upstream front surface of a calorimeter.
+// calo  EC01P1__  1111.500 - 45./2 - 10. = 1111.500 - 32.5 = 1079.0
+// calo  EC02P1__  3325.200 - 45./2 - 10. = 3325.200 - 32.5 = 3292.7
+// calo  HC01P1__  1267.500 -100./2 - 10. = 1267.500 - 60.0 = 1207.5
+// calo  HC02P1__  3576.000 -112./2 - 10. = 3576.000 - 66.0 = 3510.0
+// (NOTA BENE: The positions of E/HCAL1 may in fact differ from what is quoted supra and corresponds to the 2006/7 setup.)
+TraF	SmoothPos [1]	1079.0	// Smooth track at ECAL1
+TraF	SmoothPos [2]	1207.5	// Smooth track at HCAL1
+TraF	SmoothPos [3]	3292.7	// Smooth track at ECAL2
+TraF	SmoothPos [4]	3510.0	// Smooth track at HCAL2
+
+
+//                 STRAW options: X-ray and signal propagation correction
+//  X-ray is disabled in MC. Signal propagation is not simulated. Yet it has to
+// be booked here, since it conditions the correcting the time delay (be it
+// because of trigger jitter or of off-time track) w.r.t. 0 = trigger time.
+STRAW settings signal_propagation=YES
+
+// ********** SPECIAL SETTING TO HISTOGRAM GEMs Amplitude Correlation **********
+// (in "TEv::RDMonitor", which need be recompiled w/ "RDMon_DIGIT_DATA" and
+// "RDMon_DIGIT_GM" defined)
+//TraF	Hist	[ 1]	21	// MCMonitor (&2:D0Kpi,&4:Scat'd mu,&8:Lppi)
+//TraF	Hist	[18]	2	// Residuals: &Groups of tracks histo'ed
+// (in "TEv::Quadruples", which need be recompiled w/ "Quadruples_HISTO" defined)
+//end

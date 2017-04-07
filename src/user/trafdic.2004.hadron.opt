@@ -1,0 +1,386 @@
+// $Id: hadron.opt,v 1.18 2010/02/08 14:54:52 tnagel Exp $
+
+// coral options file for hadron setup data.
+
+// NOTA BENE: For optimum reconstruction of 2004 hadron setup data, CORAL has
+// to be compiled w/ variable "PR_HADRON_2004" set.  (This is not needed for
+// later years.)  If this was forgotten in the first place, no need to
+// recompile everything: here is a fastest procedure:
+//
+// cd $CORAL/src/track/lattice
+// rm ../traffic/Linux/TEvPrePattern2.o
+// rm Linux/extra/TAlgoFindProjQ.o Linux/extra/TAlgoFindSpace.o
+// make PR_HADRON_2004=1
+//
+//           ...and then recompile your executable.
+
+// This is to be modified by:
+//   I)  Specifying input data one wants to process, instead of default
+//     04/W44/42661 (chunk 12009)
+//  II)  Specifying accordingly the detector table (its full path that is, for
+//     automatic search w/in a specified directory is not available in the
+//     hadron case).
+// III)  Adding whatever options are needed to enable a given output, e.g.
+//     mDST (default, but active only if executable is phast-compatible, cf.
+//     "./README") or DST.
+//       Default mDST selection is:
+//       - Event with vertex,
+//       - Only 1-st helix on the track,
+//       - Only tracks with momentum.
+//     Cf. $PHAST/coral/README for how to change this behaviour.
+// III)  Selection criteria: Trigger selection, BoS rejection, etc...
+//  IV)  CDB entrytime.
+//   V)  Hadron specific's (cf. in fine).
+
+// Tip: Set your "emacs" in "c++-mode" to view this ".opt" file. And have this
+//     done automatically by setting the appropriate hook in your "~/.emacs.el"
+//     init file, cf. "~ybedfer/.emacs.el".
+
+
+// From "trafdic.2004.opt"
+// Modified:
+//  - Reference to hadron geometry.
+//  - hadron-specific tracking options, overwring defaults, cf. in fine.
+//  - Cancel target material maps.
+// $Log: hadron.opt,v $
+// Revision 1.18  2010/02/08 14:54:52  tnagel
+// improved comment w.r.t. previous version
+//
+// Revision 1.17  2010/02/08 13:57:31  tnagel
+// reflect HADRON_SETUP ---> PR_HADRON_2004 rename in the comments
+//
+// Revision 1.16  2007/11/14 16:43:11  ges
+// "hadron run" option had been added
+// CDB server had been changes to wwwcompass
+// Obsolete "mDST digits" option had been removed
+//
+// Revision 1.15  2006/07/10 17:50:20  ybedfer
+//  ...
+//
+// Revision 1.14  2005/11/07 03:11:17  ybedfer
+//  Add ``smooth'' points @ calorimeters.
+//
+// Revision 1.13  2005/11/06 18:21:34  ybedfer
+//  - Material maps version h2004.03 (N.B.: No rich map available, as was
+//   already the case w/ h2004.00, but this time we decide not to supplement
+//   the missing map w/ a one from the muon setup => No longer overestimate
+//   the %X0 of the radiator gas (no C4F10) but underestimate it because no
+//   accounting for rich entrance/exit windows and mirrors.)
+//  - Post-vertexing refit.
+//  - Geometry and dico: ".42655" instead of ".42324" (simply because the new
+//   releases were made vailable earlier for the former).
+//
+// Revision 1.12  2005/09/15 23:51:35  ybedfer
+//  Target abscissa @ -306 cm, instead of -350 cm. (According to Jan, and in
+// agreement w/ observed Z vertex distribution.)
+//
+// Revision 1.11  2005/08/10 13:49:14  ybedfer
+//  - Default data run = 42661
+//  - New geometry file. New dico file.
+//  - All setup files referenced to "COMPASS_FILES" env var.
+//  - SI02XV re-enabled. And "iPRpar's" changed accordingly.
+//
+// Revision 1.10  2005/07/26 13:49:48  ybedfer
+// On Thu, 14 Apr 2005, Valery Dorofeev wrote:
+//   The "GM11" should be excluded [...] for it was off during the whole hadron
+// run", according to Bernhard. But it should be present in the MC detector
+// description, for it was really in the beam, as far as i understand.
+//
+// Revision 1.9  2005/06/24 22:51:03  ybedfer
+//  Move in PR requirements for beam reco.
+//
+// Revision 1.8  2005/06/22 10:14:19  ybedfer
+//  Enlarge "CsAverPattern CUTS[0]", i.e. max. distance between target
+// and vertex in pre-filter step.
+//
+// Revision 1.7  2005/06/16 16:18:40  ybedfer
+//  Enable central GM06,7,9X,Y. This is repeating what's just been committed
+// in "../pkopt/trafdic.hadron.opt" and is being placed in the hadron
+// specific's block of this->file for the list of activated central gems may
+// have changed in the course of hadron data taking (or so I think, Y.B.).
+//
+// Revision 1.6  2005/06/01 02:13:35  ybedfer
+//  - Bug fix in beam reco: "PID_doBeamID selAllBeams". (Besides, beam package
+//   is turned off: was useless.)
+//  - Modifs introduced to improve vertex reco: "CsAverPattern" and
+//   "CsKalmanFitting" configured in accordance w/ hadron setup.
+//  - Various modifs regarding geometry, material and output options, done in
+//   accordance with options file used otherwise by hadron group.
+//  - Default input data: switch to 04W44/42296.
+//  - Turn off SI02X,V, for they are found to give out no hit in #42296.
+//
+// Revision 1.5  2005/05/22 23:41:24  ybedfer
+//  - Settings specific to hadron and common to all hadron data taking periods
+//   have been moved to a newly created "./pkopt/trafdic.hadron.opt".
+//  - Comment out entries for target field maps: they are useless.
+//
+// Revision 1.4  2004/11/02 19:18:33  ybedfer
+//  Specify beam momentum spread: used to set variance of momentum for beam
+// tracks.
+//
+// Revision 1.3  2004/10/25 19:00:09  ybedfer
+//  - Correct zones definition and SM2 field map.
+//  - Cancle backtracking (in order to keep all fringe-field tracks).
+//  - Special PR par's in scifi/Si zone: 1SI + 1FI.
+//  - Enlarge FI05Y time window: this only shows that the detector
+//   is not working at all.
+//
+// Revision 1.2  2004/10/21 17:04:29  ybedfer
+//  New geometry files.
+//
+// Revision 1.1  2004/10/20 22:02:12  ybedfer
+//  Preliminary...
+//
+
+hadron run 
+//                                         ***** phast OUTPUT
+// - Active only if used on a phast-compatible executable, cf. "./README"
+// - Cf. "$PHAST/coral/README" for the details of the options
+mDST file		${HOME}/phast.root
+mDST select		0	// 0 <-> No selection
+//mDST hits		HL	// MegaDST...
+
+//make DST 4				// ***** DST OUTPUT
+
+
+//					   ***** HISTOGRAMMING
+histograms package ROOT
+
+histograms home		${HOME}/trafdic.root
+
+
+//					   ***** THIS IS A DATA RUN
+Data job
+//					   ***** INPUT DATA...
+
+
+//						...either raw file
+//Data file 	/castor/cern.ch/compass/data/2004/raw/W44/cdr12009-42661.raw
+//Data file 	/castor/cern.ch/compass/data/2004/raw/W46/cdr09001-43176.raw
+Data file 	/castor/cern.ch/compass/data/2004/raw/W46/cdr09004-43279.raw
+
+//						...or retrieved from oracle DB
+//Data type   raw
+//Database select oracle
+
+//Data year   2004
+//Data run select 34941
+//Data container cdr16001-34941
+
+
+// 					   ***** DETECTOR TABLE...
+detector table   	$COMPASS_FILES/geometry/2004/detectors.42655.hadron.dat
+
+// 					   ***** MATERIAL MAPS
+CsMaterialMap Zone_0	$COMPASS_FILES/maps/material/2004.03/material.silicon.h2004.03.map
+//CsMaterialMap Zone_1	// Cf. infra
+CsMaterialMap Zone_2	$COMPASS_FILES/maps/material/2004.03/material.saclay.h2004.03.map
+CsMaterialMap Zone_3	$COMPASS_FILES/maps/material/2004.03/material.straw.h2004.03.map
+CsMaterialMap Zone_4	$COMPASS_FILES/maps/material/2004.03/material.muf2.h2004.03.map
+CsMaterialMap Zone_5	$COMPASS_FILES/maps/material/2004.03/material.muf3.h2004.03.map
+CsMaterialMap Zone_6	$COMPASS_FILES/maps/material/2004.03/material.hcal1.h2004.03.map
+CsMaterialMap Zone_7	$COMPASS_FILES/maps/material/2004.03/material.muf1.h2004.03.map
+//CsMaterialMap Zone_8	// Non existing!!
+//CsMaterialMap ELossTarget	// Cf. infra
+
+//					   ***** CALIBRATION
+
+use calibration
+CDB use 	MySQLDB
+
+//CDB server	pccoeb03	// Located in 888 (powercuts at times!..)
+CDB server	wwwcompass
+
+// "CDB entrytime Y-M-D-H:M:S" can be entered to reject all calibrations issued
+// before specified date. E.g., in order to reject all trigger matrix files:
+// N.B.: CDB is constantly evolving => Leaving "CDB entrytime" disabled may
+// give rise to unprecdictable behaviour.
+
+// "entrytime" entry can be made to affect only a (set of) specific TBName(s):
+// "TBname(or TB) CDBentrytime(sic!)"
+//ST CDBentrytime 2003-10-01-00:00:00	// Files registered before specif'd date
+//DW CDBentrytime 2003-10-01-00:00:00	// Files registered before specif'd date
+
+// CDB can be replaced by a File DB, for any given (set of) TBName(s):
+
+//DW FileDB	/afs/cern.ch/user/l/leberig/public/marcin/
+
+
+
+//					   ***** MAPPING
+decoding map	$COMPASS_FILES/maps/2004.xml
+
+
+//					   ***** EVENT SELECTION
+events to read 30000			// # of evts to read or file name of evt#'s (evt# = spill#<<16|evt#_in_spill)
+//events to skip 32900
+//events BOS_skip 1.22			// skip first ~400(? cf. Jürgen) ms in spill (disabled in 2004)
+//selection trigger mask f		// Trigger selection (hexadecimal)
+//selection trigger strict
+
+
+// seed for random number generations:
+random number engine JamesEngine
+random number seed 19990102
+//reset random seed every new event
+
+//ST IS_MWPC
+//MB IS_MWPC
+//DW IS_MWPC
+
+pattern method 1        // not used yet
+tracking method 1       // not used yet
+
+// 					   ***** DECODING
+make decoding 	 	// <nothing>, MCExact
+
+//  	 	 	 	 	   ***** CLUSTERING
+make clustering 	// <nothing>, MCExact, MCSmeared, MCQuantized
+
+//					   ***** RECONSTRUCTION SCHEMA
+reconstruction schema 1
+
+//					   ***** TRACKING
+make tracking
+track prepattern method traffic
+track bridging   method traffic
+track fitting    method traffic
+
+
+//					   ***** Beam RECONSTRUCTION 
+//make beam reconstruction
+//include ${CORAL}/src/pkopt/beam_2003.opt
+//                   Overwrite what's set in "beam.opt"
+//BeamRecons	useTRAFFIC	1	// >0: Traffic is used, =0: standalone beampackage is used
+//BeamRecons	AllowMultCand	2
+// Hadron specific: everything upstrean of target center is beam
+// (Target center is set at center of target magnet, i.e. magnet #3. Even if
+// the latter is absent in reality, it must have been specified in the
+// detector table file.)
+PID_doBeamID	selAllBeams	1
+
+
+
+//					   ***** Vertex RECONSTRUCTION
+make vertex reconstruction
+vertex pattern method averaging
+vertex fitting method kalman
+include ${CORAL}/src/pkopt/vertex.2002.opt
+//                   Overwrite what's set in "vertex.opt"
+CsAverPattern  Hist	1	// 0 - Off, 1 - ON
+CsAverPattern  findSec	1	// 0 - Off, 1 - ON
+CsAverPattern  Print [ 0 ]	0	// Prefilter info.
+CsAverPattern  Print [ 1 ]	0	// Error info. 
+// track is considered as accepted if its momentum is smaller
+// than "AcceptTill" percents of beam track
+CsAverPattern	AcceptTill	120	// in %
+//                     Z Dist(from centre)  DCA(number of sigmas)
+CsAverPattern	CUTS		4800			10
+CsAverPattern Refit 1 	// 0 - Off, 1 - ON
+CsKalmanFitting  Hist	1	// 0 - Off, 1 - ON
+CsKalmanFitting  Print [ 0 ]	0	// Kalman filter info.
+CsKalmanFitting  Print [ 1 ]	0	// Global fit info.
+CsKalmanFitting  Print [ 2 ]	0	// IKF info.
+CsKalmanFitting  RefPlane	-2000	// in mm
+CsKalmanFitting  RefBeam	-4300	// in mm
+CsKalmanFitting  RefMargin	500	// in mm
+// Chi2 increment cuts:		DirChi2Trk	InvChi2Trk
+CsKalmanFitting  CUTS		7		10.75
+// Vertex Chi2 cut:
+CsKalmanFitting  Chi2VCut	10.5
+
+
+//					   ***** RICH1
+make rich1 reconstruction
+include ${CORAL}/src/pkopt/rich1.2003.opt
+
+//					   ***** CALORIMETERS
+make calorimeters reconstruction
+include ${CORAL}/src/pkopt/calorim.opt
+
+//					   ***** MU' PID
+include ${CORAL}/src/pkopt/trigger.2003.opt
+
+
+//  	 	 	 	 	   ***** GEOMETRICAL ZONES
+define zone -3530  3500 before M1
+define zone  3500 17000 between M1 and M2
+define zone 17000 32500 between M2 and Muon Wall
+define zone 32500 99999 after Muon Wall
+
+define zone -8000 -3530 before the target
+
+
+//  	  	  	  	  	   ***** MAGNETIC FIELD MAPS
+CsField SM1m_field_measured $COMPASS_FILES/maps/mag_fields/SM1m/SM1M.map.172.data
+CsField SM2_field	 $COMPASS_FILES/maps/mag_fields/SM2/FSM.map.5000.data
+
+//					   ***** MAGNETs INFO
+
+CsMagInfo	MySQLDB
+
+CsMagInfo	SM2	1		// ==0: Do NOT use NMR, !=0: Rescaling factor (applied to NMR corrected map)
+
+
+
+
+//					   ***** LOGGER
+error logger log level		error	// debugging, verbose, info, anomaly, warning, error, fatal
+error logger store level	none
+error logger verbosity		normal	// low, normal, high. 
+
+//	  	  	  	  	   ***** TraFDic (+DET OPTIONS+...)
+
+include ${CORAL}/src/pkopt/trafdic.2004.hadron.opt
+
+//                   Overwrite what's set in "../pkopt/trafdic.2004.opt"
+TraF	SmoothPos [0]	745.1		// Smooth track at Rich entrance
+TraF	SmoothPos [1]	1266.500	// Smooth track at HCAL1
+TraF	SmoothPos [2]	3342.000	// Smooth track at ECAL2
+TraF	SmoothPos [3]	3575.000	// Smooth track at HCAL2
+//TraF	Graph	[0]	0		// For INTERACTIVE coral w/o graphics
+//TraF	iCut	[0]	7		// Trigger selection in TraFDic
+//TraF	Print	[0]	3		// Event-by-event numbering
+//TraF	Print	[8]	3		// EoE
+
+//  ******************** HADRON SPECIFIC'S ********************
+// I.e.: Parameters that may differ from defaults specified in "../pkopt"'s
+// "trafdic.2004.hadron.opt" depending upon particular data taking period considered.
+
+//				***** TARGET *****
+TraF	Target [0-2]	-306	0	0	// Target center position
+CsMaterialMap Zone_1 $COMPASS_FILES/maps/material/2004.03/material.target.h2004.03.dat
+CsMaterialMap ELossTarget $COMPASS_FILES/maps/material/2004.03/material.target_de.h2004.03.dat
+
+//				***** BEAM *****
+TraF	dCut [ 4]	190	// Beam momentum (GeV). If finite: no BMS reco.		(TEv::TracksFit2)
+TraF	dCut [ 5]	5.3e-5	// cop spread (c/GeV). Assigned to cov(1/p,1/p).	(TEv::TracksFit2)
+TraF	iCut [15]	-1	// Beam charge.		(TEv::TracksFit2)
+
+// Dictionary file: Has to be set in accordance with DETECTOR TABLE, cf. supra
+TraF	Dicofit		$COMPASS_FILES/geometry/2004/dico/dico.42655.hadron
+
+// List of detectors to be turned off in tracking. This includes, for the time
+// being:
+// - Detectors physically present in the spectrometer, but that one wants to
+//  exclude from the reconstruction:
+//  - Either active but (thought to be) useless or harmful (1st 3).
+//  - Or defective. These ARE harmful, for reco expects hits from them. SI02X
+//   and SI02V fall into this category for run #42296. But they may not have
+//   been bad for the whole hadron data taking.
+// - Detectors physically dismounted (or so I understand (Y.B.)), these would in
+//  fact be better altogether removed from the DETECTOR TABLE.
+TraF	DetNameOff	VO	VI	DW	BM	FI04	FI06	FI07	GM11	//SI02X	SI02V
+// PR requirements in the beam zone: optimum setting depends upon whether
+// SI02XV is alive or not.
+//TraF	iPRpar [ 40 - 45 ]	2   4   6	2  4  5		// 1 FI + 3/2 SI
+TraF	iPRpar [ 40 - 45 ]	2   4   7	2  4  6		// 1 FI + 2 SI
+
+// List of detectors with dead zone activated.
+TraF	DZisActive	GM06X	GM06Y	GM07X	GM07Y	GM09X	GM09Y	GM11
+
+// NOTA BENE: There's also this specification of an alternative time window for
+// "FI05Y1", which I don't remember the reason why...
+FI05Y1__ HitTime [0-1] -500 800
+
+//end

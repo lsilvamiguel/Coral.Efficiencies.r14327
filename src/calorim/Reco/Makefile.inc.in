@@ -1,0 +1,62 @@
+ver_date    = 2001-04-01
+ver         = 1.1.0
+
+DIR_ROOT    = @DIR_ROOT@
+LIB_ROOT    = @LIB_ROOT@
+
+USE_Qt      = @USE_Qt@
+DIR_Qt      = @DIR_Qt@
+LIB_Qt      = @LIB_Qt@
+MOC         = @Qt_MOC@
+UIC         = @Qt_UIC@
+
+USE_CERNLIB = @USE_CERNLIB@
+LIB_CERNLIB = @LIB_CERNLIB@
+
+CXX         = @CXX@
+F77         = @F77@
+CXXFLAGS    = @CXXFLAGS@
+FOPT        = @FFLAGS@
+INCLUDES    = @INCLUDES@
+FINC        = @FINC@
+LIBS        = @LIBS@
+
+# Library type - static or shared
+LIB_TYPE    = @LIB_TYPE@
+
+LD_OPT      = -L$(top_dir)/src
+ifeq "$(LIB_TYPE)" "shared"
+    LD_OPT += -Wl,-rpath,$(top_dir)/src -lReco
+    libReco = libReco.so
+else
+    LD_OPT += -Wl,-static -lReco -Wl,-dy
+    libReco = libReco.a
+endif
+LD_OPT     += $(LIBS)
+
+.cc.o:
+ifneq "$(VERBOSE)" ""
+		$(CXX) $(INCLUDES) $(CXXFLAGS) -c $*.cc -o $*.o
+else
+		@echo Compiling $*.cc
+		@$(CXX) $(INCLUDES) $(CXXFLAGS) -c $*.cc -o $*.o
+endif
+
+.c.o:
+ifneq "$(VERBOSE)" ""
+		$(CXX) $(INCLUDES) $(CXXFLAGS) -c $*.c -o $*.o
+else
+		@echo Compiling $*.cc
+		@$(CXX) $(INCLUDES) $(CXXFLAGS) -c $*.c -o $*.o
+endif
+
+.F.o:
+ifneq "$(VERBOSE)" ""
+		$(F77) $(FINC)     $(FOPT)     -c $*.F -o $*.o
+else
+		@echo Compiling $*.F
+		@$(F77) $(FINC)     $(FOPT)     -c $*.F -o $*.o
+endif
+
+clean_mask    = *.o *.so *.a *.bck *.bak *~ *.root *.log *.out *.dvi *.aux fort.* *Cint.[ch] *Cint.cxx \
+                *.out *.gprof gdb-transcript core doc html log

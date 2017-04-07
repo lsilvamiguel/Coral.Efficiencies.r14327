@@ -1,0 +1,1016 @@
+// $Id: CsBMSrecons.cc.advance,v 1.2 2000/12/05 08:01:45 khaustov Exp $
+
+/*!
+   \file CsBMSrecons.cc
+   \brief Compass BMS reconstruction Class.
+   \author  G. Khaustov
+   \version $Revision: 1.2 $
+   \date    $Date: 2000/12/05 08:01:45 $
+*/
+#include<iostream.h>
+#include<iomanip.h>
+#include<fstream.h>
+#include <math.h>
+#include "CsTypes.h"
+#include "CsEvent.h"
+#include "CsGeom.h"
+#include "CsBMSrecons.h"
+#include "CsDigit.h"
+#include "CsErrLog.h"
+#include "CsOpt.h"
+#include<stdio.h>
+//
+//
+CsBMSrecons:: CsBMSrecons(void) 
+{
+        int ipl, ll, i, j, lbl;
+        string tag, key;
+//        input_file.open("/afs/cern.ch/user/k/khaustov/private/coral/src/tofcalib/test/formomsv.dat");   // FOR test
+//
+        CsOpt* opt = CsOpt::Instance();
+        tag="BeamRecons";
+//
+//  BMS hodoscope description
+//
+        nhod=NBMSHODS; 
+        hodnames[0]="BMSHod0";
+        hodnames[1]="BMSHod1";
+        hodnames[2]="BMSHod2";
+        hodnames[3]="BMSHod3";
+        for (i=0; i<nhod; i++) hodsize[i]=64;            // size of hods 
+        BMStbl();
+//
+        tag="BMSreco";
+        key="Printlev";
+        if( opt->getOpt( tag, key, Printlev ) ) ; else Printlev=0;
+//
+//  BMS calibrations    
+//
+        itrg16=0;                        // Temporary. Should be replaced in a future with trigger type
+        for(i=0; i<10; i++)  BMSMN1[i]=0.;
+//
+        nrunold=-1;  
+//
+//       Reconstruction Procedure parameters
+//
+        ntrackmx=NTRACKMX;
+//
+        tag="BMSreco";
+        key="TmWindow";
+        if( opt->getOpt( tag, key, BMSpar[0]) ) ; else BMSpar[0]=10.;
+//
+        key="MxTmDiff";
+        if( opt->getOpt( tag, key, BMSpar[1]) ) ; else BMSpar[1]=2.;
+//
+        key="MxTmChi4";
+        if( opt->getOpt( tag, key, BMSpar[2]) ) ; else BMSpar[2]=30.;
+//
+        key="MxSpChiq";
+        if( opt->getOpt( tag, key, BMSpar[3]) ) ; else BMSpar[3]=10.;
+//
+        key="MxTmChi3";
+        if( opt->getOpt( tag, key, BMSpar[4]) ) ; else BMSpar[4]=30.;
+//
+        key="MxNmbHit";
+        if( opt->getOpt( tag, key, mxnmbhit) ) ; else mxnmbhit=BMSBUFSIZE;
+        if(mxnmbhit>BMSBUFSIZE) mxnmbhit=BMSBUFSIZE;
+//
+        if(Printlev>0) {
+	cout << "CsBMSrecons:: Time window   " << BMSpar[0] << endl;
+	cout << "CsBMSrecons:: Max hit time deviation   " << BMSpar[1] << endl;
+	cout << "CsBMSrecons:: Max time Chiq for 4 hit tracks  " 
+             <<  BMSpar[2] << endl;
+	cout << "CsBMSrecons:: Max time Chiq for 3 hit tracks  " 
+             <<  BMSpar[4] << endl;
+	cout << "CsBMSrecons:: Max. Space Chiq   " 
+             <<  BMSpar[3] << endl;
+	cout << "CsBMSrecons:: Max. number of Hits/plane   " 
+             <<  mxnmbhit << endl;
+        }
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void CsBMSrecons:: getBMStrack(const int n, double &pmom, double &pchiq, 
+                         double &mntime, double &tmchiq, int &nhit ,
+                         int& nhttot) const
+{
+          if((n<0)||(n>=ntrack)) return;
+              pmom=TRKp[n];
+              mntime=TRKtime[n];
+              pchiq=SPchiq[n];
+              nhit =  TRKhit[n];
+              tmchiq=TMchiq[n];
+              nhttot=nhittotal;
+              return;
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void CsBMSrecons:: getBMSmoments(const int n, double& m0, double& m1) const
+{
+int ipl, k;
+          if((n<0)||(n>=ntrack)) return;
+            for(m0=0., m1=0., ipl=0; ipl<nhod; ipl++){
+              k = TRKindx[n][ipl];
+              if(k<hodsize[ipl])  {
+                  m1+=tbmz16[k][ipl]/tmresol[ipl];
+                  m0+=1./tmresol[ipl];
+              }
+            }
+            return;
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+double CsBMSrecons:: getNewChi2(const int n, const double mntime) const
+{
+int ipl, k;
+double chiq, temp;
+          if((n<0)||(n>=ntrack)) return 0.;
+            for(chiq=0., ipl=0; ipl<nhod; ipl++){
+              k = TRKindx[n][ipl];
+              if(k<hodsize[ipl])  {
+                  temp=tbmz16[k][ipl] - mntime;
+                  chiq+=temp*temp/disp[ipl];
+              }
+            }
+            return chiq;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void CsBMSrecons:: bmsprnt(ostream &out) const
+{
+      int ipl,i;
+      out << "CsBMSrecons: " << ntrack << "  BMS track(s) found" << endl;
+      if(ntrack) {
+        out <<"  #      P   TMchiq  SPchiq    Nhits   Time" << endl;
+	out << resetiosflags(ios::scientific);
+        out << setiosflags(ios::fixed|ios::showpoint);
+        out << setprecision(1);
+        for(i=0; i<ntrack; i++)
+          out  << setw(3) << i << setw(8) << TRKp[i] << setw(8) << TMchiq[i]  
+                << setw(8) << SPchiq[i] << setw(8) << TRKhit[i] << setw(8) 
+                << TRKtime[i] << endl;
+      }
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void CsBMSrecons:: bmsrec(void)
+{
+      int n, ipl, k;
+//
+//     start of run and start of job Init
+//
+      long int nrun = CsEvent::Instance()->getRunNumber();
+      if(nrun != nrunold){
+         nrunold = nrun;
+          
+         bookhist();       
+         if(!init()) CsErrLog::Instance()->mes(elFatal, 
+                 "      BMS Hodoscopes Initilization failed -> check Coral option file" );
+         if(!readcalib()) CsErrLog::Instance()->mes(elError," Error to read calibrations"); 
+      }
+//
+//    decode and select data
+//
+      ntrack=0;
+      nfired=0;
+//      test();                    // for test purposes
+      if(Printlev>1) rawevprint(cout);
+      if(!decode()) return;
+      if(nfired<3) return;
+//
+//       Fill some test hists
+//
+      double z[4], ptmp, chiq;
+      if((nfired==4)&&
+                (khit16[0]*khit16[1]*khit16[2]*khit16[3]==1)) {   // only for 1hit/hod events
+         for(ipl=0; ipl<nhod; ipl++) {  
+               HiHtime1[ipl]->Fill(tbmz16[0][ipl]);
+               z[ipl] = zhit16[0][ipl];
+         }
+         moment4(z, &ptmp, &chiq);                            //beam momentum, chiq
+         if(chiq < BMSpar[3]) {
+              for(ipl=0; ipl<nhod; ipl++) {  
+                   HiHtime2[ipl]->Fill(tbmz16[0][ipl]);
+                   HiTmVsHt[ipl]->Fill((double)ibmz16[0][ipl],tbmz16[0][ipl]);
+              } 
+              Hit0t1->Fill(tbmz16[0][0],tbmz16[0][1]);
+              Hit0t2->Fill(tbmz16[0][0],tbmz16[0][2]);
+              Hit0t3->Fill(tbmz16[0][0],tbmz16[0][3]);
+              Hit0t1dif->Fill(tbmz16[0][0]-tbmz16[0][1]);
+              Hit0t2dif->Fill(tbmz16[0][0]-tbmz16[0][2]);
+              Hit0t3dif->Fill(tbmz16[0][0]-tbmz16[0][3]);
+
+         }
+      }
+//
+//    find BMS tracks
+//
+      track();
+      if(Printlev>1) bmsprnt(cout);
+//
+//       Fill output hists
+//
+        if(!ntrack) return;
+        int nhit, nhit3 = 0;
+        double yhit; 
+        for(n=0; n<ntrack; n++) { 
+           nhit =  TRKhit[n];
+           HiNhtev->Fill((double)nhit);
+           if(nhit==4){                                              // 4 fired hod. hists
+              HiBmom4->Fill(TRKp[n]);
+              HiTMchi4->Fill(TMchiq[n]);
+              HiSPchi4->Fill(SPchiq[n]);
+              HiTime4->Fill(TRKtime[n]);
+              for(ipl=0; ipl<nhod; ipl++) {
+                  k=TRKindx[n][ipl];
+                  yhit=(double)ibmz16[k][ipl];
+                  HiHpro4[ipl]->Fill(yhit);
+                  HiYpro4[ipl]->Fill(TRKy[n][ipl]);
+              }
+              if(khit16[0]*khit16[1]*khit16[2]*khit16[3]==1) {       // 1hit/hod  hists
+                   HiBmom1->Fill(TRKp[n]);
+                   HiTMchi1->Fill(TMchiq[n]);
+                   HiSPchi1->Fill(SPchiq[n]);
+                   HiTime1->Fill(TRKtime[n]);
+                   for(ipl=0; ipl<nhod; ipl++) {
+                       k=TRKindx[n][ipl];
+                       yhit=(double)ibmz16[k][ipl];
+                       HiHpro1[ipl]->Fill(yhit);
+                   }
+              }
+           }
+           else {
+             HiBmom3->Fill(TRKp[n]);                                //  3 fired hod. hists
+              HiTMchi3->Fill(TMchiq[n]);
+              HiSPchi3->Fill(SPchiq[n]);
+              HiTime3->Fill(TRKtime[n]);
+              for(ipl=0; ipl<nhod; ipl++) {
+                  k=TRKindx[n][ipl];
+                  if(k<hodsize[ipl])
+                          HiHpro3[ipl]->Fill((double)ibmz16[k][ipl]);
+              }
+              nhit3++;
+           }
+         }
+        HiN4h3h->Fill((double)nhit3, (double)(ntrack-nhit3));
+//
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void CsBMSrecons:: track(void)
+//
+//      track reconstruction
+//
+{
+      int indx[4],kfl[4],i,j,k,l,ipl,ll,ilb;
+      int  nn, ntot, nstart;
+      double delt1, delt2, delt3, delt4, z[4], am;
+      double p, chiq, tmean, tchiq;
+//
+//    put some dummies for 3 hit tracks
+//
+      if(nfired==3) {
+          for(ipl=0; ipl<nhod; ipl++) {
+             if(!khit16[ipl]) {khit16[ipl]=1; iflc16[0][ipl]=0; }
+          }
+      }
+//
+//      four hit tracks
+//
+        if(nfired==4) {
+        for(i=0; i<khit16[0]; i++) {
+            indx[0]=i;
+            for(j=0; j<khit16[1]; j++){
+                indx[1]=j;
+                for(k=0; k<khit16[2]; k++){
+                    indx[2]=k;
+                    for(l=0; l<khit16[3]; l++) {
+                       tmean=(tbmz16[i][0]+tbmz16[j][1]+tbmz16[k][2]+tbmz16[l][3])/4.;
+                       delt1=fabs(tmean-tbmz16[i][0]);
+                       if(delt1>BMSpar[1]) continue;         // timing check
+                       delt2=fabs(tmean-tbmz16[j][1]);
+                       if(delt2>BMSpar[1]) continue;
+                       delt3=fabs(tmean-tbmz16[k][2]);
+                       if(delt3>BMSpar[1]) continue;
+                       delt4=fabs(tmean-tbmz16[l][3]);
+                       if(delt4>BMSpar[1]) continue;
+//
+                       tchiq=delt1*delt1+delt2*delt2+delt3*delt3+delt4*delt4;
+                       if(tchiq>BMSpar[2]) continue;        // time chiq cut
+//
+                       z[0]=zhit16[i][0];
+                       z[1]=zhit16[j][1];
+                       z[2]=zhit16[k][2];
+                       z[3]=zhit16[l][3];
+//                      
+                       moment4(z,&p,&chiq);                 //beam momentum
+                       if(chiq > BMSpar[3]) continue;                      // space chiq cut
+//
+                       indx[3]=l;
+//
+//    save new track
+//
+                         if(ntrack==NTRACKMX) return;
+                         for(ipl=0;ipl<nhod;ipl++) {
+                                    TRKindx[ntrack][ipl]=indx[ipl];
+                                    TRKy[ntrack][ipl] = z[ipl];
+                         }
+                         TRKp[ntrack] = p; 
+                         TMchiq[ntrack] = tchiq;
+                         SPchiq[ntrack] = chiq;
+                         TRKhit[ntrack] = 4;
+                         TRKtime[ntrack] = tmean;
+                         ntrack++;
+                     }
+                 }
+             }
+         }
+//
+//ckeck for the same momentum/chiq already found - take the best time chiq
+//and check for 2 common poins - if find take track with better time chiq
+//
+         if(ntrack>1) {
+             int  seltrack=ntrack, nmin;
+             double minchq;
+             while(seltrack){
+                for(i=0, nmin=0, minchq = 10.e7; i<ntrack; i++){
+                    if(TRKhit[i]<0) continue;
+                    if(TMchiq[i]< minchq) {
+                       minchq = TMchiq[i];
+                       nmin = i;
+                    }
+                } 
+                for(i=0; i<ntrack; i++){
+                       if(TRKhit[i]<0||i==nmin ) continue;
+                       if((fabs(TRKp[i]-TRKp[nmin])<1.0e-6) 
+                             &&(fabs(SPchiq[i]-SPchiq[nmin])<1.0e-6)) {
+                             TRKhit[i]=-1;
+                             seltrack-=1;
+                             continue;
+                        }
+                        for(nn=0, ipl=0; ipl<nhod; ipl++){
+                             if(TRKindx[i][ipl]==TRKindx[nmin][ipl]) nn++;
+                        }
+                        if(nn>1) {
+                              TRKhit[i]=-1; 
+                              seltrack-=1;
+                        }
+                }
+            TRKhit[nmin]=-4; 
+            seltrack-=1;
+            }
+         ntrack = compress(0);
+         }
+         
+//
+//       set hit flags for tracks found, so 3 hit tracks procedure will not considere these hits 
+//
+         if(ntrack) {
+             for(ipl=0; ipl<nhod; ipl++) {
+                 for(i=0; i<ntrack; i++) {
+                     ll=TRKindx[i][ipl];
+                     iflc16[ll][ipl]=0;
+                 }
+                 for(kfl[ipl]=0, i=0; i<khit16[ipl]; i++){
+                     if(iflc16[i][ipl]) kfl[ipl]=1;}
+             }
+             if(kfl[0]+kfl[1]+kfl[2]+kfl[3]<3) return;
+         }
+      }
+//
+//       3 hit tracks
+//
+        nstart=ntrack;
+        for(i=0; i<khit16[0]; i++) {
+            for(j=0; j<khit16[1]; j++){
+                for(k=0; k<khit16[2]; k++){
+                    for(l=0; l<khit16[3]; l++) {
+                       kfl[0]=iflc16[i][0];
+                       kfl[1]=iflc16[j][1];
+                       kfl[2]=iflc16[k][2];
+                       kfl[3]=iflc16[l][3];
+//                       
+                       ntot=kfl[0]+kfl[1]+kfl[2]+kfl[3];
+                       if(ntot<3) continue;               // select combination with >= 3 hits   
+//
+                       tmean=(tbmz16[i][0]*kfl[0]+tbmz16[j][1]*kfl[1]+
+                              tbmz16[k][2]*kfl[2]+tbmz16[l][3]*kfl[3])/ntot;
+                       delt1=fabs(tmean-tbmz16[i][0]);
+                       delt2=fabs(tmean-tbmz16[j][1]);
+                       delt3=fabs(tmean-tbmz16[k][2]);
+                       delt4=fabs(tmean-tbmz16[l][3]);
+//
+                       if(ntot==nhod){                    
+//
+// These are 4 hit tracks - must have been found before and failed
+// hence remove the worst hit
+//
+                          am=delt1; ilb=0;                
+                          if(delt2>am){am=delt2; ilb=1;}  
+                          if(delt3>am){am=delt3; ilb=2;}
+                          if(delt4>am) ilb=3;
+                          kfl[ilb]=0;
+                          ntot=3;
+                          tmean=(tbmz16[i][0]*kfl[0]+tbmz16[j][1]*kfl[1]+
+                                 tbmz16[k][2]*kfl[2]+tbmz16[l][3]*kfl[3])/ntot;
+                          delt1=fabs(tmean-tbmz16[i][0]);
+                          delt2=fabs(tmean-tbmz16[j][1]);
+                          delt3=fabs(tmean-tbmz16[k][2]);
+                          delt4=fabs(tmean-tbmz16[l][3]);
+                       }
+                       if(delt1>BMSpar[1]) kfl[0]=0;         // check timing
+                       if(delt2>BMSpar[1]) kfl[1]=0;
+                       if(delt3>BMSpar[1]) kfl[2]=0;
+                       if(delt4>BMSpar[1]) kfl[3]=0;
+                       ntot=kfl[0]+kfl[1]+kfl[2]+kfl[3];
+                       if(ntot<3) continue;
+//
+                       tchiq=pow(delt1,2.)*kfl[0]+
+                             pow(delt2,2.)*kfl[1]+
+                             pow(delt3,2.)*kfl[2]+
+                             pow(delt4,2.)*kfl[3];                       
+                       if(tchiq>BMSpar[4]) continue;        // time chiq cut
+//
+                       indx[0]=(i+1)*kfl[0]-1; 
+                       indx[1]=(j+1)*kfl[1]-1;
+                       indx[2]=(k+1)*kfl[2]-1; 
+                       indx[3]=(l+1)*kfl[3]-1;
+//
+//    remove tracks with 3 common points
+//
+                       if(ntrack!=nstart) {
+                          for(ll=nstart;ll<ntrack;ll++) {
+                              for(ntot=0,ipl=0;ipl<nhod;ipl++) {
+                                  if(kfl[ipl]&&(indx[ipl]==TRKindx[ll][ipl])) ntot++;
+                              }
+                              if(ntot==3) goto next3;  
+                           }
+                       }
+//
+                       if(ntrack==NTRACKMX) return;
+                       for(ipl=0;ipl<nhod;ipl++) { 
+                           if(kfl[ipl]) {
+                                   TRKindx[ntrack][ipl]=indx[ipl]; 
+                                   z[ipl]=zhit16[indx[ipl]][ipl];
+                                   TRKy[ntrack][ipl] = z[ipl];
+                           }
+                           else  {
+                                   z[ipl]=99999.;
+                                   TRKindx[ntrack][ipl]=9999; 
+                                   TRKy[ntrack][ipl] = z[ipl];
+                           }
+                       } 
+                       TMchiq[ntrack] = tchiq;
+                       TRKtime[ntrack] = tmean;  
+                       moment3(z,&p,&chiq);
+                       TRKp[ntrack] = p; 
+                       SPchiq[ntrack] = fabs(p0-p);
+                       TRKhit[ntrack] = 3;
+                       ntrack++;
+               next3:  continue;  
+                   }
+                }
+            }
+        }
+//
+//  Track selection
+// No common points allowed for 3 hit tracks -
+// if find - take track with better time chiq
+//
+         if(ntrack-nstart>1) {
+             int  seltrack=ntrack-nstart, nmin;
+             double minchq;
+             while(seltrack){
+                for(i=nstart, nmin=0, minchq = 10.e7; i<ntrack; i++){
+                    if(TRKhit[i]<0) continue;
+                    if(TMchiq[i]< minchq) {
+                       minchq = TMchiq[i];
+                       nmin = i;
+                    }
+                } 
+                for(i=nstart; i<ntrack; i++){
+                       if(TRKhit[i]<0||i==nmin) continue;   
+                        for(nn=0, ipl=0; ipl<nhod; ipl++){
+                             if((TRKindx[i][ipl]!=9999)
+                                 &&(TRKindx[i][ipl]==TRKindx[nmin][ipl])) nn++;
+                        }
+                        if(nn) {
+                              TRKhit[i]=-1; 
+                              seltrack-=1;
+                        }
+                }
+            seltrack-=1;
+            TRKhit[nmin]=-3; 
+            }
+         ntrack = compress(nstart);
+         }
+}
+//
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int CsBMSrecons:: compress(int start)
+{
+      int ipl, i, newntrack;
+          for(i=newntrack=start; i<ntrack; i++) {
+                 if(TRKhit[i]==-1) continue;
+                 TRKhit[newntrack]  =  -TRKhit[i];
+                 if(newntrack==i) { 
+                     newntrack++; 
+                     continue;
+                 }
+                 for(ipl=0;ipl<nhod;ipl++) {
+                     TRKindx[newntrack][ipl]=TRKindx[i][ipl];
+                     TRKy[newntrack][ipl] =  TRKy[i][ipl];
+                 }
+                 TRKp[newntrack]    =  TRKp[i]; 
+                 TMchiq[newntrack]  =  TMchiq[i];
+                 SPchiq[newntrack]  =  SPchiq[i];
+                 TRKtime[newntrack] =  TRKtime[i];
+                 newntrack++;
+         }
+         return newntrack;
+}
+//
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void CsBMSrecons:: moment3(double z[], double* p, double* vchisq)
+//
+// *** BEAM MOMENTUM ANALYSIS for 3 hit traks
+// *** USING PRINCIPLE COMPONENTS AND
+// *** MULTI-DIMENSIONAL LEAST SQUARES FITTING.
+//
+//   input:  Z(4)   - hodoscope hits
+//   output: p      - momentum
+//           vchisq - chi squared
+//   
+{
+	int nhit=0;
+	int i, j, ncase=0;
+        double z2[4], pb;
+//	
+	for(i=0; i<nhod; i++) {                //  HOW MANY HITS WE HAVE  ?
+	    if(z[i]>10000.) ncase=i;
+	    else    z2[nhit++]=z[i];
+	}
+//
+        if(nhit<3) {                       // too few hits, return
+	        *p=1.0e6;  *vchisq=1.0e6;
+       	        return; 
+        }
+//
+         *vchisq=0.0;  ncase++; 
+//
+         pb = coff16[0][2][ncase];  
+         for(i=0; i<3; i++) {
+              pb = pb + z2[i]*coff16[i+1][2][ncase];
+         }
+         *p=1./pb;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void CsBMSrecons:: moment4(double z[], double* p, double* vchisq)
+//
+// *** BEAM MOMENTUM ANALYSIS for 4 hit tracks
+// *** USING PRINCIPLE COMPONENTS AND
+// *** MULTI-DIMENSIONAL LEAST SQUARES FITTING.
+//
+//   input:  Z(4)   - hodoscope hits
+//   output: p      - momentum
+//           vchisq - chi squared
+//   
+{
+	int i, j;
+	double z1[4];
+        double z2[4], pb;
+//
+        for(i=0; i<4; i++) z1[i]=z[i]-avsg16[i];
+        for(i=0; i<4; i++) {      
+            for(j=0, z2[i]=0.; j<4; j++) 
+                 z2[i]=z2[i]+z1[j]*evec16[j][i];
+        }      
+        *vchisq=z2[3]*z2[3];
+//
+        pb = coff16[0][2][0];  
+        for(i=0; i<3; i++) {      
+	    pb = pb + z2[i]*coff16[i+1][2][0];
+        }
+        *p=1./pb;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+int CsBMSrecons:: decode(void)
+//
+//   get, decode, calibrate and select data         
+//
+{
+  int ipl, i, nhit, nchnl;
+  int rawhit[NBMSHODS];
+  double time, tm;
+  char* detName;
+  CsDetector* det;
+  int label = 1;
+//
+  nfired=0;
+  for(ipl=0; ipl<nhod; ipl++) { 
+     khit16[ipl]=0; rawhit[ipl]=0; 
+//
+     if(!Id[ipl]) continue;
+     list<CsDigit*>digit = Id[ipl]->getMyDigits();
+     if(!digit.size()) continue;  
+     list<CsDigit*>::iterator Idig;
+     for( Idig = digit.begin(); Idig != digit.end(); Idig ++ ) {
+        CsDigit* digWB = *Idig;
+//
+	   nchnl = digWB->getAddress();
+    	   time  = digWB->getDatum();
+//       
+          if((nchnl>hodsize[ipl])||(nchnl<0)) {
+                 ostrstream message;
+                 message << " CsBMScalib:: Wrong channel number:"<< nchnl
+                         <<"   hodoscope:"<< ipl << endl;
+                 CsErrLog::Instance()->mes(elInfo, message.str());                  
+                 continue;
+          }
+//          if((tm>65535.)||(tm<0.)) {
+//                 ostrstream message;
+//                 message << " CsBMScalib:: Wrong time:"<< time<<" hodoscope:"<<ipl << endl;
+//                 CsErrLog::Instance()->mes(elInfo, message.str());                  
+//                 continue;
+//          }
+            tm=time-10*TMt0[nchnl][ipl]-BMSMN1[itrg16];
+            tm=tm*TDCSLP[nchnl][ipl];
+//
+//        some hists for raw data
+// 
+             rawhit[ipl]++;        
+             HiFired[ipl]->Fill((double)nchnl);
+             HiProf[ipl]->Fill(BMStable[nchnl][ipl]);
+             HiHtime[ipl]->Fill(tm);
+//
+//   time cuts   
+//
+             if(fabs(tm)<BMSpar[0]) {                       //   time window cut
+               if(khit16[ipl]>=mxnmbhit) {label=0; continue;}
+               nhit=khit16[ipl];
+               tbmz16[nhit][ipl]=tm;                 //save good hit
+               ibmz16[nhit][ipl]=nchnl;
+               zhit16[nhit][ipl]=BMStable[nchnl][ipl];    
+               iflc16[nhit][ipl]=1;
+               khit16[ipl]++;
+             }
+        }
+        if(khit16[ipl]) nfired++;  
+   }
+  nhittotal=khit16[0]+khit16[1]+khit16[2]+khit16[3];
+  for(ipl=0; ipl<nhod; ipl++)  HiNhit[ipl]->Fill((double)rawhit[ipl]);
+  return label;
+}
+//
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void CsBMSrecons:: BMStbl(void)
+//
+//    decoding table for BMS hodoscopes
+//
+{
+     int ipl, ll, chn;
+         for(ipl=0; ipl < nhod; ipl++) {
+             for(ll=1; ll <= hodsize[ipl]; ll++){
+                chn = ll-1;
+                switch(ipl){
+                   case 0: if    (ll<=4)              BMStable[chn][ipl] = -87.5+5.*(ll-1); 
+                           else if((ll>4)&&(ll<=60))  BMStable[chn][ipl] = -67.5+5.*((ll-5)/2);
+                           else                       BMStable[chn][ipl] =  72.5+5.*(ll-61);
+                           break;
+                   case 1: if    (ll<=8)              BMStable[chn][ipl] = -42.5+5.*((ll-1)/2); 
+                           else if((ll>8 )&&(ll<=20)) BMStable[chn][ipl] = -22.5+5.*((ll-9)/4);
+                           else if((ll>20)&&(ll<=44)) BMStable[chn][ipl] =  -7.5+5.*((ll-21)/6);
+                           else if((ll>44)&&(ll<=56)) BMStable[chn][ipl] =  12.5+5.*((ll-45)/4);
+                           else                       BMStable[chn][ipl] =  27.5+5.*((ll-57)/2);
+                           break;
+                   case 2: if    (ll<=12)             BMStable[chn][ipl] = -47.5+5.*((ll-1)/2); 
+                           else if((ll>12)&&(ll<=20)) BMStable[chn][ipl] = -17.5+5.*((ll-13)/4);
+                           else if((ll>20)&&(ll<=44)) BMStable[chn][ipl] =  -7.5+5.*((ll-21)/6);
+                           else if((ll>44)&&(ll<=54)) BMStable[chn][ipl] =  12.5+5.*((ll-45)/4);
+                           else                       BMStable[chn][ipl] =  27.5+5.*((ll-55)/2);
+                           break;
+                   case 3: if    (ll<=14)             BMStable[chn][ipl] =-112.5+5.*(ll-1); 
+                           else if((ll>14)&&(ll<=50)) BMStable[chn][ipl] = -42.5+5.*((ll-15)/2);
+                           else                       BMStable[chn][ipl] =  47.5+5.*(ll-51);
+                           break;}
+              }
+         }
+}
+//
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool  CsBMSrecons:: readcalib(void)
+//
+{
+  int i;
+  bool OK = true;
+//
+        for(i=0; i<nhod; i++){
+            tmresol[i]=1.;                 // hods time resolution. Temporary. Sould be read from CsDetector
+            disp[i]=tmresol[i]*tmresol[i];
+        }
+        readBMSconst("bmscoef.dat");
+        if(Printlev>1) prntBMSconst();
+//
+//     Temporary. Should be replaces in a future by DB reading
+//
+         int ipl, ll, j;
+     {
+         ifstream input_calib("bmsslp.dat");
+	 if(input_calib.fail()){
+	    cerr << " Error during opening of input file "<< "bmsslp.dat" << endl;
+              OK=false;
+              for(ipl=0; ipl<nhod; ipl++){
+                 for(ll=0; ll<hodsize[ipl];ll++) TDCSLP[ll][ipl]=1.;
+           }
+         }
+         else {
+           for(ipl=0; ipl<nhod; ipl++){
+            for(ll=0; ll<hodsize[ipl];ll++) input_calib >>TDCSLP[ll][ipl];
+           }
+           if(!input_calib.good()) OK=false;
+         }
+	 input_calib.close();
+      }
+//
+      {         
+         ifstream input_calib("bmst0.dat");
+	 if(input_calib.fail()){
+	    cerr << " Error during opening of input file "<< "bmst0.dat" << endl;
+            OK=false;
+            for(ipl=0; ipl<nhod; ipl++){
+                for(ll=0; ll<hodsize[ipl]; ll++) TMt0[ll][ipl]=0;
+           }
+         }
+         else {
+           for(ipl=0; ipl<nhod; ipl++){
+            for(ll=0; ll<hodsize[ipl]; ll++) input_calib >>TMt0[ll][ipl];
+           }
+           if(!input_calib.good()) OK=false;
+         }
+	 input_calib.close();
+      }
+      if(Printlev>1){         
+         cout<< endl << "BMS TDC slopes:" << endl;
+         prntclb(cout, TDCSLP);
+         cout << endl << "BMS TDC t0s" << endl;
+         prntclb(cout, TMt0);
+      }
+//
+      for(int i=0; i<nhod; i++) disp[i]=tmresol[i]*tmresol[i];
+      return OK;
+}
+//
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool  CsBMSrecons:: init(void)
+{
+  static bool notfirst = false;
+  static bool initOK = false;
+  if(notfirst) return initOK;
+  notfirst = true;
+        int i;
+        string name;
+        CsOpt* opt = CsOpt::Instance();
+        list <CsDetector*>  det = CsGeom::Instance()->getDetectors();
+        list<CsDetector*>::iterator idet;
+        for(i=0; i<nhod; i++) {
+        Id[i]=0;
+        if( !opt->getOpt( hodnames[i], "Name", name)) continue; 
+            for( idet = det.begin(); idet != det.end(); idet++ ) {
+               CsDetector* detpnt = *idet;
+  	       if( detpnt ) {
+                       if(detpnt->getName()==name) {
+//                          if(detpnt->getUnit()!=(i/2+1)) continue;  // Attention: for test only
+                          Id[i] = detpnt;
+//                          hodsize[i] = detpnt->getNWir();  //Attention - test
+                       }
+               } 
+            }
+        }
+//        BMStbl();
+        if(Id[0]&&Id[1]&&Id[2]&&Id[3])   initOK=true;   
+        return initOK;
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void CsBMSrecons::bookhist()
+{
+// Book histograms
+//
+  static bool first = true;
+  if(first){
+    first = false;
+    int ii, nh = 1;
+    char titl[80], name[40];
+    string pathname =  "/BeamRecons/BMSrecond";
+    CsHistograms::SetCurrentPath(pathname);
+//
+      for(int i=0; i<nhod; i++){
+        ii=i+1;
+        sprintf(name,"BMS%4.4i",i+1);
+        sprintf(titl,"Number of hits, BMS%i, raw events",ii);
+        HiNhit[i] = new CsHist1D(name, titl, 71, 0, 70);
+        sprintf(name,"BMS%4.4i",i+5);
+        sprintf(titl,"Fired channels, BMS%i, raw events",ii);
+        HiFired[i] = new CsHist1D(name, titl, 65, 0, 64);
+        sprintf(name,"BMS%4.4i",i+9);
+        sprintf(titl,"Beam y-profile, BMS%i, raw events",ii);
+        HiProf[i] = new CsHist1D(name, titl, 64, -32*5, 32*5);
+        sprintf(name,"BMS%4.4i",i+13);
+        sprintf(titl,"Hit time distr., BMS%i, raw events",ii);
+        HiHtime[i] = new CsHist1D(name, titl, 100, -20, 20);
+//
+        sprintf(name,"BMS%4.4i",i+17);
+        sprintf(titl,"Hit time distribution, BMS%i, 1hit/hod events",ii);
+        HiHtime1[i] = new CsHist1D(name, titl, 100, -20, 20);
+        sprintf(name,"BMS%4.4i",i+21);
+        sprintf(titl,"Hittime distr.,BMS%i, 1hit/hod evnt, SPchiq cut",ii);
+        HiHtime2[i] = new CsHist1D(name, titl, 40, -20, 20);
+        sprintf(name,"BMS%4.4i",i+25);
+        sprintf(titl,"Time vs channel number, BMS%i, 1hit/hod events",ii);
+        HiTmVsHt[i] =  new CsHist2D(name, titl, 64, 0, 64, 40, -10, 10);
+//
+        sprintf(name,"BMS%4.4i",54+i);
+        sprintf(titl,"Hit distrb. for 4hit tracks, BMS%i",ii);
+        HiHpro4[i] =  new CsHist1D(name, titl, 64, 0, 64);
+        sprintf(name,"BMS%4.4i",58+i);
+        sprintf(titl,"Hit distrb. for 3hit tracks, BMS%i",ii);
+        HiHpro3[i] =  new CsHist1D(name, titl, 64, 0, 64);
+        sprintf(name,"BMS%4.4i",62+i);
+        sprintf(titl,"Track Y-profile, BMS%i",ii);
+        HiYpro4[i] =  new CsHist1D(name, titl, 64, -32*5, 32*5);
+//
+        sprintf(name,"BMS%4.4i",75+i);
+        sprintf(titl,"Hit distrb. for 1hit/hod tracks, BMS%i",ii);
+        HiHpro1[i] =  new CsHist1D(name, titl, 64, 0, 64);
+     }
+//
+        nh=29;
+        sprintf(name,"BMS%4.4i",nh++);
+        Hit0t1 = new CsHist2D(name, "BMS1 hittime vs BMS2 hittime, 1hit/hod events",
+                       40, -20, 20, 40, -20, 20);
+        sprintf(name,"BMS%4.4i",nh++);
+        Hit0t2 = new CsHist2D(name, "BMS1 hittime vs BMS3 hittime, 1hit/hod events",
+                       40, -20, 20, 40, -20, 20);
+        sprintf(name,"BMS%4.4i",nh++);
+        Hit0t3 = new CsHist2D(name, "BMS1 hittime vs BMS4 hittime, 1hit/hod events",
+                       40, -20, 20, 40, -20, 20);
+        sprintf(name,"BMS%4.4i",nh++);
+        Hit0t1dif  = new CsHist1D(name,"BMS1 hittime - BMS2 hittime, 1hit/hod events", 50, -20, 20);
+        sprintf(name,"BMS%4.4i",nh++);
+        Hit0t2dif  = new CsHist1D(name,"BMS1 hittime - BMS3 hittime, 1hit/hod events", 50, -20, 20);
+        sprintf(name,"BMS%4.4i",nh++);
+        Hit0t3dif  = new CsHist1D(name,"BMS1 hittime - BMS4 hittime, 1hit/hod events", 50, -20, 20);
+//
+        nh=40;
+        sprintf(name,"BMS%4.4i",nh++);
+        HiBmom4  = new CsHist1D(name, "BMS momemtum, 4hits tracks ", 100, 0, 250);
+        sprintf(name,"BMS%4.4i",nh++);
+        HiBmom3  = new CsHist1D(name, "BMS momemtum, 3hits trakcs ", 100, 0, 250);
+        sprintf(name,"BMS%4.4i",nh++);
+        HiTMchi4 = new CsHist1D(name, "BMS track time chiq, 4 hit tracks", 100, 0, 100);
+        sprintf(name,"BMS%4.4i",nh++);
+        HiTMchi3 = new CsHist1D(name, "BMS track time chiq, 3 hit tracks", 100, 0, 100);
+        sprintf(name,"BMS%4.4i",nh++);
+        HiSPchi4 = new CsHist1D(name, "BMS Track space chiq, 4 hit tracks", 100, 0, 100);
+        sprintf(name,"BMS%4.4i",nh++);
+        HiSPchi3 = new CsHist1D(name, "BMS Track space chiq, 3 hit tracks", 100, 0, 100);
+        sprintf(name,"BMS%4.4i",nh++);
+        HiTime4  = new CsHist1D(name, "BMS track time, 4 hit tracks", 40, -20, 20);
+        sprintf(name,"BMS%4.4i",nh++);
+        HiTime3  = new CsHist1D(name, "BMS track time, 3 hit tracks", 40, -20, 20);
+        sprintf(name,"BMS%4.4i",nh++);
+        HiNhtev  = new CsHist1D(name, "Number of BMS hits/track", 5, 0, 5);
+        sprintf(name,"BMS%4.4i",nh++);
+        HiN4h3h  = new CsHist2D(name, "Number of 4hit tracks vs >numb. of 3hit tracks",
+                       15, 0, 14, 15, 0, 14);
+//
+        nh=70;
+        sprintf(name,"BMS%4.4i",nh++);
+        HiBmom1  = new CsHist1D(name, "BMS momemtum, 1hit/hod events", 100, 0, 250);
+        sprintf(name,"BMS%4.4i",nh++);
+        HiTMchi1 = new CsHist1D(name, "BMS track time chiq, 1hit/hod events", 100, 0, 100);
+        sprintf(name,"BMS%4.4i",nh++);
+        HiSPchi1 = new CsHist1D(name, "BMS space chiq, 1hit/hod events", 100, 0, 100);
+        sprintf(name,"BMS%4.4i",nh++);
+        HiTime1  = new CsHist1D(name, "BMS track time, 1hit/hod events", 40, -20, 20);
+//
+  }
+} 
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//
+void CsBMSrecons::prntclb(ostream &out, double calib[][NBMSHODS]) const
+{
+      int ipl, i, j;
+      out << resetiosflags(ios::scientific);
+      out << setiosflags(ios::fixed|ios::showpoint);
+      out << setprecision(4); 
+      for(ipl=0; ipl<nhod; ipl++){
+            cout <<hodnames[ipl]<<" Nchanels:"<< hodsize[ipl] << endl;
+        for(j=0; j<hodsize[ipl]; ) {
+           for( i=0; (i<8)&&(j<hodsize[ipl]); i++, j++) out<<calib[j][ipl]<<"  ";
+           out << endl;
+        }
+      }
+}
+//
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void CsBMSrecons:: rawevprint(ostream &out) const
+//
+//   print raw BMS event         
+//
+{
+  int ipl, j, nchnl;
+  double time;
+// 
+  out << resetiosflags(ios::scientific);
+  out << setiosflags(ios::fixed|ios::showpoint);
+  out << setfill(' ');
+  out << setprecision(1) ;
+  out << "========================= raw  BMS event ====================" << endl;
+//
+  list<CsDigit*>::iterator Idig;
+  for(ipl=0; ipl<nhod; ipl++) {
+     if(!Id[ipl]) continue;
+     list<CsDigit*>digit = Id[ipl]->getMyDigits();
+     out << hodnames[ipl] << ":  total number of hits: " << digit.size() 
+           << "   Hits(channel/time):"<< endl;
+     if(!digit.size()) continue;
+     j=0;  
+     for( Idig = digit.begin(); Idig !=digit.end(); Idig ++ ) {
+          CsDigit* digWB = *Idig;
+	  nchnl = digWB->getAddress();
+    	  time  = digWB->getDatum();
+          out << setw(10) << nchnl 
+               << setw(7) << time;
+          j++; 
+          if(j==5) { j=0; out << endl;}
+     }
+     if(j!=0) out << endl;
+  } 
+  out << "------------------------- end raw  BMS event ----------------" << endl;
+  return;
+}
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void CsBMSrecons:: test(void)
+// for test purpuses
+{
+      int ipl,i,j,k,l,npart,part[30],ntrackf;
+      double tst[4][30];
+//
+            for(ipl=0; ipl<4; ipl++){
+            input_file >> khit16[ipl];
+              if(khit16[ipl]) {
+	        for(i=0; i<khit16[ipl]; i++) input_file >> ibmz16[i][ipl]; 
+	        for(i=0; i<khit16[ipl]; i++) input_file >> tbmz16[i][ipl];
+              } 
+            }
+            nfired=0;
+            for(i=0;i<nhod;i++) {if(khit16[i]>0) nfired++;}
+//
+            for(ipl=0; ipl<4; ipl++){
+            cout << "BMS plane, khit: "<< ipl<< "   "<< khit16[ipl]<<endl;
+              if(khit16[ipl]) {
+	        for(i=0; i<khit16[ipl]; i++) cout << ibmz16[i][ipl]<<" "; 
+                cout << endl;
+	        for(i=0; i<khit16[ipl]; i++) cout << tbmz16[i][ipl]<<" ";
+                cout << endl;
+              } 
+            }
+//          
+            input_file >> ntrackf;
+            cout<< "BMS:: found  " << ntrackf << endl;
+            if(ntrackf) {
+               for(i=0; i<ntrackf; i++) {
+                input_file  >> part[i] >> tst[0][i] 
+                            >> tst[1][i] >> tst[2][i] >> tst[3][i]; 
+                cout << part[i] << "  " << tst[0][i] << "  " 
+                     << tst[3][i] << "  " << tst[1][i] << "  " << tst[2][i] << endl;; 
+
+               }
+            }
+   cout << "end BMS input" << endl;
+   tstdecode();
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+void CsBMSrecons:: tstdecode(void)
+//
+//   decode, calibrate and cut BMS data (use just for test)        
+//
+{
+         int ipl, i, ll, nhit, nhit1;
+         double tm;
+         nfired=0; 
+         for(ipl=0; ipl<nhod; ipl++){
+            nhit=khit16[ipl];
+            nhit1=0;    
+            for(i=0; i<nhit; i++) {
+                ll=ibmz16[i][ipl]-1;                           //  Changed to move to zero channel count base
+                if(ll<=hodsize[ipl]) {
+                  tm=tbmz16[i][ipl];
+//
+                  if(fabs(tm)>BMSpar[0]) continue;         //   time window cut   
+                  zhit16[nhit1][ipl]=BMStable[ll][ipl];    //save good hit
+                  tbmz16[nhit1][ipl]=tm;
+                  ibmz16[nhit1][ipl]=ll;
+                  iflc16[nhit1][ipl]=1;
+                  nhit1++;
+                }
+            }
+            khit16[ipl]=nhit1;
+            if(nhit1) nfired++;
+         } 
+//
+}

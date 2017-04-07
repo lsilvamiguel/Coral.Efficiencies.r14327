@@ -1,0 +1,6 @@
+
+      REAL  posx,posy,phf
+      INTEGER  NFEEDMAX
+      PARAMETER(NFEEDMAX=100000)
+c
+      COMMON / DSTART / posx(NFEEDMAX),posy(NFEEDMAX),phf(NFEEDMAX)
